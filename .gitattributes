@@ -1,0 +1,2 @@
+# Preserve copied upstream legal texts byte-for-byte (hash-checked in notices.json).
+third_party/licenses/** -whitespace

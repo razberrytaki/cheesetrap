@@ -1,0 +1,563 @@
+{
+  "schema_version": 1,
+  "limits": {
+    "record": 262144,
+    "body": 16384,
+    "uri": 8192,
+    "headers": 16384
+  },
+  "common_fields": {
+    "event_id": "UNASSIGNED (JSON null): installation-immutable identity assigned by the M1 transaction, never an engine field or content hash.",
+    "ingestion_seq": "UNASSIGNED (JSON null): installation commit order assigned by the M1 transaction with its checkpoint.",
+    "schema_version": "Adapter constant 1; input schema_version is ignored.",
+    "sensor_id": "Verified local Context.SensorID; input sensor_id is ignored.",
+    "engine": "Adapter constant cowrie or web; input engine is ignored.",
+    "observed_at": "Engine timestamp parsed as RFC3339Nano and normalized to UTC. Missing/invalid timestamps stay null and are flagged. More than 5 minutes after the optional local ReferenceTime is flagged.",
+    "ingested_at": "UNASSIGNED (JSON null): DB collection time assigned by M1. Neither engine timestamp nor local ReferenceTime stands in for a committed collection time.",
+    "source_ip": "Socket-observed src_ip (Cowrie) or peer_ip (web), parsed by net/netip and Unmap. Headers, body, query, input source_ip and forwarded claims cannot set this field.",
+    "source_port": "Socket-observed src_port (Cowrie) or peer_port (web); 1..65535. Missing remains 0 with source_missing, never replaced with a client local port or forwarded value.",
+    "destination_ip": "Context.PublicIP only after exact normalized observed destination IP AND port match Context.ObservedIP/ObservedPort for this sensor and service. Raw container address is never published as destination.",
+    "destination_port": "Context.PublicPort only after the same verified endpoint match. A missing raw endpoint leaves public destination unassigned with destination_missing; mismatch is rejected.",
+    "service": "Verified local Context.Service (ssh/http/https). Cowrie requires ssh; web protocol must match the configured service.",
+    "event_type": "Allowlisted Cowrie eventid TYPE, or exact web event_type=web.request. Cowrie eventid is not a unique engine event identity.",
+    "session_id": "Cowrie session supplied by engine, bounded structural identifier; absent session is flagged. Web has no session identifier in this envelope.",
+    "attributes": "Typed allowlist of redacted credentials/command or method/URI/headers/body/parser metadata. Nullable unavailable fields are omitted, observed empty strings/arrays retained; field_completeness records web availability. Freeform messages and unknown fields/reasons are omitted.",
+    "source_cursor": "Trusted local Context.Cursor: file_generation_id plus byte_offset at record start. Neither supported engine provides a stable unique event ID. Equal bytes at different positions remain distinct observations.",
+    "raw_hash": "SHA-256 of exact supplied incoming record bytes BEFORE redaction/normalization. Fixture tests supply each JSONL line excluding LF; offsets include LF. Caller-supplied LF/whitespace is hashed if included. This detects byte changes, does not attest truth, and must never be a deduplication key.",
+    "quality_flags": "Fixed adapter enums plus allowlisted engine quality/parser flags; unknown strings become generic flags without copying text. Truncation, unavailable fields, parse limits, metadata contradictions, time anomalies, redaction limits and trusted collection gaps remain visible.",
+    "is_test": "Trusted local Context.IsTest only. Raw is_test/auto_report_eligible, HTTP headers/query/body and Cowrie input cannot assign test provenance."
+  },
+  "engines": [
+    {
+      "engine": "cowrie",
+      "fixture": "cowrie/events.jsonl",
+      "expected": "cowrie/expected.json",
+      "fixture_sha256": "0cda5f2fa324b874607734c1a48b4a23cab200a7c9c438a4d2bae3e26558e83a",
+      "original_raw_sha256": "3bdb41e9729ab67ffcf2bc1533f100351aa0a7504afa231f8402fd7872f81b07",
+      "row_count": 18,
+      "destinations": [
+        {
+          "service": "ssh",
+          "observed_ip": "172.30.0.2",
+          "observed_port": 2222,
+          "public_ip": "192.0.2.10",
+          "public_port": 2222
+        }
+      ],
+      "rows": [
+        {
+          "line": 1,
+          "byte_offset": 0,
+          "raw_hash": "ddfeeba4ce1d317f6a2477299e9a5db59560e5a94c331778eb097a13bb8aba14",
+          "engine_quality_flags": []
+        },
+        {
+          "line": 2,
+          "byte_offset": 183,
+          "raw_hash": "9ec86a990425f27a98721bb0d7e66c4fb3569ea2fe59f0b1ff469f06a6af7d17",
+          "engine_quality_flags": []
+        },
+        {
+          "line": 3,
+          "byte_offset": 365,
+          "raw_hash": "f2e99415b05a6bf7b4f10a58a164b0eb66cbc720ab24a9435962a93fcfb34242",
+          "engine_quality_flags": []
+        },
+        {
+          "line": 4,
+          "byte_offset": 548,
+          "raw_hash": "5563dc4a7a549076f62535a6384417f8b4d269008806daf049b2db3bf76dc64a",
+          "engine_quality_flags": []
+        },
+        {
+          "line": 5,
+          "byte_offset": 730,
+          "raw_hash": "0f4e0b06e09afefcb2d2918538ddfbd63a141e644f563e72ea3746abc191e9c6",
+          "engine_quality_flags": []
+        },
+        {
+          "line": 6,
+          "byte_offset": 908,
+          "raw_hash": "769e318d8603a6e064ddd1b4a8d0dbedd3bf144110e915f555a535303cf27e7c",
+          "engine_quality_flags": []
+        },
+        {
+          "line": 7,
+          "byte_offset": 1141,
+          "raw_hash": "6bce93099f98c9b8dcc573b2735b245e2c5d502558ab71bc259306a334ca1e07",
+          "engine_quality_flags": []
+        },
+        {
+          "line": 8,
+          "byte_offset": 1323,
+          "raw_hash": "668cf37c33bcaebd91310212e9f0ff4359133514ef1efe0b684861d847ce2eda",
+          "engine_quality_flags": []
+        },
+        {
+          "line": 9,
+          "byte_offset": 1506,
+          "raw_hash": "99a033c0bcd2af2799311e720c1406e9398593a7e92449c27c2764538b607310",
+          "engine_quality_flags": []
+        },
+        {
+          "line": 10,
+          "byte_offset": 1688,
+          "raw_hash": "633cd32dc580c06d1a3ba6e88c1479b129630c8f0c4cd22a73cd185ad076ccbb",
+          "engine_quality_flags": []
+        },
+        {
+          "line": 11,
+          "byte_offset": 1866,
+          "raw_hash": "e3b7c9d7c381a517e4a3298574632fc30dc2d322ad2ff9ad9f1d7d6175aeff11",
+          "engine_quality_flags": []
+        },
+        {
+          "line": 12,
+          "byte_offset": 2089,
+          "raw_hash": "16b616b5dcc503e7297e7c57f9decae4955b710479d089d334259621c6d9fcf0",
+          "engine_quality_flags": []
+        },
+        {
+          "line": 13,
+          "byte_offset": 2271,
+          "raw_hash": "5a8520ac8eadf547c420cd6bc96ce1090919be0f012ff1e9d971d43c2a17735f",
+          "engine_quality_flags": []
+        },
+        {
+          "line": 14,
+          "byte_offset": 2479,
+          "raw_hash": "4ddf423be397487913748f1e8ab38e0b31efbf5410c9a31fb656bf8496030309",
+          "engine_quality_flags": []
+        },
+        {
+          "line": 15,
+          "byte_offset": 2675,
+          "raw_hash": "72a9857f406fae4341bc3b0f560dd1ac276acd042f0c7efe7126a3bf324224fb",
+          "engine_quality_flags": []
+        },
+        {
+          "line": 16,
+          "byte_offset": 2871,
+          "raw_hash": "aecd9eb2251078fa0b116f72da603d19c27e29ff072a87edcdfa108548d4eede",
+          "engine_quality_flags": []
+        },
+        {
+          "line": 17,
+          "byte_offset": 3074,
+          "raw_hash": "d530cfad626298b501e2d016339dd7c263d47a22a1689e3fb94f44a3fa35892e",
+          "engine_quality_flags": []
+        },
+        {
+          "line": 18,
+          "byte_offset": 3252,
+          "raw_hash": "39394eed7ff1d51b09ba830fe9f356feb4189cb4b5f72a2d175a682922d95a88",
+          "engine_quality_flags": []
+        }
+      ],
+      "provenance_kind": "sanitized-real-engine-run",
+      "source_run_id": "ctm0-b3689264",
+      "original_run_sha256": "6b96660b8dec385308cb2c9357ff98a9fe1c2ed930dc1a0d7f2475c95ce193bb",
+      "hash_scope": "fixture_sha256 hashes the committed sanitized JSONL including LF; original_raw_sha256 hashes private original engine bytes, a distinct provenance fact. Row raw_hash hashes only the committed fixture record supplied to this adapter.",
+      "field_mapping": {
+        "timestamp": "observed_at",
+        "eventid": "event_type (TYPE, not unique identity)",
+        "session": "session_id",
+        "src_ip/src_port": "source_ip/source_port",
+        "dst_ip/dst_port": "exact observed-endpoint match against Context, then destination_ip/destination_port from Context public mapping",
+        "username/password": "attributes.username/password = [REDACTED]",
+        "input": "redacted attributes.command",
+        "message/unknown fields": "omitted",
+        "engine stable event ID": "unavailable; use local file generation and byte offset"
+      },
+      "original_per_record_hashes": "Not present in existing expected.json; do not invent from sanitized fixture bytes."
+    },
+    {
+      "engine": "web",
+      "fixture": "web/events.jsonl",
+      "expected": "web/expected.json",
+      "fixture_sha256": "08e3ffbe5317a4bb531d893bd172804890b29d83c4980d363d511da5462d5179",
+      "original_raw_sha256": "4abe7691d39989b3c79324f6942d981efb91f0ae8d40c5a0e69de89e8e610cd5",
+      "row_count": 38,
+      "destinations": [
+        {
+          "service": "http",
+          "observed_ip": "172.30.0.2",
+          "observed_port": 8080,
+          "public_ip": "192.0.2.10",
+          "public_port": 18080
+        },
+        {
+          "service": "https",
+          "observed_ip": "172.30.0.2",
+          "observed_port": 8443,
+          "public_ip": "192.0.2.10",
+          "public_port": 18443
+        }
+      ],
+      "rows": [
+        {
+          "line": 1,
+          "byte_offset": 0,
+          "raw_hash": "d822699b3985de625fa02adc67f542b77d4dfae2a6e54bd85a280906b91f87c5",
+          "engine_quality_flags": [],
+          "original_engine_record_sha256": "79bd8eae216a0402c7b072dd384b5347d327de6c4a5dba368a253b4d5c7ccd29"
+        },
+        {
+          "line": 2,
+          "byte_offset": 1313,
+          "raw_hash": "9711f358d6b8f46a28aebd782e38672fd6dfc9fa719aa92f83de834607302b06",
+          "engine_quality_flags": [],
+          "original_engine_record_sha256": "7491f1355d84cf36c95d159da8ccf6d7a769a876da298e224e2d51403f770a89"
+        },
+        {
+          "line": 3,
+          "byte_offset": 2655,
+          "raw_hash": "1c897872adbec559efaf30259811e40ad154947055d65b0b2b13c1b3399b6e08",
+          "engine_quality_flags": [],
+          "original_engine_record_sha256": "9af3b31ee9c2fd29649af33a5ae91ee5682d05181ccb660a813b62b723a24b3f"
+        },
+        {
+          "line": 4,
+          "byte_offset": 4015,
+          "raw_hash": "487846c29d93aa626b5b00dce0ac7d2b50d6160bfbbc5f941a28fd54b79b2b22",
+          "engine_quality_flags": [],
+          "original_engine_record_sha256": "87d918d45b2692afae228f779773bdfe3ca7f8154458cd533c50c641c7edb77e"
+        },
+        {
+          "line": 5,
+          "byte_offset": 5439,
+          "raw_hash": "ba4872f7214e9f1d0f43fddcb97591dd41c04e2c7c045fd93f4c3ee3ba325a9f",
+          "engine_quality_flags": [
+            "malformed_http",
+            "required_field_unavailable"
+          ],
+          "original_engine_record_sha256": "3a18456ed1a663dd76a1677ba6f87e3c8acc9f3596b7def53c221d8ba3e401df"
+        },
+        {
+          "line": 6,
+          "byte_offset": 6837,
+          "raw_hash": "5504a6229f75e593308853fb8956790aedd8e422bdbc10f7474a74fa9b58d269",
+          "engine_quality_flags": [
+            "body_truncated"
+          ],
+          "original_engine_record_sha256": "f9799ac9c6d546e0e52bf6a38f73d1a71de9d044740d33498cef2723c40661e6"
+        },
+        {
+          "line": 7,
+          "byte_offset": 24656,
+          "raw_hash": "b0e6ceef8cc9585d34402dd28548235f17314e1e7d40909584c37e3c3185e1f0",
+          "engine_quality_flags": [
+            "required_field_unavailable",
+            "uri_limit",
+            "uri_truncated"
+          ],
+          "original_engine_record_sha256": "98f085dd75d97f393815735bc6d3fabde2e3a1abd3c74d54fa702fb5250949f8"
+        },
+        {
+          "line": 8,
+          "byte_offset": 34233,
+          "raw_hash": "cab05d6d0c686388d8880d86f896660173c384bff4f6509344bb2405325377b4",
+          "engine_quality_flags": [
+            "line_limit",
+            "required_field_unavailable"
+          ],
+          "original_engine_record_sha256": "398a2a9384872ca5111bc33b4bf0cc56a77561f456157b1514332c2c40e7076c"
+        },
+        {
+          "line": 9,
+          "byte_offset": 35613,
+          "raw_hash": "1ebf5026938395b9d0fb039403169df9770ae6019e7ba80ae4e5722cbb15bd4f",
+          "engine_quality_flags": [
+            "body_truncated"
+          ],
+          "original_engine_record_sha256": "b7a699968e68203074ace1b8b013b21a58ce586534f8c1801e58ee5e34a968e9"
+        },
+        {
+          "line": 10,
+          "byte_offset": 53434,
+          "raw_hash": "842002fcc0935e6f79d81e7d7822baed5cf22332fc80d3972f54de6b912daf41",
+          "engine_quality_flags": [],
+          "original_engine_record_sha256": "a8cd77240e0b681c95b407a1ed05b128b7521561ff4186c08feebd5900dfc582"
+        },
+        {
+          "line": 11,
+          "byte_offset": 54838,
+          "raw_hash": "33c57b90ee5517bc760b188fecc39ced5c50cc7a00a85128370611f709ca2bc1",
+          "engine_quality_flags": [],
+          "original_engine_record_sha256": "c60f7a03cf13391d1e7aba826cb185fed3dbb7438c75e59f992881c86ba03fbb"
+        },
+        {
+          "line": 12,
+          "byte_offset": 56217,
+          "raw_hash": "8a07a9bdaee6af5bf13004bd3238aeae6b0bf7cdd78c24d6cc349ba6ae820245",
+          "engine_quality_flags": [],
+          "original_engine_record_sha256": "3244964c9babfa1de52f8bc53174f1cc118a5949413fd61b7fca490fbb6aee16"
+        },
+        {
+          "line": 13,
+          "byte_offset": 57574,
+          "raw_hash": "5ae2d33bd47e4567cafb738b6359d35aba9c4c6318f8136e6353c19c5693d297",
+          "engine_quality_flags": [],
+          "original_engine_record_sha256": "e4894da9844a1d3fe9872840c9b7152386b4ccda43a4b3ea3646f1d05ea0a468"
+        },
+        {
+          "line": 14,
+          "byte_offset": 58888,
+          "raw_hash": "aac1f8c3f327940e3c395ca2504a1a47fc2c5391411dcc7f1b587d5d87dc0693",
+          "engine_quality_flags": [],
+          "original_engine_record_sha256": "bbf2c10475efb8ab93b5da7b5e5b5b9070fff80adbe5b1a6d57e2cc9ef3552da"
+        },
+        {
+          "line": 15,
+          "byte_offset": 60231,
+          "raw_hash": "a15b757f639f92a1739973694b358d09d41fa6209bc4f2094487c8fdf3db2479",
+          "engine_quality_flags": [],
+          "original_engine_record_sha256": "e6deb364e9defae49547387ff57028ec83d080b9361c635a81738c94b1ded99b"
+        },
+        {
+          "line": 16,
+          "byte_offset": 61592,
+          "raw_hash": "0df4c5e35b17556ee1b183c41f81fd400b87e2a34b49ebe0dac1d6117a0fa126",
+          "engine_quality_flags": [],
+          "original_engine_record_sha256": "127c673c5c6c2e3d6647007dff48609c6b911e96eb957d839f222067c22fc95f"
+        },
+        {
+          "line": 17,
+          "byte_offset": 63017,
+          "raw_hash": "a8e546053d1e1dd93707eeaec3726e4aa410de0fb1a8897d14e244a5e94b3362",
+          "engine_quality_flags": [
+            "malformed_http",
+            "required_field_unavailable"
+          ],
+          "original_engine_record_sha256": "59081716d1563672e787374f5b9e9685f1d123cfdd740d0abfbad96dec3b3402"
+        },
+        {
+          "line": 18,
+          "byte_offset": 64417,
+          "raw_hash": "afca4e7263481cdf8c61165b2e2a2913b50fac700339dd3a168452f4cb96528c",
+          "engine_quality_flags": [
+            "body_truncated"
+          ],
+          "original_engine_record_sha256": "ad04f844b9632da9ce11f6cc92513748b527d3e87c24fb5c1c5775efa65abaf5"
+        },
+        {
+          "line": 19,
+          "byte_offset": 82237,
+          "raw_hash": "b6271ac8e4cec2feb6048b2c8d0e3082f40d820ad989b5d5b997d1c40670dfd3",
+          "engine_quality_flags": [
+            "required_field_unavailable",
+            "uri_limit",
+            "uri_truncated"
+          ],
+          "original_engine_record_sha256": "02c920f7fcc1d0cd43318a57b4f3546db04a07e98475b51ecf1bc9a2381850c0"
+        },
+        {
+          "line": 20,
+          "byte_offset": 91815,
+          "raw_hash": "41e9058e89d32af6903365a03f514c3726f6abd662808c6a057fa328019baa83",
+          "engine_quality_flags": [
+            "line_limit",
+            "required_field_unavailable"
+          ],
+          "original_engine_record_sha256": "1e02668af5a635df4b574e671f3841c211f1f96522f85d2de7793f30be206b6e"
+        },
+        {
+          "line": 21,
+          "byte_offset": 93196,
+          "raw_hash": "2aa5ecfa56c0070175406bd27b3618827959ec7e836a058170f07df01708fca6",
+          "engine_quality_flags": [
+            "body_truncated"
+          ],
+          "original_engine_record_sha256": "842c68ae010c4f5eb5d4e9034f7a01d1c464603c8ef03952b61b042db2cee7aa"
+        },
+        {
+          "line": 22,
+          "byte_offset": 111018,
+          "raw_hash": "e603954c3d4503dc8f248eb0f0c87aa5f381281111cd5338ddf5df80c5380e38",
+          "engine_quality_flags": [],
+          "original_engine_record_sha256": "85d9c938b59f2c57ae5af5457ffff9517a54b06e147bdd7a768e9ecdf2f3ff63"
+        },
+        {
+          "line": 23,
+          "byte_offset": 112423,
+          "raw_hash": "1a11e54028c17594db801b954278b8d6f0c7a276217ce9b1215b2c304ed97b66",
+          "engine_quality_flags": [],
+          "original_engine_record_sha256": "ce8d751f5ed7f30ed4548c3b1cb2d553482063bc3520dfd0e2e4cba63fe28372"
+        },
+        {
+          "line": 24,
+          "byte_offset": 113803,
+          "raw_hash": "8e34046a88d897ccc617d17a256c42daf1462b0475ba79d307d23ef420e722a8",
+          "engine_quality_flags": [],
+          "original_engine_record_sha256": "37c049bc8aed7a02f3be5315ae2a76aedec3208bfcb0571ca9db9b07fc50b629"
+        },
+        {
+          "line": 25,
+          "byte_offset": 115161,
+          "raw_hash": "a40fef46995db4a9462e6127d4c72f1f435110ed2ef16225f6d7ab42c40d9152",
+          "engine_quality_flags": [],
+          "original_engine_record_sha256": "3018f7bbbf81b30365ab4c6ad9ef2ffcf78b313825683bcceffc300fd224371d"
+        },
+        {
+          "line": 26,
+          "byte_offset": 116486,
+          "raw_hash": "f21f31c870a865f0912331800ae009f2d98af4e332e79fe823961e2dda85b6e4",
+          "engine_quality_flags": [
+            "body_redacted",
+            "headers_redacted"
+          ],
+          "original_engine_record_sha256": "35a5e33cf79c0e252e9f793b7321de03c74f1dadf027fb38ed921a8436b23a38"
+        },
+        {
+          "line": 27,
+          "byte_offset": 118133,
+          "raw_hash": "1be5744d2c4f50e48c5cce77f0ca396105c27301d47a6b24e9b1b483409c0da0",
+          "engine_quality_flags": [],
+          "original_engine_record_sha256": "89667357ca1aee7e800f7a4f13075d8e0f4adc9ea0e555dc0fee28607a1c949f"
+        },
+        {
+          "line": 28,
+          "byte_offset": 119548,
+          "raw_hash": "4ad8f2c3d5da00cee50a63d736559d0343ee271e2af906b36707a797e8146162",
+          "engine_quality_flags": [
+            "client_disconnect"
+          ],
+          "original_engine_record_sha256": "4d33fd7f2c5685f7ff5d4ff2c4196704dffea6afcb01e961564366cf53767599"
+        },
+        {
+          "line": 29,
+          "byte_offset": 121001,
+          "raw_hash": "99e07b634f8768703a6c98eeb781f56518625b70ddc226e2e89e4ceb9036f9c6",
+          "engine_quality_flags": [
+            "malformed_http",
+            "required_field_unavailable"
+          ],
+          "original_engine_record_sha256": "d6a7eeabe4286936b121753da29913821228b3eeeaa39d45c1fffc58aad7c11c"
+        },
+        {
+          "line": 30,
+          "byte_offset": 122418,
+          "raw_hash": "113c6a862731457910b59286b20feb2d9fd4cf0462811ba5151042e460fa66cd",
+          "engine_quality_flags": [
+            "body_redacted",
+            "body_truncated"
+          ],
+          "original_engine_record_sha256": "07731babda12c99a64454dd63ebcb020cb66fac866c4b66153e7233c31619228"
+        },
+        {
+          "line": 31,
+          "byte_offset": 123912,
+          "raw_hash": "a5d57c684128d36504ab95c6030a4aeea7483749772102fd2714626f926c775f",
+          "engine_quality_flags": [
+            "body_redacted",
+            "body_truncated"
+          ],
+          "original_engine_record_sha256": "86dd544d5201a3ce814f3cec342588ff6302a852eb51f6dae7317e306364f29a"
+        },
+        {
+          "line": 32,
+          "byte_offset": 125425,
+          "raw_hash": "f83ffece236e645f03babc067fecef91db63bec5d5e6be38a44fe493ea8d0d79",
+          "engine_quality_flags": [],
+          "original_engine_record_sha256": "a8b281c4eae1a19127412de37d38f2524aff570061184e9b48114f0812689670"
+        },
+        {
+          "line": 33,
+          "byte_offset": 126751,
+          "raw_hash": "0232b797bd3372e8e75d31d87318ec8e0ae828d41b25c625e909956c7a022f4b",
+          "engine_quality_flags": [
+            "body_redacted",
+            "headers_redacted"
+          ],
+          "original_engine_record_sha256": "a027377c65f7a6c9b46f46689dbe3296279f70c92e2380c6fc68258e55731366"
+        },
+        {
+          "line": 34,
+          "byte_offset": 128399,
+          "raw_hash": "9c868cf71b8d3e4f3c24d893cc5a8734cd7756dda303c24dbe7d9a8e36a737d3",
+          "engine_quality_flags": [],
+          "original_engine_record_sha256": "9315da83a0a2cb24602f3b46249e2af05f730ce83c7877850690c7389d6317ca"
+        },
+        {
+          "line": 35,
+          "byte_offset": 129816,
+          "raw_hash": "dc355c74e9ffb54e7cfeedd0406121875c4438cc7e0a3af1aa28aa2074ce545a",
+          "engine_quality_flags": [
+            "client_disconnect"
+          ],
+          "original_engine_record_sha256": "8a73a571aca270f02a13fd952bbe8bfe2f030e1d6926f6223230029d8d382392"
+        },
+        {
+          "line": 36,
+          "byte_offset": 131270,
+          "raw_hash": "ff743191168d99b1f27b279540164897baaf2bc8c2c28824390e28407d641797",
+          "engine_quality_flags": [
+            "malformed_http",
+            "required_field_unavailable"
+          ],
+          "original_engine_record_sha256": "52101ee3b326df9465f4ee48d371b90a26ee024be4ade81458159ea624288cd1"
+        },
+        {
+          "line": 37,
+          "byte_offset": 132689,
+          "raw_hash": "60451dfceb9b2d40960abd5a6e56bd1d2b8031f25a638952426782a287fb04b3",
+          "engine_quality_flags": [
+            "body_redacted",
+            "body_truncated"
+          ],
+          "original_engine_record_sha256": "4d1677e69c7eafc2bb2598108ab73fcffce812cdd42f69021b6ef2e4bb72c7b4"
+        },
+        {
+          "line": 38,
+          "byte_offset": 134184,
+          "raw_hash": "63e273a49fc12e1d58c1cfa2898ad62bfa9cc0806ea869ef8ab5185b4a8c2087",
+          "engine_quality_flags": [
+            "body_redacted",
+            "body_truncated"
+          ],
+          "original_engine_record_sha256": "798960f30a0fe0953b23c8d0e9edcdd19a4d4187d5a41ec9e57f91c630572836"
+        }
+      ],
+      "provenance_kind": "sanitized-real-engine-run",
+      "source_run_id": "ctm0-57e7ccd5",
+      "original_run_sha256": "cddacc3d2053c8f852dd28c6479f5445d1b33df2a25fc28d773fd580f2f3fb63",
+      "hash_scope": "fixture_sha256 hashes the committed sanitized JSONL including LF; original_raw_sha256 hashes private original engine bytes, a distinct provenance fact. Row raw_hash hashes only the committed fixture record supplied to this adapter.",
+      "field_mapping": {
+        "timestamp": "observed_at",
+        "event_type": "event_type=web.request",
+        "protocol": "must match Context.Service",
+        "peer_ip/peer_port": "source_ip/source_port",
+        "destination_ip/destination_port": "exact observed-endpoint match against Context, then public destination mapping",
+        "method/uri/headers/body": "bounded redacted attributes; null stays unavailable",
+        "parse_error": "allowlisted attributes.parse_error and quality; unknown text omitted",
+        "field_completeness": "derived safe field availability, metadata absence/contradiction flagged; arbitrary source/reason text omitted",
+        "truncation": "original engine counts preserved separately from adapter clipping flags",
+        "quality_flags": "fixed allowlist; unknown flags replaced by engine_quality_unknown",
+        "auto_report_eligible/is_test": "ignored; test provenance only from Context.IsTest",
+        "wire_sha256/wire_bytes": "omitted from canonical attributes; these describe received wire bytes, not raw_hash of the record",
+        "engine stable event ID/session ID": "unavailable; use local file generation and byte offset"
+      }
+    }
+  ],
+  "contract": "docs/decisions/0001-honeypot-engines.md; pre-commit adapter evidence only",
+  "limit_policy": {
+    "record": "Reject input over 262144 bytes, invalid UTF-8, malformed/nonobject/trailing JSON, duplicate or case-colliding object keys, or nesting deeper than 64 with fixed payload-free errors.",
+    "uri": "At most 8192 bytes. Oversize or ambiguous percent/query parsing is withheld, with uri_truncated and/or uri_redaction_limited flags; secret query values and URL userinfo are removed.",
+    "headers": "At most 16384 original bytes total, counting name + value + 4 framing bytes per header; retain whole headers only. Known authentication/cookie/token values are redacted. Forwarded headers may remain attributes but never influence source. Redacted output header bytes are independently capped at the same limit because markers can increase short values.",
+    "body": "At most 16384 bytes. JSON and form bodies are structurally redacted; truncated structured bodies, malformed/duplicate JSON, ambiguous encodings, unsupported media types and content codings are withheld with body_redaction_limited. Safe plain text and nonsecret structured values remain evidence. Non-UTF-8/non-ASCII declared charset, content-transfer-encoding and structured data labeled plain text are also withheld.",
+    "command": "At most 16384 bytes. Known credential labels/options (including attached -pVALUE and -uUSER:VALUE) and encoding ambiguity withhold the command with quality flags. Any single quote, double quote or backslash withholds the whole command with command_redacted and command_redaction_limited because the adapter does not interpret shell quoting or escapes. Ordinary unambiguous nonsecret commands remain evidence. This is not universal shell credential detection.",
+    "engine_truncation": "attributes.truncation preserves valid original engine limit/observed/retained/truncated values. Retained counts precede engine/fixture redaction and need not equal the length of redacted strings. Adapter clipping is indicated separately by adapter_uri_limit, adapter_headers_limit or adapter_body_limit; no original byte count is overwritten."
+  },
+  "trust_boundary": "These functions consume envelopes written by the verified engine, not arbitrary network JSON as authoritative transport metadata. The engine remains the source of socket observations; raw_hash does not make a dishonest engine trustworthy. There is no network I/O, code execution, DB, API, report dispatch or River integration.",
+  "missing_information": [
+    "Installation event identity, commit ordering, DB collection time and atomic checkpoint assignment remain M1 responsibilities.",
+    "Both envelopes lack a stable unique engine event ID; collector must establish file generations and start offsets, including rotation/truncation handling in M1.",
+    "Redacted or withheld evidence cannot reconstruct the original secret. Structured ambiguity is explicitly limited, not represented as complete evidence.",
+    "Public destination mappings are verified local settings; no public destination is inferred from internal addresses, request Host headers or attacker claims.",
+    "ReferenceTime is optional local clock evidence; absent reference is flagged time_reference_unavailable. Missing/invalid observed time is never replaced by collection time.",
+    "Cowrie fixtures were sanitized before this adapter and omit freeform messages, client version details and other fields outside the exporter allowlist.",
+    "Web malformed/limited cases contain unavailable fields, and body/URI/header truncation remains incomplete. An event is not automatically report-eligible merely because it decodes.",
+    "Supported runtime validation remains Linux ARM64 and public IPv4. IPv6 and IPv4-mapped IPv6 normalization are unit-level evidence only; public IPv6 is NOT_SUPPORTED.",
+    "These offline adapters do not validate M0-06 overall GO, durability, report rules, authenticity, arbitrary future engine event schemas or unknown credential formats."
+  ]
+}

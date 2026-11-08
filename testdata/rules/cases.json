@@ -1,0 +1,634 @@
+[
+  {
+    "name": "ssh_9",
+    "groups": [
+      {
+        "count": 9,
+        "step_second": 1
+      }
+    ],
+    "rule": "",
+    "evidence_count": 0,
+    "distinct_paths": 0,
+    "hold": ""
+  },
+  {
+    "name": "ssh_10",
+    "groups": [
+      {
+        "count": 10,
+        "step_second": 1
+      }
+    ],
+    "rule": "SSH-REPEAT",
+    "evidence_count": 10,
+    "distinct_paths": 0,
+    "hold": ""
+  },
+  {
+    "name": "web_19_5_paths",
+    "groups": [
+      {
+        "count": 19,
+        "kind": "web",
+        "paths": [
+          "/.env",
+          "/.git/config",
+          "/wp-login.php",
+          "/wp-admin",
+          "/phpmyadmin"
+        ]
+      }
+    ],
+    "rule": "",
+    "evidence_count": 0,
+    "distinct_paths": 0,
+    "hold": ""
+  },
+  {
+    "name": "web_20_4_paths",
+    "groups": [
+      {
+        "count": 20,
+        "kind": "web",
+        "paths": [
+          "/.env",
+          "/.git/config",
+          "/wp-login.php",
+          "/wp-admin"
+        ]
+      }
+    ],
+    "rule": "",
+    "evidence_count": 0,
+    "distinct_paths": 0,
+    "hold": ""
+  },
+  {
+    "name": "web_20_5_paths",
+    "groups": [
+      {
+        "count": 20,
+        "kind": "web",
+        "paths": [
+          "/.env",
+          "/.git/config",
+          "/wp-login.php",
+          "/wp-admin",
+          "/phpmyadmin"
+        ]
+      }
+    ],
+    "rule": "WEB-REPEAT",
+    "evidence_count": 20,
+    "distinct_paths": 5,
+    "hold": ""
+  },
+  {
+    "name": "normal_bulk",
+    "groups": [
+      {
+        "count": 100,
+        "kind": "web",
+        "paths": [
+          "/",
+          "/news",
+          "/products",
+          "/contact",
+          "/about"
+        ]
+      }
+    ],
+    "rule": "",
+    "evidence_count": 0,
+    "distinct_paths": 0,
+    "hold": ""
+  },
+  {
+    "name": "single_404",
+    "groups": [
+      {
+        "count": 1,
+        "kind": "web",
+        "paths": [
+          "/does-not-exist"
+        ]
+      }
+    ],
+    "rule": "",
+    "evidence_count": 0,
+    "distinct_paths": 0,
+    "hold": ""
+  },
+  {
+    "name": "single_auth_failure",
+    "groups": [
+      {
+        "count": 1
+      }
+    ],
+    "rule": "",
+    "evidence_count": 0,
+    "distinct_paths": 0,
+    "hold": ""
+  },
+  {
+    "name": "late_1201_to_1209_then_1200",
+    "groups": [
+      {
+        "count": 9,
+        "start_second": 60,
+        "step_second": 60
+      },
+      {
+        "count": 1
+      }
+    ],
+    "rule": "SSH-REPEAT",
+    "evidence_count": 10,
+    "distinct_paths": 0,
+    "hold": ""
+  },
+  {
+    "name": "inclusive_exact_10_minutes",
+    "groups": [
+      {
+        "count": 9
+      },
+      {
+        "count": 1,
+        "start_second": 600
+      }
+    ],
+    "rule": "SSH-REPEAT",
+    "evidence_count": 10,
+    "distinct_paths": 0,
+    "hold": ""
+  },
+  {
+    "name": "outside_10_minutes",
+    "groups": [
+      {
+        "count": 9
+      },
+      {
+        "count": 1,
+        "start_second": 601
+      }
+    ],
+    "rule": "",
+    "evidence_count": 0,
+    "distinct_paths": 0,
+    "hold": ""
+  },
+  {
+    "name": "same_ip_only",
+    "groups": [
+      {
+        "count": 9
+      },
+      {
+        "count": 1,
+        "ip": "198.51.100.21"
+      }
+    ],
+    "rule": "",
+    "evidence_count": 0,
+    "distinct_paths": 0,
+    "hold": ""
+  },
+  {
+    "name": "canonical_mapped_ipv4",
+    "groups": [
+      {
+        "count": 9
+      },
+      {
+        "count": 1,
+        "ip": "::ffff:198.51.100.20"
+      }
+    ],
+    "rule": "SSH-REPEAT",
+    "evidence_count": 10,
+    "distinct_paths": 0,
+    "hold": ""
+  },
+  {
+    "name": "test_evidence_hold",
+    "groups": [
+      {
+        "count": 9
+      },
+      {
+        "count": 1,
+        "is_test": true
+      }
+    ],
+    "rule": "SSH-REPEAT",
+    "evidence_count": 10,
+    "distinct_paths": 0,
+    "hold": "test_evidence"
+  },
+  {
+    "name": "truncated_flag_hold",
+    "groups": [
+      {
+        "count": 9
+      },
+      {
+        "count": 1,
+        "flags": [
+          "command_truncated"
+        ]
+      }
+    ],
+    "rule": "SSH-REPEAT",
+    "evidence_count": 10,
+    "distinct_paths": 0,
+    "hold": "command_truncated"
+  },
+  {
+    "name": "truncated_metadata_hold",
+    "groups": [
+      {
+        "count": 9
+      },
+      {
+        "count": 1,
+        "truncated": true
+      }
+    ],
+    "rule": "SSH-REPEAT",
+    "evidence_count": 10,
+    "distinct_paths": 0,
+    "hold": "body_truncated"
+  },
+  {
+    "name": "time_anomaly_hold",
+    "groups": [
+      {
+        "count": 9
+      },
+      {
+        "count": 1,
+        "flags": [
+          "observed_at_future"
+        ]
+      }
+    ],
+    "rule": "SSH-REPEAT",
+    "evidence_count": 10,
+    "distinct_paths": 0,
+    "hold": "observed_at_future"
+  },
+  {
+    "name": "future_exact_5_minutes_hold",
+    "groups": [
+      {
+        "count": 9
+      },
+      {
+        "count": 1,
+        "future_seconds": 300
+      }
+    ],
+    "rule": "SSH-REPEAT",
+    "evidence_count": 10,
+    "distinct_paths": 0,
+    "hold": "observed_at_future"
+  },
+  {
+    "name": "future_less_than_5_minutes",
+    "groups": [
+      {
+        "count": 9
+      },
+      {
+        "count": 1,
+        "future_seconds": 299
+      }
+    ],
+    "rule": "SSH-REPEAT",
+    "evidence_count": 10,
+    "distinct_paths": 0,
+    "hold": ""
+  },
+  {
+    "name": "benign_redaction_retains_count",
+    "groups": [
+      {
+        "count": 10,
+        "flags": [
+          "credentials_redacted"
+        ]
+      }
+    ],
+    "rule": "SSH-REPEAT",
+    "evidence_count": 10,
+    "distinct_paths": 0,
+    "hold": ""
+  },
+  {
+    "name": "exploit_literal_get",
+    "groups": [
+      {
+        "count": 1,
+        "kind": "web",
+        "paths": [
+          "/../../etc/passwd"
+        ],
+        "method": "GET"
+      }
+    ],
+    "rule": "WEB-EXPLOIT",
+    "evidence_count": 1,
+    "distinct_paths": 1,
+    "hold": ""
+  },
+  {
+    "name": "exploit_literal_head",
+    "groups": [
+      {
+        "count": 1,
+        "kind": "web",
+        "paths": [
+          "/../../etc/passwd"
+        ],
+        "method": "HEAD"
+      }
+    ],
+    "rule": "WEB-EXPLOIT",
+    "evidence_count": 1,
+    "distinct_paths": 1,
+    "hold": ""
+  },
+  {
+    "name": "exploit_negative_plain_sensitive",
+    "groups": [
+      {
+        "count": 1,
+        "kind": "web",
+        "paths": [
+          "/etc/passwd"
+        ]
+      }
+    ],
+    "rule": "",
+    "evidence_count": 0,
+    "distinct_paths": 0,
+    "hold": ""
+  },
+  {
+    "name": "exploit_negative_benign",
+    "groups": [
+      {
+        "count": 1,
+        "kind": "web",
+        "paths": [
+          "/docs/passwd"
+        ]
+      }
+    ],
+    "rule": "",
+    "evidence_count": 0,
+    "distinct_paths": 0,
+    "hold": ""
+  },
+  {
+    "name": "exploit_negative_encoded",
+    "groups": [
+      {
+        "count": 1,
+        "kind": "web",
+        "paths": [
+          "/%2e%2e/etc/passwd"
+        ]
+      }
+    ],
+    "rule": "",
+    "evidence_count": 0,
+    "distinct_paths": 0,
+    "hold": ""
+  },
+  {
+    "name": "exploit_negative_query_only",
+    "groups": [
+      {
+        "count": 1,
+        "kind": "web",
+        "paths": [
+          "/?file=../../etc/passwd"
+        ]
+      }
+    ],
+    "rule": "",
+    "evidence_count": 0,
+    "distinct_paths": 0,
+    "hold": ""
+  },
+  {
+    "name": "exploit_negative_suffix",
+    "groups": [
+      {
+        "count": 1,
+        "kind": "web",
+        "paths": [
+          "/../../etc/passwd.txt"
+        ]
+      }
+    ],
+    "rule": "",
+    "evidence_count": 0,
+    "distinct_paths": 0,
+    "hold": ""
+  },
+  {
+    "name": "exploit_negative_redacted",
+    "groups": [
+      {
+        "count": 1,
+        "kind": "web",
+        "paths": [
+          "[REDACTED]"
+        ]
+      }
+    ],
+    "rule": "",
+    "evidence_count": 0,
+    "distinct_paths": 0,
+    "hold": ""
+  },
+  {
+    "name": "exploit_missing_method",
+    "groups": [
+      {
+        "count": 1,
+        "kind": "web",
+        "paths": [
+          "/../etc/passwd"
+        ],
+        "missing_method": true
+      }
+    ],
+    "rule": "",
+    "evidence_count": 0,
+    "distinct_paths": 0,
+    "hold": ""
+  },
+  {
+    "name": "exploit_missing_uri",
+    "groups": [
+      {
+        "count": 1,
+        "kind": "web",
+        "paths": [
+          "/../etc/passwd"
+        ],
+        "missing_uri": true
+      }
+    ],
+    "rule": "",
+    "evidence_count": 0,
+    "distinct_paths": 0,
+    "hold": ""
+  },
+  {
+    "name": "exploit_post_not_supported",
+    "groups": [
+      {
+        "count": 1,
+        "kind": "web",
+        "paths": [
+          "/../etc/passwd"
+        ],
+        "method": "POST"
+      }
+    ],
+    "rule": "",
+    "evidence_count": 0,
+    "distinct_paths": 0,
+    "hold": ""
+  },
+  {
+    "name": "query_variants_are_one_path",
+    "groups": [
+      {
+        "count": 20,
+        "kind": "web",
+        "paths": [
+          "/.env?a=1",
+          "/.env?a=2",
+          "/.env?a=3",
+          "/.env?a=4",
+          "/.env?a=5"
+        ]
+      }
+    ],
+    "rule": "",
+    "evidence_count": 0,
+    "distinct_paths": 0
+  },
+  {
+    "name": "exact_allowlist_no_suffix",
+    "groups": [
+      {
+        "count": 20,
+        "kind": "web",
+        "paths": [
+          "/.env.backup",
+          "/.git/configuration",
+          "/prefix/wp-login.php",
+          "/wp-admin/help",
+          "/phpmyadmin-other"
+        ]
+      }
+    ],
+    "rule": "",
+    "evidence_count": 0,
+    "distinct_paths": 0
+  },
+  {
+    "name": "exploit_no_prefix",
+    "groups": [
+      {
+        "count": 1,
+        "kind": "web",
+        "paths": [
+          "/prefix/../etc/passwd"
+        ]
+      }
+    ],
+    "rule": "",
+    "evidence_count": 0,
+    "distinct_paths": 0
+  },
+  {
+    "name": "exploit_no_double_encoding",
+    "groups": [
+      {
+        "count": 1,
+        "kind": "web",
+        "paths": [
+          "/%252e%252e/etc/passwd"
+        ]
+      }
+    ],
+    "rule": "",
+    "evidence_count": 0,
+    "distinct_paths": 0
+  },
+  {
+    "name": "web_inclusive_boundary",
+    "groups": [
+      {
+        "count": 19,
+        "kind": "web",
+        "paths": [
+          "/.env",
+          "/.git/config",
+          "/wp-login.php",
+          "/wp-admin",
+          "/phpmyadmin"
+        ]
+      },
+      {
+        "count": 1,
+        "kind": "web",
+        "start_second": 600,
+        "paths": [
+          "/.env"
+        ]
+      }
+    ],
+    "rule": "WEB-REPEAT",
+    "evidence_count": 20,
+    "distinct_paths": 5
+  },
+  {
+    "name": "web_outside_boundary",
+    "groups": [
+      {
+        "count": 19,
+        "kind": "web",
+        "paths": [
+          "/.env",
+          "/.git/config",
+          "/wp-login.php",
+          "/wp-admin",
+          "/phpmyadmin"
+        ]
+      },
+      {
+        "count": 1,
+        "kind": "web",
+        "start_second": 601,
+        "paths": [
+          "/.env"
+        ]
+      }
+    ],
+    "rule": "",
+    "evidence_count": 0,
+    "distinct_paths": 0
+  }
+]

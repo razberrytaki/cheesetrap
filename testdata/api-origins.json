@@ -1,0 +1,202 @@
+[
+  {
+    "input": "http://127.0.0.1:8080",
+    "canonical": "http://127.0.0.1:8080"
+  },
+  {
+    "input": "http://127.0.0.1:80",
+    "canonical": "http://127.0.0.1"
+  },
+  {
+    "input": "http://[::1]:80",
+    "canonical": "http://[::1]"
+  },
+  {
+    "input": "https://dashboard.example.com",
+    "canonical": "https://dashboard.example.com"
+  },
+  {
+    "input": "https://node.tail-example.ts.net:443",
+    "canonical": "https://node.tail-example.ts.net"
+  },
+  {
+    "input": "https://dashboard.example.com:8443",
+    "canonical": "https://dashboard.example.com:8443"
+  },
+  {
+    "input": "https://100.64.0.1",
+    "canonical": "https://100.64.0.1"
+  },
+  {
+    "input": "https://127.0.0.1:9443",
+    "canonical": "https://127.0.0.1:9443"
+  },
+  {
+    "input": "https://[2001:db8::1]:443",
+    "canonical": "https://[2001:db8::1]"
+  },
+  {
+    "input": "https://xn--bcher-kva.example",
+    "canonical": "https://xn--bcher-kva.example"
+  },
+  {
+    "input": "https://localhost",
+    "canonical": "https://localhost"
+  },
+  {
+    "input": "http://dashboard.example.com",
+    "canonical": ""
+  },
+  {
+    "input": "http://100.64.0.1",
+    "canonical": ""
+  },
+  {
+    "input": "http://localhost:8080",
+    "canonical": ""
+  },
+  {
+    "input": "https://",
+    "canonical": ""
+  },
+  {
+    "input": "https://*.example.com",
+    "canonical": ""
+  },
+  {
+    "input": "https://dashboard.example.com/",
+    "canonical": ""
+  },
+  {
+    "input": "https://dashboard.example.com/path",
+    "canonical": ""
+  },
+  {
+    "input": "https://user:pass@dashboard.example.com",
+    "canonical": ""
+  },
+  {
+    "input": "https://dashboard.example.com?",
+    "canonical": ""
+  },
+  {
+    "input": "https://dashboard.example.com#",
+    "canonical": ""
+  },
+  {
+    "input": "https://dashboard.example.com:0",
+    "canonical": ""
+  },
+  {
+    "input": "https://dashboard.example.com:65536",
+    "canonical": ""
+  },
+  {
+    "input": "https://dashboard.example.com:0443",
+    "canonical": ""
+  },
+  {
+    "input": "https://dashboard.example.com:",
+    "canonical": ""
+  },
+  {
+    "input": "https://dashboard.example.com.",
+    "canonical": ""
+  },
+  {
+    "input": "https://Dashboard.example.com",
+    "canonical": ""
+  },
+  {
+    "input": "HTTPS://dashboard.example.com",
+    "canonical": ""
+  },
+  {
+    "input": "https://bad_host.example.com",
+    "canonical": ""
+  },
+  {
+    "input": "https://-bad.example.com",
+    "canonical": ""
+  },
+  {
+    "input": "https://bad-.example.com",
+    "canonical": ""
+  },
+  {
+    "input": "https://bad..example.com",
+    "canonical": ""
+  },
+  {
+    "input": "https://bücher.example",
+    "canonical": ""
+  },
+  {
+    "input": "https://127.1",
+    "canonical": ""
+  },
+  {
+    "input": "https://2130706433",
+    "canonical": ""
+  },
+  {
+    "input": "https://0177.0.0.1",
+    "canonical": ""
+  },
+  {
+    "input": "https://0x7f000001",
+    "canonical": ""
+  },
+  {
+    "input": "https://[::ffff:127.0.0.1]",
+    "canonical": ""
+  },
+  {
+    "input": "https://[fe80::1%25en0]",
+    "canonical": ""
+  },
+  {
+    "input": "https://0.0.0.0",
+    "canonical": ""
+  },
+  {
+    "input": "https://[::]",
+    "canonical": ""
+  },
+  {
+    "input": "https://224.0.0.1",
+    "canonical": ""
+  },
+  {
+    "input": "https://dashboard.example.com\nBAD=1",
+    "canonical": ""
+  },
+  {
+    "input": " https://dashboard.example.com",
+    "canonical": ""
+  },
+  {
+    "input": "https://dash\tboard.example.com",
+    "canonical": ""
+  },
+  {
+    "input": "https://$DOMAIN",
+    "canonical": ""
+  },
+  {
+    "input": "https://dashboard.example.com,https://other.example.com",
+    "canonical": ""
+  },
+  {
+    "input": "https://dashboard.example.com\\@evil.invalid",
+    "canonical": ""
+  },
+  {
+    "input": "https://example.%63om",
+    "canonical": ""
+  },
+  {
+    "input": "https://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.example.com",
+    "canonical": ""
+  }
+]

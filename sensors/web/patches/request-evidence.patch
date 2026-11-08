@@ -1,0 +1,23 @@
+--- a/opencanary/modules/http.py
++++ b/opencanary/modules/http.py
+@@ -325,5 +325,6 @@
+         root.putChild(b"", RedirectCustomHeaders(b"/index.html", factory=self))
+         root.putChild(b"index.html", page)
+         wrapped = EncodingResourceWrapper(root, [GzipEncoderFactory()])
+-        site = CanaryHttpServiceSite(wrapped)
++        from opencanary.modules.request_evidence import evidence_site
++        site = evidence_site(wrapped, self, CanaryRequest)
+         return internet.TCPServer(self.port, site, interface=self.listen_addr)
+--- a/opencanary/modules/https.py
++++ b/opencanary/modules/https.py
+@@ -106,7 +106,9 @@
+         root.putChild(b"", RedirectCustomHeaders(b"/index.html", factory=self))
+         root.putChild(b"index.html", page)
+         wrapped = EncodingResourceWrapper(root, [GzipEncoderFactory()])
+-        site = Site(wrapped)
++        from opencanary.modules.request_evidence import evidence_site
++        from twisted.web.server import Request
++        site = evidence_site(wrapped, self, Request)
+         return internet.SSLServer(
+             self.port,
+             site,

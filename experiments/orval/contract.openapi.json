@@ -1,0 +1,48 @@
+{
+  "openapi": "3.1.0",
+  "info": { "title": "Synthetic Orval contract probe", "version": "1" },
+  "paths": {
+    "/probe": {
+      "get": {
+        "operationId": "probe-get",
+        "parameters": [
+          { "name": "required_q", "in": "query", "required": true, "schema": { "type": "string" } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 50 } },
+          { "name": "state", "in": "query", "schema": { "type": "string", "enum": ["ready", "held"] } }
+        ],
+        "responses": { "200": { "description": "Synthetic", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Probe" } } } } }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Probe": {
+        "type": "object",
+        "required": ["required_text", "required_nullable", "timestamp", "date_only", "integer64", "wire_integer64", "items", "state", "one", "any", "all"],
+        "properties": {
+          "required_text": { "type": "string" },
+          "required_nullable": { "type": ["string", "null"] },
+          "optional_text": { "type": "string" },
+          "optional_nullable": { "type": ["string", "null"] },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "date_only": { "type": "string", "format": "date" },
+          "integer64": { "type": "integer", "format": "int64" },
+          "wire_integer64": { "type": "string", "format": "int64" },
+          "items": { "type": ["array", "null"], "items": { "type": "string" } },
+          "state": { "type": ["string", "null"], "enum": ["ready", "held", null] },
+          "one": { "$ref": "#/components/schemas/One" },
+          "any": { "$ref": "#/components/schemas/Any" },
+          "all": { "$ref": "#/components/schemas/All" }
+        }
+      },
+      "One": { "oneOf": [{ "type": "string" }, { "type": "integer" }] },
+      "Any": { "anyOf": [{ "type": "string" }, { "type": "boolean" }] },
+      "All": {
+        "allOf": [
+          { "type": "object", "required": ["id"], "properties": { "id": { "type": "string" } } },
+          { "type": "object", "properties": { "note": { "type": ["string", "null"] } } }
+        ]
+      }
+    }
+  }
+}

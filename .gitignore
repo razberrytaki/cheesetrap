@@ -1,0 +1,125 @@
+# Local deployment config, raw evidence, credentials, and temporary data.
+.local/
+secrets/
+.env
+.env.*
+!.env.example
+!.env.*.example
+credentials.json
+credentials.yaml
+credentials.yml
+*.key
+*.pem
+*.p12
+*.pfx
+id_rsa
+id_ed25519
+id_ecdsa
+id_dsa
+.aws/
+.ssh/
+.oci/
+
+# Public templates must contain placeholders only; no blanket testdata exception.
+# Certificate/key fixtures, if needed, require explicit review before git add -f.
+
+# Build and analysis outputs.
+/bin/
+/build/
+/dist/
+/coverage/
+/cheesetrap
+*.test
+.DS_Store
+
+# Deliberately do not ignore *.jsonl, *.log, or testdata/: public, sanitized
+# fixtures must remain trackable. Keep raw evidence and keys in the dirs above.
+
+# React UI dependencies and generated release assets.
+/web/node_modules/
+/internal/ui/dist/
+
+# Python installation/test helper bytecode.
+**/__pycache__/
+*.pyc
+
+# Local agent configuration and design-tool output.
+.claude/
+.claude-plugin/
+.codex/
+.agents/
+.hallmark/
+/CLAUDE.md
+/CLAUDE.local.md
+/.mcp.json
+/skills-lock.json
+/design-previews/
+
+# External design-kit references belong in the user's skill installation.
+/accessibility/
+/components/
+/content/
+/design-systems/
+/examples/
+/frameworks/
+/taste/
+/templates/
+/workflows/
+
+# Imported reference tokens; keep tokens/cheesetrap.json trackable.
+/tokens/blur.json
+/tokens/borders.json
+/tokens/breakpoints.json
+/tokens/colors.json
+/tokens/data-viz.json
+/tokens/gradients.json
+/tokens/motion.json
+/tokens/opacity.json
+/tokens/shadows.json
+/tokens/sizing.json
+/tokens/spacing.json
+/tokens/states.json
+/tokens/theming.json
+/tokens/typography.json
+
+# Imported kit tooling; project build, test and documentation tools stay tracked.
+/scripts/_targets.mjs
+/scripts/accuracy_report.mjs
+/scripts/axe_audit.mjs
+/scripts/build_tokens.mjs
+/scripts/check_no_emoji.py
+/scripts/contrast.py
+/scripts/design_systems.py
+/scripts/gate.mjs
+/scripts/lint_hardcodes.py
+/scripts/lint_intent.mjs
+/scripts/lint_native_select.py
+/scripts/lint_taste.py
+/scripts/measure_install_paths.py
+/scripts/measure_render.mjs
+/scripts/observe.mjs
+/scripts/render_framework_source.mjs
+/scripts/scaffold_component.py
+/scripts/screenshot_docs.mjs
+/scripts/slop_tells.mjs
+/scripts/taste_audit.mjs
+/scripts/update_homebrew_formula.mjs
+/scripts/validate_component_spec.py
+/scripts/validate_contrast.py
+/scripts/validate_template.py
+/scripts/validate_theme_refs.py
+/scripts/validate_tokens.py
+/scripts/verify_focustrap.mjs
+/scripts/verify_interactive.mjs
+/scripts/verify_keyboard.mjs
+/scripts/verify_mobile_first.mjs
+/scripts/verify_overflow.mjs
+/scripts/verify_reduced_motion.mjs
+/scripts/verify_responsive.mjs
+/scripts/verify_rtl.mjs
+/scripts/verify_screen_economy.mjs
+/scripts/verify_states.mjs
+/scripts/verify_target_size.mjs
+
+# Local Cloudflare CLI account cache.
+/.wrangler/

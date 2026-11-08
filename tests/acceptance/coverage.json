@@ -1,0 +1,365 @@
+{
+  "schema": 1,
+  "source": "docs/decisions/0003-report-drafts-only.md",
+  "requirements": [
+    {
+      "id": "T01",
+      "title": "Fresh installation, SSH tunnel, authentication and decoy observation",
+      "tests": [
+        {
+          "suite": "integration",
+          "package": "cheesetrap/tests/acceptance",
+          "name": "TestInstallConfiguration"
+        },
+        {
+          "suite": "integration",
+          "package": "cheesetrap/tests/acceptance",
+          "name": "TestInstallIngestionAndManagement"
+        },
+        {
+          "suite": "integration",
+          "package": "cheesetrap/internal/api",
+          "name": "TestAuthCLI"
+        }
+      ],
+      "linux": [
+        "linux-install"
+      ],
+      "ui_tests": []
+    },
+    {
+      "id": "T02",
+      "title": "Negative cases, rule thresholds and retained attack evidence",
+      "tests": [
+        {
+          "suite": "go",
+          "package": "cheesetrap/internal/detection",
+          "name": "TestRulesFixtures"
+        },
+        {
+          "suite": "go",
+          "package": "cheesetrap/internal/detection",
+          "name": "TestRulesTriggerMustBeEvidence"
+        },
+        {
+          "suite": "go",
+          "package": "cheesetrap/internal/detection",
+          "name": "TestRulesRetainedWebEvidence"
+        },
+        {
+          "suite": "integration",
+          "package": "cheesetrap/tests/acceptance",
+          "name": "TestReviewFlow"
+        }
+      ],
+      "linux": [],
+      "ui_tests": []
+    },
+    {
+      "id": "T03",
+      "title": "Partial writes, rotation, crash duplicates and visible gaps",
+      "tests": [
+        {
+          "suite": "go",
+          "package": "cheesetrap/internal/ingestion",
+          "name": "TestTailerPartialAndIdenticalRecords"
+        },
+        {
+          "suite": "go",
+          "package": "cheesetrap/internal/ingestion",
+          "name": "TestTailerRenameAndLateWrites"
+        },
+        {
+          "suite": "go",
+          "package": "cheesetrap/internal/ingestion",
+          "name": "TestTailerTruncationAndReplacement"
+        },
+        {
+          "suite": "go",
+          "package": "cheesetrap/internal/ingestion",
+          "name": "TestTailerResumeMissingChangedAndInvalidBoundary"
+        },
+        {
+          "suite": "integration",
+          "package": "cheesetrap/internal/ingestion",
+          "name": "TestCommitBatch"
+        },
+        {
+          "suite": "integration",
+          "package": "cheesetrap/internal/ingestion",
+          "name": "TestCollectorRetriesUncommittedBatch"
+        }
+      ],
+      "linux": [],
+      "ui_tests": []
+    },
+    {
+      "id": "T04",
+      "title": "Peer and destination preservation, forged headers and address family",
+      "tests": [
+        {
+          "suite": "go",
+          "package": "cheesetrap/internal/ingestion",
+          "name": "TestDecodeEngineEvidence"
+        },
+        {
+          "suite": "go",
+          "package": "cheesetrap/internal/ingestion",
+          "name": "TestCollectorWebRoutingUsesObservedSocket"
+        },
+        {
+          "suite": "integration",
+          "package": "cheesetrap/tests/acceptance",
+          "name": "TestInstallIngestionAndManagement"
+        }
+      ],
+      "linux": [
+        "linux-install",
+        "linux-ipv6"
+      ],
+      "ui_tests": []
+    },
+    {
+      "id": "T05",
+      "title": "Missing, multiple, changed and expired contacts",
+      "tests": [
+        {
+          "suite": "go",
+          "package": "cheesetrap/internal/enrichment",
+          "name": "TestLookup"
+        },
+        {
+          "suite": "go",
+          "package": "cheesetrap/internal/enrichment",
+          "name": "TestLookupSafety"
+        },
+        {
+          "suite": "go",
+          "package": "cheesetrap/internal/enrichment",
+          "name": "TestLookupFallbackCannotBypassHeldResults"
+        },
+        {
+          "suite": "integration",
+          "package": "cheesetrap/internal/enrichment",
+          "name": "TestContactCache"
+        },
+        {
+          "suite": "integration",
+          "package": "cheesetrap/internal/api",
+          "name": "TestReviewAPI"
+        }
+      ],
+      "linux": [],
+      "ui_tests": []
+    },
+    {
+      "id": "T06",
+      "title": "Collection sealing, completed detection, changed windows and evidence ownership",
+      "tests": [
+        {
+          "suite": "integration",
+          "package": "cheesetrap/internal/detection",
+          "name": "TestDetectionCursor"
+        },
+        {
+          "suite": "integration",
+          "package": "cheesetrap/internal/detection",
+          "name": "TestRuleConfigBoundary"
+        },
+        {
+          "suite": "integration",
+          "package": "cheesetrap/internal/reporting",
+          "name": "TestSealWindow"
+        },
+        {
+          "suite": "integration",
+          "package": "cheesetrap/internal/reporting",
+          "name": "TestReportRevision"
+        },
+        {
+          "suite": "integration",
+          "package": "cheesetrap/internal/reporting",
+          "name": "TestScheduleMidnightDST"
+        }
+      ],
+      "linux": [],
+      "ui_tests": []
+    },
+    {
+      "id": "T07",
+      "title": "Draft-only API rejects sending operations and retains archived drafts",
+      "tests": [
+        {
+          "suite": "go",
+          "package": "cheesetrap/internal/api",
+          "name": "TestDraftOnlyContract"
+        },
+        {
+          "suite": "integration",
+          "package": "cheesetrap/internal/api",
+          "name": "TestDraftOnlyAPI"
+        }
+      ],
+      "linux": [],
+      "ui_tests": []
+    },
+    {
+      "id": "T08",
+      "title": "Stale automatic settings and legacy queued jobs cannot send",
+      "tests": [
+        {
+          "suite": "integration",
+          "package": "cheesetrap/internal/jobs",
+          "name": "TestDraftRuntime"
+        }
+      ],
+      "linux": [],
+      "ui_tests": []
+    },
+    {
+      "id": "T09",
+      "title": "Draft and contact jobs enqueue and recover",
+      "tests": [
+        {
+          "suite": "integration",
+          "package": "cheesetrap/internal/jobs",
+          "name": "TestReconcile"
+        },
+        {
+          "suite": "integration",
+          "package": "cheesetrap/internal/jobs",
+          "name": "TestDraftRuntime"
+        },
+        {
+          "suite": "integration",
+          "package": "cheesetrap/internal/api",
+          "name": "TestReviewAPI"
+        }
+      ],
+      "linux": [],
+      "ui_tests": []
+    },
+    {
+      "id": "T10",
+      "title": "Removed SMTP configuration and sending settings cannot enable transport",
+      "tests": [
+        {
+          "suite": "go",
+          "package": "cheesetrap/internal/config",
+          "name": "TestWorkerRejectsRemovedSMTPConfiguration"
+        },
+        {
+          "suite": "integration",
+          "package": "cheesetrap/internal/api",
+          "name": "TestDraftOnlyAPI"
+        }
+      ],
+      "linux": [],
+      "ui_tests": []
+    },
+    {
+      "id": "T11",
+      "title": "Size, masking, XSS, CSRF, draft headers and secret boundaries",
+      "tests": [
+        {
+          "suite": "go",
+          "package": "cheesetrap/internal/api",
+          "name": "TestAuthOriginHostCSRFAndErrorEnvelope"
+        },
+        {
+          "suite": "go",
+          "package": "cheesetrap/internal/api",
+          "name": "TestAuthBodyLimitsAndSessionBoundCSRF"
+        },
+        {
+          "suite": "go",
+          "package": "cheesetrap/internal/reporting",
+          "name": "TestRender"
+        },
+        {
+          "suite": "go",
+          "package": "cheesetrap/internal/ingestion",
+          "name": "TestRedactEvidence"
+        },
+        {
+          "suite": "go",
+          "package": "cheesetrap/internal/ingestion",
+          "name": "TestRedactEvidenceOutputBounds"
+        },
+        {
+          "suite": "integration",
+          "package": "cheesetrap/tests/acceptance",
+          "name": "TestInstallConfiguration"
+        },
+        {
+          "suite": "e2e",
+          "package": "cheesetrap/tests/acceptance",
+          "name": "TestReviewFlow"
+        }
+      ],
+      "linux": [
+        "linux-sensor-egress"
+      ],
+      "ui_tests": [
+        {
+          "file": "src/features/events/EventList.test.tsx",
+          "name": "EventList renders attacker-controlled fields as inert text and preserves bigint/null/quality details"
+        },
+        {
+          "file": "src/features/reports/ReportDetail.test.tsx",
+          "name": "report review shows holds, safe text, contacts and evidence quality without sending actions"
+        }
+      ],
+      "browser_tests": [
+        {
+          "file": "review.spec.ts",
+          "name": "captured engine evidence reaches authenticated review and persisted rejection"
+        },
+        {
+          "file": "draft-only.spec.ts",
+          "name": "draft-only navigation and settings expose no sending actions"
+        }
+      ]
+    },
+    {
+      "id": "T12",
+      "title": "Public services versus management, DB, metadata and sensor egress",
+      "tests": [
+        {
+          "suite": "integration",
+          "package": "cheesetrap/tests/acceptance",
+          "name": "TestInstallConfiguration"
+        }
+      ],
+      "linux": [
+        "linux-public-boundary",
+        "linux-sensor-egress",
+        "linux-ipv6"
+      ],
+      "ui_tests": []
+    },
+    {
+      "id": "T13",
+      "title": "Evidence copies, retention, capacity and draft restore",
+      "tests": [
+        {
+          "suite": "integration",
+          "package": "cheesetrap/internal/retention",
+          "name": "TestRetentionDatabase"
+        },
+        {
+          "suite": "integration",
+          "package": "cheesetrap/internal/ingestion",
+          "name": "TestRetentionCapacityRecovery"
+        },
+        {
+          "suite": "integration",
+          "package": "cheesetrap/tests/acceptance",
+          "name": "TestRestoreDrafts"
+        }
+      ],
+      "linux": [],
+      "ui_tests": []
+    }
+  ]
+}

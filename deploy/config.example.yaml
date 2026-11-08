@@ -1,0 +1,13 @@
+{
+  "project": "cheesetrap-example",
+  "address_family": "ipv4",
+  "public_ip": "192.0.2.10",
+  "ingress_policy": "single_client",
+  "allowed_client_cidr": "198.51.100.20/32",
+  "management_ssh_port": 22,
+  "api_origin": "http://127.0.0.1:8080",
+  "sensor_ports": {"ssh": 2222, "http": 18080, "https": 18443},
+  "sensor_network": {"name": "cheesetrap-example-sensor", "bridge": "ctm1-sensor", "subnet": "172.30.91.0/24", "gateway": "172.30.91.1", "cowrie_ip": "172.30.91.10", "web_ip": "172.30.91.11"},
+  "minimum_free_gib": 10,
+  "is_test": true
+}

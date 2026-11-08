@@ -1,0 +1,65 @@
+{
+  "report_id": "10000000-0000-4000-8000-000000000507",
+  "revision_id": "20000000-0000-4000-8000-000000000507",
+  "version": 1,
+  "snapshot": {
+    "source_ip": "1.1.1.1",
+    "window_id": "30000000-0000-4000-8000-000000000507",
+    "window_start": "2026-10-19T01:02:03Z",
+    "window_end": "2026-10-19T02:02:03Z",
+    "observed_start": "2026-10-19T01:02:03Z",
+    "observed_end": "2026-10-19T01:02:03Z",
+    "delayed_collection": false,
+    "evidence": [
+      {
+        "event_id": "40000000-0000-4000-8000-000000000507",
+        "ingestion_seq": 9007199254740993,
+        "sensor_id": "",
+        "engine": "",
+        "observed_at": "2026-10-19T01:02:03Z",
+        "ingested_at": "2026-10-19T01:02:03Z",
+        "source_ip": "",
+        "source_port": 0,
+        "destination_ip": "",
+        "destination_port": 0,
+        "service": "",
+        "event_type": "",
+        "raw_hash": "",
+        "quality_flags": [],
+        "is_test": false
+      }
+    ],
+    "rules": [
+      {
+        "detection_id": "50000000-0000-4000-8000-000000000507",
+        "rule_id": "SSH-REPEAT",
+        "rule_version": "1",
+        "context_count": 10,
+        "attached_count": 10,
+        "evidence_hash": "",
+        "evidence_eligible": true,
+        "auto_approval_allowed": true,
+        "explanation": {
+          "threshold": 10,
+          "rule_version": "1",
+          "count": 10
+        }
+      }
+    ],
+    "registry": {
+      "schema_version": 1,
+      "address": "1.1.1.1",
+      "lookup_succeeded": true,
+      "candidates": []
+    }
+  },
+  "recipient": "abuse@example.net",
+  "reply_to": "operator@example.org",
+  "subject": "Legacy subject",
+  "body": "Legacy body",
+  "hold_reasons": [],
+  "state": "needs_review",
+  "auto_approval_allowed": true,
+  "body_edited": false,
+  "content_digest": "650de5f9fa83361e3876580df85010754aa75e8c1972ae1f4e9d9f220682d16f"
+}

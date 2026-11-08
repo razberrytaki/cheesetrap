@@ -1,0 +1,4571 @@
+{
+  "build_inputs_sha256": {
+    "sensors/images.lock": "5db9be5a25b2270f17c2a17477d423c69328b1ab1e291d450b417b911e7d6b64",
+    "sensors/web/Dockerfile": "f8c81f843619c8ff11c9b6f14c9b3a0593ad732aa50fbd6c35af433bc00a15ea",
+    "sensors/web/apply_patch.py": "1869ad43b2aec0de8663c2d074a916d0a1839ff8fd3b1d4bd72f418ecf93a895",
+    "sensors/web/opencanary.conf": "ed03222d77c603c02d589ea4d0a2064445a720a4d69e9bc5ca2e4f10b2a10c4b",
+    "sensors/web/patches/request-evidence.patch": "fd0f271158b1eadb325a434681e1e515fceebd2b9a9e38cb3a6dd8a67db3fdd2",
+    "sensors/web/request_evidence.py": "391edc59f724236729325e242aa72ccfe4fbd78664ed015b8183be8683551c3a"
+  },
+  "image_inspect_sha256": "99366e844a25f4972df455630c6896755374ee58f13d3c01d5a1dc1380796fd1",
+  "kind": "sanitized-real-engine-run",
+  "source_run_id": "ctm0-57e7ccd5",
+  "original_raw_sha256": "4abe7691d39989b3c79324f6942d981efb91f0ae8d40c5a0e69de89e8e610cd5",
+  "original_run_sha256": "cddacc3d2053c8f852dd28c6479f5445d1b33df2a25fc28d773fd580f2f3fb63",
+  "original_line_sha256": [
+    "79bd8eae216a0402c7b072dd384b5347d327de6c4a5dba368a253b4d5c7ccd29",
+    "7491f1355d84cf36c95d159da8ccf6d7a769a876da298e224e2d51403f770a89",
+    "9af3b31ee9c2fd29649af33a5ae91ee5682d05181ccb660a813b62b723a24b3f",
+    "87d918d45b2692afae228f779773bdfe3ca7f8154458cd533c50c641c7edb77e",
+    "3a18456ed1a663dd76a1677ba6f87e3c8acc9f3596b7def53c221d8ba3e401df",
+    "f9799ac9c6d546e0e52bf6a38f73d1a71de9d044740d33498cef2723c40661e6",
+    "98f085dd75d97f393815735bc6d3fabde2e3a1abd3c74d54fa702fb5250949f8",
+    "398a2a9384872ca5111bc33b4bf0cc56a77561f456157b1514332c2c40e7076c",
+    "b7a699968e68203074ace1b8b013b21a58ce586534f8c1801e58ee5e34a968e9",
+    "a8cd77240e0b681c95b407a1ed05b128b7521561ff4186c08feebd5900dfc582",
+    "c60f7a03cf13391d1e7aba826cb185fed3dbb7438c75e59f992881c86ba03fbb",
+    "3244964c9babfa1de52f8bc53174f1cc118a5949413fd61b7fca490fbb6aee16",
+    "e4894da9844a1d3fe9872840c9b7152386b4ccda43a4b3ea3646f1d05ea0a468",
+    "bbf2c10475efb8ab93b5da7b5e5b5b9070fff80adbe5b1a6d57e2cc9ef3552da",
+    "e6deb364e9defae49547387ff57028ec83d080b9361c635a81738c94b1ded99b",
+    "127c673c5c6c2e3d6647007dff48609c6b911e96eb957d839f222067c22fc95f",
+    "59081716d1563672e787374f5b9e9685f1d123cfdd740d0abfbad96dec3b3402",
+    "ad04f844b9632da9ce11f6cc92513748b527d3e87c24fb5c1c5775efa65abaf5",
+    "02c920f7fcc1d0cd43318a57b4f3546db04a07e98475b51ecf1bc9a2381850c0",
+    "1e02668af5a635df4b574e671f3841c211f1f96522f85d2de7793f30be206b6e",
+    "842c68ae010c4f5eb5d4e9034f7a01d1c464603c8ef03952b61b042db2cee7aa",
+    "85d9c938b59f2c57ae5af5457ffff9517a54b06e147bdd7a768e9ecdf2f3ff63",
+    "ce8d751f5ed7f30ed4548c3b1cb2d553482063bc3520dfd0e2e4cba63fe28372",
+    "37c049bc8aed7a02f3be5315ae2a76aedec3208bfcb0571ca9db9b07fc50b629",
+    "3018f7bbbf81b30365ab4c6ad9ef2ffcf78b313825683bcceffc300fd224371d",
+    "35a5e33cf79c0e252e9f793b7321de03c74f1dadf027fb38ed921a8436b23a38",
+    "89667357ca1aee7e800f7a4f13075d8e0f4adc9ea0e555dc0fee28607a1c949f",
+    "4d33fd7f2c5685f7ff5d4ff2c4196704dffea6afcb01e961564366cf53767599",
+    "d6a7eeabe4286936b121753da29913821228b3eeeaa39d45c1fffc58aad7c11c",
+    "07731babda12c99a64454dd63ebcb020cb66fac866c4b66153e7233c31619228",
+    "86dd544d5201a3ce814f3cec342588ff6302a852eb51f6dae7317e306364f29a",
+    "a8b281c4eae1a19127412de37d38f2524aff570061184e9b48114f0812689670",
+    "a027377c65f7a6c9b46f46689dbe3296279f70c92e2380c6fc68258e55731366",
+    "9315da83a0a2cb24602f3b46249e2af05f730ce83c7877850690c7389d6317ca",
+    "8a73a571aca270f02a13fd952bbe8bfe2f030e1d6926f6223230029d8d382392",
+    "52101ee3b326df9465f4ee48d371b90a26ee024be4ade81458159ea624288cd1",
+    "4d1677e69c7eafc2bb2598108ab73fcffce812cdd42f69021b6ef2e4bb72c7b4",
+    "798960f30a0fe0953b23c8d0e9edcdd19a4d4187d5a41ec9e57f91c630572836"
+  ],
+  "fixture_sha256": "08e3ffbe5317a4bb531d893bd172804890b29d83c4980d363d511da5462d5179",
+  "cases_sha256": "dba7f03d30ba2afd23be5d19cab63dc08f9fa3536468524bda37470a8ab6bdda",
+  "redactions": [
+    "transport peer replaced consistently with 198.51.100.20",
+    "public destination replaced with 192.0.2.10; container destination with 172.30.0.2",
+    "original timestamps, ports, case hashes and line order preserved",
+    "sensitive query/header/body values redacted by the engine before this fixture; no original raw payloads copied",
+    "serialized record length/hash recomputed after address substitution; original line hashes retained"
+  ],
+  "run": {
+    "run_id": "ctm0-57e7ccd5",
+    "variant": "patched",
+    "image_id": "sha256:71f370e058f7fdf7f9773a8b05aa76ec73c735d881a294998ffa56cc27a0b965",
+    "image_reference": "sha256:71f370e058f7fdf7f9773a8b05aa76ec73c735d881a294998ffa56cc27a0b965",
+    "expected_ip": "198.51.100.20",
+    "destination_mapping": {
+      "http": {
+        "public_ip": "192.0.2.10",
+        "public_port": 18080,
+        "host_port": 18080,
+        "container_ip": "172.30.0.2",
+        "container_port": 8080
+      },
+      "https": {
+        "public_ip": "192.0.2.10",
+        "public_port": 18443,
+        "host_port": 18443,
+        "container_ip": "172.30.0.2",
+        "container_port": 8443
+      }
+    },
+    "attempts": [
+      {
+        "case_id": "http-normal-path",
+        "protocol": "http",
+        "executed_at": "2026-10-17T15:33:33.066408Z",
+        "ended_at": "2026-10-17T15:33:33.145318Z",
+        "input_file": "inputs/http-normal-path.bin",
+        "input_sha256": "90536322b88414620e261d72f469264d82748dce82e47271d818be3957fdc93e",
+        "local_port": 57584,
+        "bytes_written": 60,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 819,
+        "response_status": "302"
+      },
+      {
+        "case_id": "http-missing-path",
+        "protocol": "http",
+        "executed_at": "2026-10-17T15:33:33.397788Z",
+        "ended_at": "2026-10-17T15:33:33.476348Z",
+        "input_file": "inputs/http-missing-path.bin",
+        "input_sha256": "b4ac528e0db5ad9d847727a2f84cd0c85e320ee39e6abf54e139def6a4432829",
+        "local_port": 57585,
+        "bytes_written": 87,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 439,
+        "response_status": "404"
+      },
+      {
+        "case_id": "http-query",
+        "protocol": "http",
+        "executed_at": "2026-10-17T15:33:33.72819Z",
+        "ended_at": "2026-10-17T15:33:33.807022Z",
+        "input_file": "inputs/http-query.bin",
+        "input_sha256": "11ecb1f36a7a78f8d66f6a5d3116e14adcbb3296ff9a6442e76107f3aceb7833",
+        "local_port": 57586,
+        "bytes_written": 95,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 418,
+        "response_status": "404"
+      },
+      {
+        "case_id": "http-post",
+        "protocol": "http",
+        "executed_at": "2026-10-17T15:33:34.058939Z",
+        "ended_at": "2026-10-17T15:33:34.137849Z",
+        "input_file": "inputs/http-post.bin",
+        "input_sha256": "a6077294d67d768566410cf30f1393931b9709c4a4b39d2898d007fd742c968e",
+        "local_port": 57587,
+        "bytes_written": 130,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 418,
+        "response_status": "404"
+      },
+      {
+        "case_id": "http-malformed",
+        "protocol": "http",
+        "executed_at": "2026-10-17T15:33:34.389559Z",
+        "ended_at": "2026-10-17T15:33:34.468578Z",
+        "input_file": "inputs/http-malformed.bin",
+        "input_sha256": "b157db553748b030b7de394773a072189e04f923755cd6ea4c15a979c73d9153",
+        "local_port": 57588,
+        "bytes_written": 44,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 28,
+        "response_status": "400"
+      },
+      {
+        "case_id": "http-oversize-body",
+        "protocol": "http",
+        "executed_at": "2026-10-17T15:33:34.720626Z",
+        "ended_at": "2026-10-17T15:33:34.835384Z",
+        "input_file": "inputs/http-oversize-body.bin",
+        "input_sha256": "93fb3ee19889baa52fb04745cd75f902b1b936aa6b36d1481931b1a50da0f91f",
+        "local_port": 57589,
+        "bytes_written": 16501,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 418,
+        "response_status": "404"
+      },
+      {
+        "case_id": "http-oversize-uri",
+        "protocol": "http",
+        "executed_at": "2026-10-17T15:33:35.087017Z",
+        "ended_at": "2026-10-17T15:33:35.16652Z",
+        "input_file": "inputs/http-oversize-uri.bin",
+        "input_sha256": "8712f52cdd5fa1cda27152754b8f605e4b0a3db6449342565dcfe70b2f3127de",
+        "local_port": 57590,
+        "bytes_written": 8252,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 28,
+        "response_status": "400"
+      },
+      {
+        "case_id": "http-oversize-headers",
+        "protocol": "http",
+        "executed_at": "2026-10-17T15:33:35.418106Z",
+        "ended_at": "2026-10-17T15:33:35.533933Z",
+        "input_file": "inputs/http-oversize-headers.bin",
+        "input_sha256": "ac8e9045b4c9bbc898a8843c6d1549f1e7777f006ea3ed316b4c0cd9340ad3ed",
+        "local_port": 57591,
+        "bytes_written": 16459,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 28,
+        "response_status": "400"
+      },
+      {
+        "case_id": "http-oversize-record-input",
+        "protocol": "http",
+        "executed_at": "2026-10-17T15:33:35.786371Z",
+        "ended_at": "2026-10-17T15:33:36.021849Z",
+        "input_file": "inputs/http-oversize-record-input.bin",
+        "input_sha256": "91728b94d8945d42ef2401cb8ab9ba5ffe5f359b9820d8fa5d387a48410ea3c9",
+        "local_port": 57592,
+        "bytes_written": 262261,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 417,
+        "response_status": "404"
+      },
+      {
+        "case_id": "http-forged-forwarded",
+        "protocol": "http",
+        "executed_at": "2026-10-17T15:33:36.274418Z",
+        "ended_at": "2026-10-17T15:33:36.353266Z",
+        "input_file": "inputs/http-forged-forwarded.bin",
+        "input_sha256": "531981ee6516ebeca046d3824243766d2396190c03ad0739d1da4f0cd30c5d65",
+        "local_port": 57593,
+        "bytes_written": 129,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 819,
+        "response_status": "302"
+      },
+      {
+        "case_id": "http-forged-x-forwarded-for",
+        "protocol": "http",
+        "executed_at": "2026-10-17T15:33:36.605377Z",
+        "ended_at": "2026-10-17T15:33:36.698053Z",
+        "input_file": "inputs/http-forged-x-forwarded-for.bin",
+        "input_sha256": "c454661a468fdfb0f79678a5269b0a66ad2fba921ddff1c1719ea6429e080b49",
+        "local_port": 57594,
+        "bytes_written": 106,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 819,
+        "response_status": "302"
+      },
+      {
+        "case_id": "http-forged-x-real-ip",
+        "protocol": "http",
+        "executed_at": "2026-10-17T15:33:36.949783Z",
+        "ended_at": "2026-10-17T15:33:37.029379Z",
+        "input_file": "inputs/http-forged-x-real-ip.bin",
+        "input_sha256": "269810c567e32b2e279b868824d88a09e4c88b62a5a9ee3734196f4ca234ce7c",
+        "local_port": 57595,
+        "bytes_written": 85,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 819,
+        "response_status": "302"
+      },
+      {
+        "case_id": "https-normal-path",
+        "protocol": "https",
+        "executed_at": "2026-10-17T15:33:37.281794Z",
+        "ended_at": "2026-10-17T15:33:37.404557Z",
+        "input_file": "inputs/https-normal-path.bin",
+        "input_sha256": "90536322b88414620e261d72f469264d82748dce82e47271d818be3957fdc93e",
+        "local_port": 57596,
+        "bytes_written": 60,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 819,
+        "response_status": "302"
+      },
+      {
+        "case_id": "https-missing-path",
+        "protocol": "https",
+        "executed_at": "2026-10-17T15:33:37.657149Z",
+        "ended_at": "2026-10-17T15:33:37.814039Z",
+        "input_file": "inputs/https-missing-path.bin",
+        "input_sha256": "b4ac528e0db5ad9d847727a2f84cd0c85e320ee39e6abf54e139def6a4432829",
+        "local_port": 57597,
+        "bytes_written": 87,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 439,
+        "response_status": "404"
+      },
+      {
+        "case_id": "https-query",
+        "protocol": "https",
+        "executed_at": "2026-10-17T15:33:38.066549Z",
+        "ended_at": "2026-10-17T15:33:38.187002Z",
+        "input_file": "inputs/https-query.bin",
+        "input_sha256": "11ecb1f36a7a78f8d66f6a5d3116e14adcbb3296ff9a6442e76107f3aceb7833",
+        "local_port": 57599,
+        "bytes_written": 95,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 418,
+        "response_status": "404"
+      },
+      {
+        "case_id": "https-post",
+        "protocol": "https",
+        "executed_at": "2026-10-17T15:33:38.438609Z",
+        "ended_at": "2026-10-17T15:33:38.561374Z",
+        "input_file": "inputs/https-post.bin",
+        "input_sha256": "a6077294d67d768566410cf30f1393931b9709c4a4b39d2898d007fd742c968e",
+        "local_port": 57601,
+        "bytes_written": 130,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 418,
+        "response_status": "404"
+      },
+      {
+        "case_id": "https-malformed",
+        "protocol": "https",
+        "executed_at": "2026-10-17T15:33:38.813667Z",
+        "ended_at": "2026-10-17T15:33:38.976506Z",
+        "input_file": "inputs/https-malformed.bin",
+        "input_sha256": "b157db553748b030b7de394773a072189e04f923755cd6ea4c15a979c73d9153",
+        "local_port": 57602,
+        "bytes_written": 44,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 28,
+        "response_status": "400"
+      },
+      {
+        "case_id": "https-oversize-body",
+        "protocol": "https",
+        "executed_at": "2026-10-17T15:33:39.228918Z",
+        "ended_at": "2026-10-17T15:33:39.428012Z",
+        "input_file": "inputs/https-oversize-body.bin",
+        "input_sha256": "93fb3ee19889baa52fb04745cd75f902b1b936aa6b36d1481931b1a50da0f91f",
+        "local_port": 57603,
+        "bytes_written": 16501,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 418,
+        "response_status": "404"
+      },
+      {
+        "case_id": "https-oversize-uri",
+        "protocol": "https",
+        "executed_at": "2026-10-17T15:33:39.680304Z",
+        "ended_at": "2026-10-17T15:33:39.840096Z",
+        "input_file": "inputs/https-oversize-uri.bin",
+        "input_sha256": "8712f52cdd5fa1cda27152754b8f605e4b0a3db6449342565dcfe70b2f3127de",
+        "local_port": 57604,
+        "bytes_written": 8252,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 28,
+        "response_status": "400"
+      },
+      {
+        "case_id": "https-oversize-headers",
+        "protocol": "https",
+        "executed_at": "2026-10-17T15:33:40.091775Z",
+        "ended_at": "2026-10-17T15:33:40.290415Z",
+        "input_file": "inputs/https-oversize-headers.bin",
+        "input_sha256": "ac8e9045b4c9bbc898a8843c6d1549f1e7777f006ea3ed316b4c0cd9340ad3ed",
+        "local_port": 57605,
+        "bytes_written": 16459,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 28,
+        "response_status": "400"
+      },
+      {
+        "case_id": "https-oversize-record-input",
+        "protocol": "https",
+        "executed_at": "2026-10-17T15:33:40.5438Z",
+        "ended_at": "2026-10-17T15:33:40.814698Z",
+        "input_file": "inputs/https-oversize-record-input.bin",
+        "input_sha256": "91728b94d8945d42ef2401cb8ab9ba5ffe5f359b9820d8fa5d387a48410ea3c9",
+        "local_port": 57606,
+        "bytes_written": 262261,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 417,
+        "response_status": "404"
+      },
+      {
+        "case_id": "https-forged-forwarded",
+        "protocol": "https",
+        "executed_at": "2026-10-17T15:33:41.06594Z",
+        "ended_at": "2026-10-17T15:33:41.186633Z",
+        "input_file": "inputs/https-forged-forwarded.bin",
+        "input_sha256": "531981ee6516ebeca046d3824243766d2396190c03ad0739d1da4f0cd30c5d65",
+        "local_port": 57610,
+        "bytes_written": 129,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 819,
+        "response_status": "302"
+      },
+      {
+        "case_id": "https-forged-x-forwarded-for",
+        "protocol": "https",
+        "executed_at": "2026-10-17T15:33:41.437907Z",
+        "ended_at": "2026-10-17T15:33:41.594608Z",
+        "input_file": "inputs/https-forged-x-forwarded-for.bin",
+        "input_sha256": "c454661a468fdfb0f79678a5269b0a66ad2fba921ddff1c1719ea6429e080b49",
+        "local_port": 57612,
+        "bytes_written": 106,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 819,
+        "response_status": "302"
+      },
+      {
+        "case_id": "https-forged-x-real-ip",
+        "protocol": "https",
+        "executed_at": "2026-10-17T15:33:41.846372Z",
+        "ended_at": "2026-10-17T15:33:42.000674Z",
+        "input_file": "inputs/https-forged-x-real-ip.bin",
+        "input_sha256": "269810c567e32b2e279b868824d88a09e4c88b62a5a9ee3734196f4ca234ce7c",
+        "local_port": 57619,
+        "bytes_written": 85,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 819,
+        "response_status": "302"
+      },
+      {
+        "case_id": "http-login-control",
+        "protocol": "http",
+        "executed_at": "2026-10-17T15:33:42.251509Z",
+        "ended_at": "2026-10-17T15:33:42.339109Z",
+        "input_file": "inputs/http-login-control.bin",
+        "input_sha256": "67625ea5e0fe256973cc766dc9b31a5011751ee46e027f5493a9178a4468c289",
+        "local_port": 57648,
+        "bytes_written": 70,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 10365,
+        "response_status": "200"
+      },
+      {
+        "case_id": "http-redaction",
+        "protocol": "http",
+        "executed_at": "2026-10-17T15:33:42.594016Z",
+        "ended_at": "2026-10-17T15:33:42.673352Z",
+        "input_file": "inputs/http-redaction.bin",
+        "input_sha256": "d2922487ea7ba2bc67679a9df1976e58e5c1b2843d10ce09843bb1d4bf31252c",
+        "local_port": 57649,
+        "bytes_written": 276,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 418,
+        "response_status": "404"
+      },
+      {
+        "case_id": "http-chunked",
+        "protocol": "http",
+        "executed_at": "2026-10-17T15:33:42.926298Z",
+        "ended_at": "2026-10-17T15:33:43.00394Z",
+        "input_file": "inputs/http-chunked.bin",
+        "input_sha256": "fa8a4c4c0ac344dc490414afeeb13d4ac7ae921a444082b3b11bf97a5b9aefce",
+        "local_port": 57650,
+        "bytes_written": 134,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 417,
+        "response_status": "404"
+      },
+      {
+        "continue_verified": true,
+        "case_id": "http-disconnect",
+        "protocol": "http",
+        "executed_at": "2026-10-17T15:33:43.256001Z",
+        "ended_at": "2026-10-17T15:33:43.372908Z",
+        "input_file": "inputs/http-disconnect.bin",
+        "input_sha256": "3a3e4a4966ac255b4a53d22c60da7896ac92cc79781cf6f33b459005bb2eb442",
+        "local_port": 57651,
+        "bytes_written": 125,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 0
+      },
+      {
+        "case_id": "http-malformed-secret",
+        "protocol": "http",
+        "executed_at": "2026-10-17T15:33:43.624805Z",
+        "ended_at": "2026-10-17T15:33:43.704231Z",
+        "input_file": "inputs/http-malformed-secret.bin",
+        "input_sha256": "34fede05c3178416f16fa3e10df1ed69e3ba3f71516ae582cdbd7bb56cbe3404",
+        "local_port": 57652,
+        "bytes_written": 65,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 28,
+        "response_status": "400"
+      },
+      {
+        "case_id": "http-truncated-json",
+        "protocol": "http",
+        "executed_at": "2026-10-17T15:33:43.957464Z",
+        "ended_at": "2026-10-17T15:33:44.073571Z",
+        "input_file": "inputs/http-truncated-json.bin",
+        "input_sha256": "49823caceca0c7e2575820cbbe1e0350d082dbc7ceb7b37300ba5ff45ce1161b",
+        "local_port": 57653,
+        "bytes_written": 16547,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 418,
+        "response_status": "404"
+      },
+      {
+        "case_id": "http-truncated-form",
+        "protocol": "http",
+        "executed_at": "2026-10-17T15:33:44.325657Z",
+        "ended_at": "2026-10-17T15:33:44.441448Z",
+        "input_file": "inputs/http-truncated-form.bin",
+        "input_sha256": "06b60397f17f1537bb2296313bb4444d9b3fff62ef53ea87bfccb95b7eed496e",
+        "local_port": 57654,
+        "bytes_written": 16549,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 418,
+        "response_status": "404"
+      },
+      {
+        "case_id": "https-login-control",
+        "protocol": "https",
+        "executed_at": "2026-10-17T15:33:44.693148Z",
+        "ended_at": "2026-10-17T15:33:44.856798Z",
+        "input_file": "inputs/https-login-control.bin",
+        "input_sha256": "67625ea5e0fe256973cc766dc9b31a5011751ee46e027f5493a9178a4468c289",
+        "local_port": 57655,
+        "bytes_written": 70,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 10365,
+        "response_status": "200"
+      },
+      {
+        "case_id": "https-redaction",
+        "protocol": "https",
+        "executed_at": "2026-10-17T15:33:45.109497Z",
+        "ended_at": "2026-10-17T15:33:45.22973Z",
+        "input_file": "inputs/https-redaction.bin",
+        "input_sha256": "d2922487ea7ba2bc67679a9df1976e58e5c1b2843d10ce09843bb1d4bf31252c",
+        "local_port": 57656,
+        "bytes_written": 276,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 418,
+        "response_status": "404"
+      },
+      {
+        "case_id": "https-chunked",
+        "protocol": "https",
+        "executed_at": "2026-10-17T15:33:45.482378Z",
+        "ended_at": "2026-10-17T15:33:45.639516Z",
+        "input_file": "inputs/https-chunked.bin",
+        "input_sha256": "fa8a4c4c0ac344dc490414afeeb13d4ac7ae921a444082b3b11bf97a5b9aefce",
+        "local_port": 57657,
+        "bytes_written": 134,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 417,
+        "response_status": "404"
+      },
+      {
+        "continue_verified": true,
+        "case_id": "https-disconnect",
+        "protocol": "https",
+        "executed_at": "2026-10-17T15:33:45.891829Z",
+        "ended_at": "2026-10-17T15:33:46.048696Z",
+        "input_file": "inputs/https-disconnect.bin",
+        "input_sha256": "3a3e4a4966ac255b4a53d22c60da7896ac92cc79781cf6f33b459005bb2eb442",
+        "local_port": 57658,
+        "bytes_written": 125,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 0
+      },
+      {
+        "case_id": "https-malformed-secret",
+        "protocol": "https",
+        "executed_at": "2026-10-17T15:33:46.300023Z",
+        "ended_at": "2026-10-17T15:33:46.421375Z",
+        "input_file": "inputs/https-malformed-secret.bin",
+        "input_sha256": "34fede05c3178416f16fa3e10df1ed69e3ba3f71516ae582cdbd7bb56cbe3404",
+        "local_port": 57659,
+        "bytes_written": 65,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 28,
+        "response_status": "400"
+      },
+      {
+        "case_id": "https-truncated-json",
+        "protocol": "https",
+        "executed_at": "2026-10-17T15:33:46.672363Z",
+        "ended_at": "2026-10-17T15:33:46.830841Z",
+        "input_file": "inputs/https-truncated-json.bin",
+        "input_sha256": "49823caceca0c7e2575820cbbe1e0350d082dbc7ceb7b37300ba5ff45ce1161b",
+        "local_port": 57660,
+        "bytes_written": 16547,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 418,
+        "response_status": "404"
+      },
+      {
+        "case_id": "https-truncated-form",
+        "protocol": "https",
+        "executed_at": "2026-10-17T15:33:47.082842Z",
+        "ended_at": "2026-10-17T15:33:47.2414Z",
+        "input_file": "inputs/https-truncated-form.bin",
+        "input_sha256": "06b60397f17f1537bb2296313bb4444d9b3fff62ef53ea87bfccb95b7eed496e",
+        "local_port": 57661,
+        "bytes_written": 16549,
+        "status": "SENT",
+        "read_outcome": "peer_eof",
+        "response_bytes": 418,
+        "response_status": "404"
+      }
+    ],
+    "tls_certificate_verified": true,
+    "tls_untrusted_rejected": true
+  },
+  "report": {
+    "status": "PASS",
+    "run_id": "ctm0-57e7ccd5",
+    "variant": "patched",
+    "image_id": "sha256:71f370e058f7fdf7f9773a8b05aa76ec73c735d881a294998ffa56cc27a0b965",
+    "results": [
+      {
+        "case_id": "http-normal-path",
+        "status": "PASS",
+        "input": {
+          "case_id": "http-normal-path",
+          "protocol": "http",
+          "executed_at": "2026-10-17T15:33:33.066408Z",
+          "ended_at": "2026-10-17T15:33:33.145318Z",
+          "input_file": "inputs/http-normal-path.bin",
+          "input_sha256": "90536322b88414620e261d72f469264d82748dce82e47271d818be3957fdc93e",
+          "local_port": 57584,
+          "bytes_written": 60,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 819,
+          "response_status": "302"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 1,
+          "sha256": "d822699b3985de625fa02adc67f542b77d4dfae2a6e54bd85a280906b91f87c5"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 47059,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18080,
+          "host_port": 18080,
+          "container_ip": "172.30.0.2",
+          "container_port": 8080
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 0,
+            "retained": 0,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 42,
+            "retained": 42,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1312,
+            "retained": 1312,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 1,
+            "retained": 1,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": []
+      },
+      {
+        "case_id": "http-missing-path",
+        "status": "PASS",
+        "input": {
+          "case_id": "http-missing-path",
+          "protocol": "http",
+          "executed_at": "2026-10-17T15:33:33.397788Z",
+          "ended_at": "2026-10-17T15:33:33.476348Z",
+          "input_file": "inputs/http-missing-path.bin",
+          "input_sha256": "b4ac528e0db5ad9d847727a2f84cd0c85e320ee39e6abf54e139def6a4432829",
+          "local_port": 57585,
+          "bytes_written": 87,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 439,
+          "response_status": "404"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 2,
+          "sha256": "9711f358d6b8f46a28aebd782e38672fd6dfc9fa719aa92f83de834607302b06"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 52542,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18080,
+          "host_port": 18080,
+          "container_ip": "172.30.0.2",
+          "container_port": 8080
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 0,
+            "retained": 0,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 42,
+            "retained": 42,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1341,
+            "retained": 1341,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 28,
+            "retained": 28,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": []
+      },
+      {
+        "case_id": "http-query",
+        "status": "PASS",
+        "input": {
+          "case_id": "http-query",
+          "protocol": "http",
+          "executed_at": "2026-10-17T15:33:33.72819Z",
+          "ended_at": "2026-10-17T15:33:33.807022Z",
+          "input_file": "inputs/http-query.bin",
+          "input_sha256": "11ecb1f36a7a78f8d66f6a5d3116e14adcbb3296ff9a6442e76107f3aceb7833",
+          "local_port": 57586,
+          "bytes_written": 95,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 418,
+          "response_status": "404"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 3,
+          "sha256": "1c897872adbec559efaf30259811e40ad154947055d65b0b2b13c1b3399b6e08"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 46965,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18080,
+          "host_port": 18080,
+          "container_ip": "172.30.0.2",
+          "container_port": 8080
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 0,
+            "retained": 0,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 42,
+            "retained": 42,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1359,
+            "retained": 1359,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 36,
+            "retained": 36,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": []
+      },
+      {
+        "case_id": "http-post",
+        "status": "PASS",
+        "input": {
+          "case_id": "http-post",
+          "protocol": "http",
+          "executed_at": "2026-10-17T15:33:34.058939Z",
+          "ended_at": "2026-10-17T15:33:34.137849Z",
+          "input_file": "inputs/http-post.bin",
+          "input_sha256": "a6077294d67d768566410cf30f1393931b9709c4a4b39d2898d007fd742c968e",
+          "local_port": 57587,
+          "bytes_written": 130,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 418,
+          "response_status": "404"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 4,
+          "sha256": "487846c29d93aa626b5b00dce0ac7d2b50d6160bfbbc5f941a28fd54b79b2b22"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 18810,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18080,
+          "host_port": 18080,
+          "container_ip": "172.30.0.2",
+          "container_port": 8080
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 17,
+            "retained": 17,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 88,
+            "retained": 88,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1423,
+            "retained": 1423,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 7,
+            "retained": 7,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": []
+      },
+      {
+        "case_id": "http-malformed",
+        "status": "PASS",
+        "input": {
+          "case_id": "http-malformed",
+          "protocol": "http",
+          "executed_at": "2026-10-17T15:33:34.389559Z",
+          "ended_at": "2026-10-17T15:33:34.468578Z",
+          "input_file": "inputs/http-malformed.bin",
+          "input_sha256": "b157db553748b030b7de394773a072189e04f923755cd6ea4c15a979c73d9153",
+          "local_port": 57588,
+          "bytes_written": 44,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 28,
+          "response_status": "400"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "unavailable",
+            "reason": "body framing unavailable because headers did not complete"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "unavailable",
+            "reason": "malformed headers withheld to avoid secret leakage"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 5,
+          "sha256": "ba4872f7214e9f1d0f43fddcb97591dd41c04e2c7c045fd93f4c3ee3ba325a9f"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 7941,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18080,
+          "host_port": 18080,
+          "container_ip": "172.30.0.2",
+          "container_port": 8080
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 0,
+            "retained": 0,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 26,
+            "retained": 0,
+            "truncated": true
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1397,
+            "retained": 1397,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 1,
+            "retained": 1,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": [
+          "malformed_http",
+          "required_field_unavailable"
+        ]
+      },
+      {
+        "case_id": "http-oversize-body",
+        "status": "PASS",
+        "input": {
+          "case_id": "http-oversize-body",
+          "protocol": "http",
+          "executed_at": "2026-10-17T15:33:34.720626Z",
+          "ended_at": "2026-10-17T15:33:34.835384Z",
+          "input_file": "inputs/http-oversize-body.bin",
+          "input_sha256": "93fb3ee19889baa52fb04745cd75f902b1b936aa6b36d1481931b1a50da0f91f",
+          "local_port": 57589,
+          "bytes_written": 16501,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 418,
+          "response_status": "404"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 6,
+          "sha256": "5504a6229f75e593308853fb8956790aedd8e422bdbc10f7474a74fa9b58d269"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 51051,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18080,
+          "host_port": 18080,
+          "container_ip": "172.30.0.2",
+          "container_port": 8080
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 16385,
+            "retained": 16384,
+            "truncated": true
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 91,
+            "retained": 91,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 17818,
+            "retained": 17818,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 7,
+            "retained": 7,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": [
+          "body_truncated"
+        ]
+      },
+      {
+        "case_id": "http-oversize-uri",
+        "status": "PASS",
+        "input": {
+          "case_id": "http-oversize-uri",
+          "protocol": "http",
+          "executed_at": "2026-10-17T15:33:35.087017Z",
+          "ended_at": "2026-10-17T15:33:35.16652Z",
+          "input_file": "inputs/http-oversize-uri.bin",
+          "input_sha256": "8712f52cdd5fa1cda27152754b8f605e4b0a3db6449342565dcfe70b2f3127de",
+          "local_port": 57590,
+          "bytes_written": 8252,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 28,
+          "response_status": "400"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "unavailable",
+            "reason": "body framing unavailable because headers did not complete"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "unavailable",
+            "reason": "headers did not complete"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 7,
+          "sha256": "b0e6ceef8cc9585d34402dd28548235f17314e1e7d40909584c37e3c3185e1f0"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 18052,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18080,
+          "host_port": 18080,
+          "container_ip": "172.30.0.2",
+          "container_port": 8080
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 0,
+            "retained": 0,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 0,
+            "retained": 0,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 9576,
+            "retained": 9576,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 8193,
+            "retained": 8192,
+            "truncated": true
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": [
+          "required_field_unavailable",
+          "uri_limit",
+          "uri_truncated"
+        ]
+      },
+      {
+        "case_id": "http-oversize-headers",
+        "status": "PASS",
+        "input": {
+          "case_id": "http-oversize-headers",
+          "protocol": "http",
+          "executed_at": "2026-10-17T15:33:35.418106Z",
+          "ended_at": "2026-10-17T15:33:35.533933Z",
+          "input_file": "inputs/http-oversize-headers.bin",
+          "input_sha256": "ac8e9045b4c9bbc898a8843c6d1549f1e7777f006ea3ed316b4c0cd9340ad3ed",
+          "local_port": 57591,
+          "bytes_written": 16459,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 28,
+          "response_status": "400"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "unavailable",
+            "reason": "body framing unavailable because headers did not complete"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "unavailable",
+            "reason": "header line exceeded parser limit"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 8,
+          "sha256": "cab05d6d0c686388d8880d86f896660173c384bff4f6509344bb2405325377b4"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 36476,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18080,
+          "host_port": 18080,
+          "container_ip": "172.30.0.2",
+          "container_port": 8080
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 0,
+            "retained": 0,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 16443,
+            "retained": 0,
+            "truncated": true
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1379,
+            "retained": 1379,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 1,
+            "retained": 1,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": [
+          "line_limit",
+          "required_field_unavailable"
+        ]
+      },
+      {
+        "case_id": "http-oversize-record-input",
+        "status": "PASS",
+        "input": {
+          "case_id": "http-oversize-record-input",
+          "protocol": "http",
+          "executed_at": "2026-10-17T15:33:35.786371Z",
+          "ended_at": "2026-10-17T15:33:36.021849Z",
+          "input_file": "inputs/http-oversize-record-input.bin",
+          "input_sha256": "91728b94d8945d42ef2401cb8ab9ba5ffe5f359b9820d8fa5d387a48410ea3c9",
+          "local_port": 57592,
+          "bytes_written": 262261,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 417,
+          "response_status": "404"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 9,
+          "sha256": "1ebf5026938395b9d0fb039403169df9770ae6019e7ba80ae4e5722cbb15bd4f"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 42778,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18080,
+          "host_port": 18080,
+          "container_ip": "172.30.0.2",
+          "container_port": 8080
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 262145,
+            "retained": 16384,
+            "truncated": true
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 92,
+            "retained": 92,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 17820,
+            "retained": 17820,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 6,
+            "retained": 6,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": [
+          "body_truncated"
+        ]
+      },
+      {
+        "case_id": "http-forged-forwarded",
+        "status": "PASS",
+        "input": {
+          "case_id": "http-forged-forwarded",
+          "protocol": "http",
+          "executed_at": "2026-10-17T15:33:36.274418Z",
+          "ended_at": "2026-10-17T15:33:36.353266Z",
+          "input_file": "inputs/http-forged-forwarded.bin",
+          "input_sha256": "531981ee6516ebeca046d3824243766d2396190c03ad0739d1da4f0cd30c5d65",
+          "local_port": 57593,
+          "bytes_written": 129,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 819,
+          "response_status": "302"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 10,
+          "sha256": "842002fcc0935e6f79d81e7d7822baed5cf22332fc80d3972f54de6b912daf41"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 13558,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18080,
+          "host_port": 18080,
+          "container_ip": "172.30.0.2",
+          "container_port": 8080
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 0,
+            "retained": 0,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 111,
+            "retained": 111,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1403,
+            "retained": 1403,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 1,
+            "retained": 1,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": []
+      },
+      {
+        "case_id": "http-forged-x-forwarded-for",
+        "status": "PASS",
+        "input": {
+          "case_id": "http-forged-x-forwarded-for",
+          "protocol": "http",
+          "executed_at": "2026-10-17T15:33:36.605377Z",
+          "ended_at": "2026-10-17T15:33:36.698053Z",
+          "input_file": "inputs/http-forged-x-forwarded-for.bin",
+          "input_sha256": "c454661a468fdfb0f79678a5269b0a66ad2fba921ddff1c1719ea6429e080b49",
+          "local_port": 57594,
+          "bytes_written": 106,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 819,
+          "response_status": "302"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 11,
+          "sha256": "33c57b90ee5517bc760b188fecc39ced5c50cc7a00a85128370611f709ca2bc1"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 62839,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18080,
+          "host_port": 18080,
+          "container_ip": "172.30.0.2",
+          "container_port": 8080
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 0,
+            "retained": 0,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 88,
+            "retained": 88,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1378,
+            "retained": 1378,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 1,
+            "retained": 1,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": []
+      },
+      {
+        "case_id": "http-forged-x-real-ip",
+        "status": "PASS",
+        "input": {
+          "case_id": "http-forged-x-real-ip",
+          "protocol": "http",
+          "executed_at": "2026-10-17T15:33:36.949783Z",
+          "ended_at": "2026-10-17T15:33:37.029379Z",
+          "input_file": "inputs/http-forged-x-real-ip.bin",
+          "input_sha256": "269810c567e32b2e279b868824d88a09e4c88b62a5a9ee3734196f4ca234ce7c",
+          "local_port": 57595,
+          "bytes_written": 85,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 819,
+          "response_status": "302"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 12,
+          "sha256": "8a07a9bdaee6af5bf13004bd3238aeae6b0bf7cdd78c24d6cc349ba6ae820245"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 23382,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18080,
+          "host_port": 18080,
+          "container_ip": "172.30.0.2",
+          "container_port": 8080
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 0,
+            "retained": 0,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 67,
+            "retained": 67,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1356,
+            "retained": 1356,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 1,
+            "retained": 1,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": []
+      },
+      {
+        "case_id": "https-normal-path",
+        "status": "PASS",
+        "input": {
+          "case_id": "https-normal-path",
+          "protocol": "https",
+          "executed_at": "2026-10-17T15:33:37.281794Z",
+          "ended_at": "2026-10-17T15:33:37.404557Z",
+          "input_file": "inputs/https-normal-path.bin",
+          "input_sha256": "90536322b88414620e261d72f469264d82748dce82e47271d818be3957fdc93e",
+          "local_port": 57596,
+          "bytes_written": 60,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 819,
+          "response_status": "302"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 13,
+          "sha256": "5ae2d33bd47e4567cafb738b6359d35aba9c4c6318f8136e6353c19c5693d297"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 62616,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18443,
+          "host_port": 18443,
+          "container_ip": "172.30.0.2",
+          "container_port": 8443
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 0,
+            "retained": 0,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 42,
+            "retained": 42,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1313,
+            "retained": 1313,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 1,
+            "retained": 1,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": []
+      },
+      {
+        "case_id": "https-missing-path",
+        "status": "PASS",
+        "input": {
+          "case_id": "https-missing-path",
+          "protocol": "https",
+          "executed_at": "2026-10-17T15:33:37.657149Z",
+          "ended_at": "2026-10-17T15:33:37.814039Z",
+          "input_file": "inputs/https-missing-path.bin",
+          "input_sha256": "b4ac528e0db5ad9d847727a2f84cd0c85e320ee39e6abf54e139def6a4432829",
+          "local_port": 57597,
+          "bytes_written": 87,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 439,
+          "response_status": "404"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 14,
+          "sha256": "aac1f8c3f327940e3c395ca2504a1a47fc2c5391411dcc7f1b587d5d87dc0693"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 54414,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18443,
+          "host_port": 18443,
+          "container_ip": "172.30.0.2",
+          "container_port": 8443
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 0,
+            "retained": 0,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 42,
+            "retained": 42,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1342,
+            "retained": 1342,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 28,
+            "retained": 28,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": []
+      },
+      {
+        "case_id": "https-query",
+        "status": "PASS",
+        "input": {
+          "case_id": "https-query",
+          "protocol": "https",
+          "executed_at": "2026-10-17T15:33:38.066549Z",
+          "ended_at": "2026-10-17T15:33:38.187002Z",
+          "input_file": "inputs/https-query.bin",
+          "input_sha256": "11ecb1f36a7a78f8d66f6a5d3116e14adcbb3296ff9a6442e76107f3aceb7833",
+          "local_port": 57599,
+          "bytes_written": 95,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 418,
+          "response_status": "404"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 15,
+          "sha256": "a15b757f639f92a1739973694b358d09d41fa6209bc4f2094487c8fdf3db2479"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 37116,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18443,
+          "host_port": 18443,
+          "container_ip": "172.30.0.2",
+          "container_port": 8443
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 0,
+            "retained": 0,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 42,
+            "retained": 42,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1360,
+            "retained": 1360,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 36,
+            "retained": 36,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": []
+      },
+      {
+        "case_id": "https-post",
+        "status": "PASS",
+        "input": {
+          "case_id": "https-post",
+          "protocol": "https",
+          "executed_at": "2026-10-17T15:33:38.438609Z",
+          "ended_at": "2026-10-17T15:33:38.561374Z",
+          "input_file": "inputs/https-post.bin",
+          "input_sha256": "a6077294d67d768566410cf30f1393931b9709c4a4b39d2898d007fd742c968e",
+          "local_port": 57601,
+          "bytes_written": 130,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 418,
+          "response_status": "404"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 16,
+          "sha256": "0df4c5e35b17556ee1b183c41f81fd400b87e2a34b49ebe0dac1d6117a0fa126"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 30179,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18443,
+          "host_port": 18443,
+          "container_ip": "172.30.0.2",
+          "container_port": 8443
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 17,
+            "retained": 17,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 88,
+            "retained": 88,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1424,
+            "retained": 1424,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 7,
+            "retained": 7,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": []
+      },
+      {
+        "case_id": "https-malformed",
+        "status": "PASS",
+        "input": {
+          "case_id": "https-malformed",
+          "protocol": "https",
+          "executed_at": "2026-10-17T15:33:38.813667Z",
+          "ended_at": "2026-10-17T15:33:38.976506Z",
+          "input_file": "inputs/https-malformed.bin",
+          "input_sha256": "b157db553748b030b7de394773a072189e04f923755cd6ea4c15a979c73d9153",
+          "local_port": 57602,
+          "bytes_written": 44,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 28,
+          "response_status": "400"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "unavailable",
+            "reason": "body framing unavailable because headers did not complete"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "unavailable",
+            "reason": "malformed headers withheld to avoid secret leakage"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 17,
+          "sha256": "a8e546053d1e1dd93707eeaec3726e4aa410de0fb1a8897d14e244a5e94b3362"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 23136,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18443,
+          "host_port": 18443,
+          "container_ip": "172.30.0.2",
+          "container_port": 8443
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 0,
+            "retained": 0,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 26,
+            "retained": 0,
+            "truncated": true
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1399,
+            "retained": 1399,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 1,
+            "retained": 1,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": [
+          "malformed_http",
+          "required_field_unavailable"
+        ]
+      },
+      {
+        "case_id": "https-oversize-body",
+        "status": "PASS",
+        "input": {
+          "case_id": "https-oversize-body",
+          "protocol": "https",
+          "executed_at": "2026-10-17T15:33:39.228918Z",
+          "ended_at": "2026-10-17T15:33:39.428012Z",
+          "input_file": "inputs/https-oversize-body.bin",
+          "input_sha256": "93fb3ee19889baa52fb04745cd75f902b1b936aa6b36d1481931b1a50da0f91f",
+          "local_port": 57603,
+          "bytes_written": 16501,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 418,
+          "response_status": "404"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 18,
+          "sha256": "afca4e7263481cdf8c61165b2e2a2913b50fac700339dd3a168452f4cb96528c"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 17652,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18443,
+          "host_port": 18443,
+          "container_ip": "172.30.0.2",
+          "container_port": 8443
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 16385,
+            "retained": 16384,
+            "truncated": true
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 91,
+            "retained": 91,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 17819,
+            "retained": 17819,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 7,
+            "retained": 7,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": [
+          "body_truncated"
+        ]
+      },
+      {
+        "case_id": "https-oversize-uri",
+        "status": "PASS",
+        "input": {
+          "case_id": "https-oversize-uri",
+          "protocol": "https",
+          "executed_at": "2026-10-17T15:33:39.680304Z",
+          "ended_at": "2026-10-17T15:33:39.840096Z",
+          "input_file": "inputs/https-oversize-uri.bin",
+          "input_sha256": "8712f52cdd5fa1cda27152754b8f605e4b0a3db6449342565dcfe70b2f3127de",
+          "local_port": 57604,
+          "bytes_written": 8252,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 28,
+          "response_status": "400"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "unavailable",
+            "reason": "body framing unavailable because headers did not complete"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "unavailable",
+            "reason": "headers did not complete"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 19,
+          "sha256": "b6271ac8e4cec2feb6048b2c8d0e3082f40d820ad989b5d5b997d1c40670dfd3"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 26745,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18443,
+          "host_port": 18443,
+          "container_ip": "172.30.0.2",
+          "container_port": 8443
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 0,
+            "retained": 0,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 0,
+            "retained": 0,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 9577,
+            "retained": 9577,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 8193,
+            "retained": 8192,
+            "truncated": true
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": [
+          "required_field_unavailable",
+          "uri_limit",
+          "uri_truncated"
+        ]
+      },
+      {
+        "case_id": "https-oversize-headers",
+        "status": "PASS",
+        "input": {
+          "case_id": "https-oversize-headers",
+          "protocol": "https",
+          "executed_at": "2026-10-17T15:33:40.091775Z",
+          "ended_at": "2026-10-17T15:33:40.290415Z",
+          "input_file": "inputs/https-oversize-headers.bin",
+          "input_sha256": "ac8e9045b4c9bbc898a8843c6d1549f1e7777f006ea3ed316b4c0cd9340ad3ed",
+          "local_port": 57605,
+          "bytes_written": 16459,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 28,
+          "response_status": "400"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "unavailable",
+            "reason": "body framing unavailable because headers did not complete"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "unavailable",
+            "reason": "header line exceeded parser limit"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 20,
+          "sha256": "41e9058e89d32af6903365a03f514c3726f6abd662808c6a057fa328019baa83"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 48312,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18443,
+          "host_port": 18443,
+          "container_ip": "172.30.0.2",
+          "container_port": 8443
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 0,
+            "retained": 0,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 16443,
+            "retained": 0,
+            "truncated": true
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1380,
+            "retained": 1380,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 1,
+            "retained": 1,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": [
+          "line_limit",
+          "required_field_unavailable"
+        ]
+      },
+      {
+        "case_id": "https-oversize-record-input",
+        "status": "PASS",
+        "input": {
+          "case_id": "https-oversize-record-input",
+          "protocol": "https",
+          "executed_at": "2026-10-17T15:33:40.5438Z",
+          "ended_at": "2026-10-17T15:33:40.814698Z",
+          "input_file": "inputs/https-oversize-record-input.bin",
+          "input_sha256": "91728b94d8945d42ef2401cb8ab9ba5ffe5f359b9820d8fa5d387a48410ea3c9",
+          "local_port": 57606,
+          "bytes_written": 262261,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 417,
+          "response_status": "404"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 21,
+          "sha256": "2aa5ecfa56c0070175406bd27b3618827959ec7e836a058170f07df01708fca6"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 55868,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18443,
+          "host_port": 18443,
+          "container_ip": "172.30.0.2",
+          "container_port": 8443
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 262145,
+            "retained": 16384,
+            "truncated": true
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 92,
+            "retained": 92,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 17821,
+            "retained": 17821,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 6,
+            "retained": 6,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": [
+          "body_truncated"
+        ]
+      },
+      {
+        "case_id": "https-forged-forwarded",
+        "status": "PASS",
+        "input": {
+          "case_id": "https-forged-forwarded",
+          "protocol": "https",
+          "executed_at": "2026-10-17T15:33:41.06594Z",
+          "ended_at": "2026-10-17T15:33:41.186633Z",
+          "input_file": "inputs/https-forged-forwarded.bin",
+          "input_sha256": "531981ee6516ebeca046d3824243766d2396190c03ad0739d1da4f0cd30c5d65",
+          "local_port": 57610,
+          "bytes_written": 129,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 819,
+          "response_status": "302"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 22,
+          "sha256": "e603954c3d4503dc8f248eb0f0c87aa5f381281111cd5338ddf5df80c5380e38"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 13770,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18443,
+          "host_port": 18443,
+          "container_ip": "172.30.0.2",
+          "container_port": 8443
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 0,
+            "retained": 0,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 111,
+            "retained": 111,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1404,
+            "retained": 1404,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 1,
+            "retained": 1,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": []
+      },
+      {
+        "case_id": "https-forged-x-forwarded-for",
+        "status": "PASS",
+        "input": {
+          "case_id": "https-forged-x-forwarded-for",
+          "protocol": "https",
+          "executed_at": "2026-10-17T15:33:41.437907Z",
+          "ended_at": "2026-10-17T15:33:41.594608Z",
+          "input_file": "inputs/https-forged-x-forwarded-for.bin",
+          "input_sha256": "c454661a468fdfb0f79678a5269b0a66ad2fba921ddff1c1719ea6429e080b49",
+          "local_port": 57612,
+          "bytes_written": 106,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 819,
+          "response_status": "302"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 23,
+          "sha256": "1a11e54028c17594db801b954278b8d6f0c7a276217ce9b1215b2c304ed97b66"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 56729,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18443,
+          "host_port": 18443,
+          "container_ip": "172.30.0.2",
+          "container_port": 8443
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 0,
+            "retained": 0,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 88,
+            "retained": 88,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1379,
+            "retained": 1379,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 1,
+            "retained": 1,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": []
+      },
+      {
+        "case_id": "https-forged-x-real-ip",
+        "status": "PASS",
+        "input": {
+          "case_id": "https-forged-x-real-ip",
+          "protocol": "https",
+          "executed_at": "2026-10-17T15:33:41.846372Z",
+          "ended_at": "2026-10-17T15:33:42.000674Z",
+          "input_file": "inputs/https-forged-x-real-ip.bin",
+          "input_sha256": "269810c567e32b2e279b868824d88a09e4c88b62a5a9ee3734196f4ca234ce7c",
+          "local_port": 57619,
+          "bytes_written": 85,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 819,
+          "response_status": "302"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 24,
+          "sha256": "8e34046a88d897ccc617d17a256c42daf1462b0475ba79d307d23ef420e722a8"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 61212,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18443,
+          "host_port": 18443,
+          "container_ip": "172.30.0.2",
+          "container_port": 8443
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 0,
+            "retained": 0,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 67,
+            "retained": 67,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1357,
+            "retained": 1357,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 1,
+            "retained": 1,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": []
+      },
+      {
+        "case_id": "http-login-control",
+        "status": "PASS",
+        "input": {
+          "case_id": "http-login-control",
+          "protocol": "http",
+          "executed_at": "2026-10-17T15:33:42.251509Z",
+          "ended_at": "2026-10-17T15:33:42.339109Z",
+          "input_file": "inputs/http-login-control.bin",
+          "input_sha256": "67625ea5e0fe256973cc766dc9b31a5011751ee46e027f5493a9178a4468c289",
+          "local_port": 57648,
+          "bytes_written": 70,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 10365,
+          "response_status": "200"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 25,
+          "sha256": "a40fef46995db4a9462e6127d4c72f1f435110ed2ef16225f6d7ab42c40d9152"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 48646,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18080,
+          "host_port": 18080,
+          "container_ip": "172.30.0.2",
+          "container_port": 8080
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 0,
+            "retained": 0,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 42,
+            "retained": 42,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1324,
+            "retained": 1324,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 11,
+            "retained": 11,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": []
+      },
+      {
+        "case_id": "http-redaction",
+        "status": "PASS",
+        "input": {
+          "case_id": "http-redaction",
+          "protocol": "http",
+          "executed_at": "2026-10-17T15:33:42.594016Z",
+          "ended_at": "2026-10-17T15:33:42.673352Z",
+          "input_file": "inputs/http-redaction.bin",
+          "input_sha256": "d2922487ea7ba2bc67679a9df1976e58e5c1b2843d10ce09843bb1d4bf31252c",
+          "local_port": 57649,
+          "bytes_written": 276,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 418,
+          "response_status": "404"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 26,
+          "sha256": "f21f31c870a865f0912331800ae009f2d98af4e332e79fe823961e2dda85b6e4"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 28115,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18080,
+          "host_port": 18080,
+          "container_ip": "172.30.0.2",
+          "container_port": 8080
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 29,
+            "retained": 29,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 192,
+            "retained": 192,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1646,
+            "retained": 1646,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 37,
+            "retained": 37,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": [
+          "body_redacted",
+          "headers_redacted"
+        ]
+      },
+      {
+        "case_id": "http-chunked",
+        "status": "PASS",
+        "input": {
+          "case_id": "http-chunked",
+          "protocol": "http",
+          "executed_at": "2026-10-17T15:33:42.926298Z",
+          "ended_at": "2026-10-17T15:33:43.00394Z",
+          "input_file": "inputs/http-chunked.bin",
+          "input_sha256": "fa8a4c4c0ac344dc490414afeeb13d4ac7ae921a444082b3b11bf97a5b9aefce",
+          "local_port": 57650,
+          "bytes_written": 134,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 417,
+          "response_status": "404"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 27,
+          "sha256": "1be5744d2c4f50e48c5cce77f0ca396105c27301d47a6b24e9b1b483409c0da0"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 3213,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18080,
+          "host_port": 18080,
+          "container_ip": "172.30.0.2",
+          "container_port": 8080
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 4,
+            "retained": 4,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 96,
+            "retained": 96,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1414,
+            "retained": 1414,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 6,
+            "retained": 6,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": []
+      },
+      {
+        "case_id": "http-disconnect",
+        "status": "PASS",
+        "input": {
+          "continue_verified": true,
+          "case_id": "http-disconnect",
+          "protocol": "http",
+          "executed_at": "2026-10-17T15:33:43.256001Z",
+          "ended_at": "2026-10-17T15:33:43.372908Z",
+          "input_file": "inputs/http-disconnect.bin",
+          "input_sha256": "3a3e4a4966ac255b4a53d22c60da7896ac92cc79781cf6f33b459005bb2eb442",
+          "local_port": 57651,
+          "bytes_written": 125,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 0
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 28,
+          "sha256": "4ad8f2c3d5da00cee50a63d736559d0343ee271e2af906b36707a797e8146162"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 22779,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18080,
+          "host_port": 18080,
+          "container_ip": "172.30.0.2",
+          "container_port": 8080
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 7,
+            "retained": 7,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 92,
+            "retained": 92,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1452,
+            "retained": 1452,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 8,
+            "retained": 8,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": [
+          "client_disconnect"
+        ]
+      },
+      {
+        "case_id": "http-malformed-secret",
+        "status": "PASS",
+        "input": {
+          "case_id": "http-malformed-secret",
+          "protocol": "http",
+          "executed_at": "2026-10-17T15:33:43.624805Z",
+          "ended_at": "2026-10-17T15:33:43.704231Z",
+          "input_file": "inputs/http-malformed-secret.bin",
+          "input_sha256": "34fede05c3178416f16fa3e10df1ed69e3ba3f71516ae582cdbd7bb56cbe3404",
+          "local_port": 57652,
+          "bytes_written": 65,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 28,
+          "response_status": "400"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "unavailable",
+            "reason": "body framing unavailable because headers did not complete"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "unavailable",
+            "reason": "malformed headers withheld to avoid secret leakage"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 29,
+          "sha256": "99e07b634f8768703a6c98eeb781f56518625b70ddc226e2e89e4ceb9036f9c6"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 9757,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18080,
+          "host_port": 18080,
+          "container_ip": "172.30.0.2",
+          "container_port": 8080
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 0,
+            "retained": 0,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 25,
+            "retained": 0,
+            "truncated": true
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1416,
+            "retained": 1416,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 23,
+            "retained": 23,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": [
+          "malformed_http",
+          "required_field_unavailable"
+        ]
+      },
+      {
+        "case_id": "http-truncated-json",
+        "status": "PASS",
+        "input": {
+          "case_id": "http-truncated-json",
+          "protocol": "http",
+          "executed_at": "2026-10-17T15:33:43.957464Z",
+          "ended_at": "2026-10-17T15:33:44.073571Z",
+          "input_file": "inputs/http-truncated-json.bin",
+          "input_sha256": "49823caceca0c7e2575820cbbe1e0350d082dbc7ceb7b37300ba5ff45ce1161b",
+          "local_port": 57653,
+          "bytes_written": 16547,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 418,
+          "response_status": "404"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 30,
+          "sha256": "113c6a862731457910b59286b20feb2d9fd4cf0462811ba5151042e460fa66cd"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 33539,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18080,
+          "host_port": 18080,
+          "container_ip": "172.30.0.2",
+          "container_port": 8080
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 16425,
+            "retained": 16384,
+            "truncated": true
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 97,
+            "retained": 97,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1493,
+            "retained": 1493,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 7,
+            "retained": 7,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": [
+          "body_redacted",
+          "body_truncated"
+        ]
+      },
+      {
+        "case_id": "http-truncated-form",
+        "status": "PASS",
+        "input": {
+          "case_id": "http-truncated-form",
+          "protocol": "http",
+          "executed_at": "2026-10-17T15:33:44.325657Z",
+          "ended_at": "2026-10-17T15:33:44.441448Z",
+          "input_file": "inputs/http-truncated-form.bin",
+          "input_sha256": "06b60397f17f1537bb2296313bb4444d9b3fff62ef53ea87bfccb95b7eed496e",
+          "local_port": 57654,
+          "bytes_written": 16549,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 418,
+          "response_status": "404"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 31,
+          "sha256": "a5d57c684128d36504ab95c6030a4aeea7483749772102fd2714626f926c775f"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 60521,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18080,
+          "host_port": 18080,
+          "container_ip": "172.30.0.2",
+          "container_port": 8080
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 16410,
+            "retained": 16384,
+            "truncated": true
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 114,
+            "retained": 114,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1512,
+            "retained": 1512,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 7,
+            "retained": 7,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": [
+          "body_redacted",
+          "body_truncated"
+        ]
+      },
+      {
+        "case_id": "https-login-control",
+        "status": "PASS",
+        "input": {
+          "case_id": "https-login-control",
+          "protocol": "https",
+          "executed_at": "2026-10-17T15:33:44.693148Z",
+          "ended_at": "2026-10-17T15:33:44.856798Z",
+          "input_file": "inputs/https-login-control.bin",
+          "input_sha256": "67625ea5e0fe256973cc766dc9b31a5011751ee46e027f5493a9178a4468c289",
+          "local_port": 57655,
+          "bytes_written": 70,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 10365,
+          "response_status": "200"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 32,
+          "sha256": "f83ffece236e645f03babc067fecef91db63bec5d5e6be38a44fe493ea8d0d79"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 26252,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18443,
+          "host_port": 18443,
+          "container_ip": "172.30.0.2",
+          "container_port": 8443
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 0,
+            "retained": 0,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 42,
+            "retained": 42,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1325,
+            "retained": 1325,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 11,
+            "retained": 11,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": []
+      },
+      {
+        "case_id": "https-redaction",
+        "status": "PASS",
+        "input": {
+          "case_id": "https-redaction",
+          "protocol": "https",
+          "executed_at": "2026-10-17T15:33:45.109497Z",
+          "ended_at": "2026-10-17T15:33:45.22973Z",
+          "input_file": "inputs/https-redaction.bin",
+          "input_sha256": "d2922487ea7ba2bc67679a9df1976e58e5c1b2843d10ce09843bb1d4bf31252c",
+          "local_port": 57656,
+          "bytes_written": 276,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 418,
+          "response_status": "404"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 33,
+          "sha256": "0232b797bd3372e8e75d31d87318ec8e0ae828d41b25c625e909956c7a022f4b"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 17361,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18443,
+          "host_port": 18443,
+          "container_ip": "172.30.0.2",
+          "container_port": 8443
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 29,
+            "retained": 29,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 192,
+            "retained": 192,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1647,
+            "retained": 1647,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 37,
+            "retained": 37,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": [
+          "body_redacted",
+          "headers_redacted"
+        ]
+      },
+      {
+        "case_id": "https-chunked",
+        "status": "PASS",
+        "input": {
+          "case_id": "https-chunked",
+          "protocol": "https",
+          "executed_at": "2026-10-17T15:33:45.482378Z",
+          "ended_at": "2026-10-17T15:33:45.639516Z",
+          "input_file": "inputs/https-chunked.bin",
+          "input_sha256": "fa8a4c4c0ac344dc490414afeeb13d4ac7ae921a444082b3b11bf97a5b9aefce",
+          "local_port": 57657,
+          "bytes_written": 134,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 417,
+          "response_status": "404"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 34,
+          "sha256": "9c868cf71b8d3e4f3c24d893cc5a8734cd7756dda303c24dbe7d9a8e36a737d3"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 19753,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18443,
+          "host_port": 18443,
+          "container_ip": "172.30.0.2",
+          "container_port": 8443
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 4,
+            "retained": 4,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 96,
+            "retained": 96,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1416,
+            "retained": 1416,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 6,
+            "retained": 6,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": []
+      },
+      {
+        "case_id": "https-disconnect",
+        "status": "PASS",
+        "input": {
+          "continue_verified": true,
+          "case_id": "https-disconnect",
+          "protocol": "https",
+          "executed_at": "2026-10-17T15:33:45.891829Z",
+          "ended_at": "2026-10-17T15:33:46.048696Z",
+          "input_file": "inputs/https-disconnect.bin",
+          "input_sha256": "3a3e4a4966ac255b4a53d22c60da7896ac92cc79781cf6f33b459005bb2eb442",
+          "local_port": 57658,
+          "bytes_written": 125,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 0
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 35,
+          "sha256": "dc355c74e9ffb54e7cfeedd0406121875c4438cc7e0a3af1aa28aa2074ce545a"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 34097,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18443,
+          "host_port": 18443,
+          "container_ip": "172.30.0.2",
+          "container_port": 8443
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 7,
+            "retained": 7,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 92,
+            "retained": 92,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1453,
+            "retained": 1453,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 8,
+            "retained": 8,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": [
+          "client_disconnect"
+        ]
+      },
+      {
+        "case_id": "https-malformed-secret",
+        "status": "PASS",
+        "input": {
+          "case_id": "https-malformed-secret",
+          "protocol": "https",
+          "executed_at": "2026-10-17T15:33:46.300023Z",
+          "ended_at": "2026-10-17T15:33:46.421375Z",
+          "input_file": "inputs/https-malformed-secret.bin",
+          "input_sha256": "34fede05c3178416f16fa3e10df1ed69e3ba3f71516ae582cdbd7bb56cbe3404",
+          "local_port": 57659,
+          "bytes_written": 65,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 28,
+          "response_status": "400"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "unavailable",
+            "reason": "body framing unavailable because headers did not complete"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "unavailable",
+            "reason": "malformed headers withheld to avoid secret leakage"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 36,
+          "sha256": "ff743191168d99b1f27b279540164897baaf2bc8c2c28824390e28407d641797"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 55248,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18443,
+          "host_port": 18443,
+          "container_ip": "172.30.0.2",
+          "container_port": 8443
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 0,
+            "retained": 0,
+            "truncated": false
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 25,
+            "retained": 0,
+            "truncated": true
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1418,
+            "retained": 1418,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 23,
+            "retained": 23,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": [
+          "malformed_http",
+          "required_field_unavailable"
+        ]
+      },
+      {
+        "case_id": "https-truncated-json",
+        "status": "PASS",
+        "input": {
+          "case_id": "https-truncated-json",
+          "protocol": "https",
+          "executed_at": "2026-10-17T15:33:46.672363Z",
+          "ended_at": "2026-10-17T15:33:46.830841Z",
+          "input_file": "inputs/https-truncated-json.bin",
+          "input_sha256": "49823caceca0c7e2575820cbbe1e0350d082dbc7ceb7b37300ba5ff45ce1161b",
+          "local_port": 57660,
+          "bytes_written": 16547,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 418,
+          "response_status": "404"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 37,
+          "sha256": "60451dfceb9b2d40960abd5a6e56bd1d2b8031f25a638952426782a287fb04b3"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 48375,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18443,
+          "host_port": 18443,
+          "container_ip": "172.30.0.2",
+          "container_port": 8443
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 16425,
+            "retained": 16384,
+            "truncated": true
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 97,
+            "retained": 97,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1494,
+            "retained": 1494,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 7,
+            "retained": 7,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": [
+          "body_redacted",
+          "body_truncated"
+        ]
+      },
+      {
+        "case_id": "https-truncated-form",
+        "status": "PASS",
+        "input": {
+          "case_id": "https-truncated-form",
+          "protocol": "https",
+          "executed_at": "2026-10-17T15:33:47.082842Z",
+          "ended_at": "2026-10-17T15:33:47.2414Z",
+          "input_file": "inputs/https-truncated-form.bin",
+          "input_sha256": "06b60397f17f1537bb2296313bb4444d9b3fff62ef53ea87bfccb95b7eed496e",
+          "local_port": 57661,
+          "bytes_written": 16549,
+          "status": "SENT",
+          "read_outcome": "peer_eof",
+          "response_bytes": 418,
+          "response_status": "404"
+        },
+        "field_completeness": {
+          "body": {
+            "status": "present",
+            "source": "body"
+          },
+          "destination": {
+            "status": "present",
+            "source": "destination_ip/destination_port joined to raw/inspect.json port binding and network"
+          },
+          "headers": {
+            "status": "present",
+            "source": "headers"
+          },
+          "method": {
+            "status": "present",
+            "source": "method"
+          },
+          "parse_error": {
+            "status": "present",
+            "source": "parse_error"
+          },
+          "peer_ip": {
+            "status": "present",
+            "source": "peer_ip"
+          },
+          "peer_port": {
+            "status": "present",
+            "source": "peer_port"
+          },
+          "timestamp": {
+            "status": "present",
+            "source": "timestamp"
+          },
+          "truncation": {
+            "status": "present",
+            "source": "truncation"
+          },
+          "uri": {
+            "status": "present",
+            "source": "uri"
+          }
+        },
+        "evidence": {
+          "file": "raw/events.jsonl",
+          "line": 38,
+          "sha256": "63e273a49fc12e1d58c1cfa2898ad62bfa9cc0806ea869ef8ab5185b4a8c2087"
+        },
+        "observed_ip": "198.51.100.20",
+        "observed_port": 39997,
+        "destination_mapping": {
+          "public_ip": "192.0.2.10",
+          "public_port": 18443,
+          "host_port": 18443,
+          "container_ip": "172.30.0.2",
+          "container_port": 8443
+        },
+        "truncation": {
+          "body": {
+            "limit": 16384,
+            "observed": 16410,
+            "retained": 16384,
+            "truncated": true
+          },
+          "headers": {
+            "limit": 16384,
+            "observed": 114,
+            "retained": 114,
+            "truncated": false
+          },
+          "record": {
+            "limit": 262144,
+            "observed": 1513,
+            "retained": 1513,
+            "truncated": false
+          },
+          "uri": {
+            "limit": 8192,
+            "observed": 7,
+            "retained": 7,
+            "truncated": false
+          }
+        },
+        "auto_report_eligible": false,
+        "quality_flags": [
+          "body_redacted",
+          "body_truncated"
+        ]
+      }
+    ]
+  },
+  "current_build_inputs_sha256": {
+    "sensors/images.lock": "5db9be5a25b2270f17c2a17477d423c69328b1ab1e291d450b417b911e7d6b64",
+    "sensors/web/Dockerfile": "9782957e3d4e340f805b585a8880db475a49fc722e6a4a5dc3d99368ee1aea07",
+    "sensors/web/apply_patch.py": "1869ad43b2aec0de8663c2d074a916d0a1839ff8fd3b1d4bd72f418ecf93a895",
+    "sensors/web/opencanary.conf": "69353fedf183b8c887c4d2db61a7219f122636bd96a7877831c126bf30a28960",
+    "sensors/web/patches/request-evidence.patch": "fd0f271158b1eadb325a434681e1e515fceebd2b9a9e38cb3a6dd8a67db3fdd2",
+    "sensors/web/request_evidence.py": "391edc59f724236729325e242aa72ccfe4fbd78664ed015b8183be8683551c3a"
+  }
+}

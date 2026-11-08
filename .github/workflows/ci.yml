@@ -1,0 +1,123 @@
+name: CI - checks (auto/manual)
+run-name: CI - ${{ github.event_name == 'workflow_dispatch' && 'manual' || 'automatic' }} - ${{ github.event_name }} - ${{ github.ref_name }}
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+permissions:
+  contents: read
+jobs:
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install checksum-pinned Gitleaks
+        shell: bash
+        run: |
+          set -euo pipefail
+          scanner_dir=$(mktemp -d "$RUNNER_TEMP/gitleaks.XXXXXX")
+          curl --fail --silent --show-error --location --retry 3 --connect-timeout 10 --max-time 60 \
+            https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz \
+            --output "$scanner_dir/gitleaks.tar.gz"
+          echo "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  $scanner_dir/gitleaks.tar.gz" | sha256sum --check --strict
+          tar -xzf "$scanner_dir/gitleaks.tar.gz" -C "$scanner_dir" gitleaks
+          test "$("$scanner_dir/gitleaks" version)" = 8.30.1
+          echo "$scanner_dir" >> "$GITHUB_PATH"
+      - name: Verify ignore policy and secret detection
+        run: python3 -B scripts/test-secret-scan.py
+      - name: Scan all fetched Git history (redacted, no uploaded report)
+        run: >-
+          gitleaks git --config .gitleaks.toml --gitleaks-ignore-path .gitleaksignore
+          --log-opts="--all" --ignore-gitleaks-allow --redact=100
+          --no-banner --no-color --timeout 120 .
+  dependencies:
+    name: Dependency vulnerabilities
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      GOTOOLCHAIN: local
+      GOENV: 'off'
+      GOWORK: 'off'
+      GOFLAGS: '-mod=readonly'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+        with:
+          go-version: '1.27.3'
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22.23.1'
+      - name: Audit locked npm dependencies without lifecycle scripts
+        run: npm --prefix web audit --package-lock-only --ignore-scripts --audit-level=low
+      - name: Check Go call paths on both Linux architectures
+        # An npm audit failure must not hide Go findings; either failure still fails this job.
+        if: ${{ !cancelled() }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          export GOBIN="$RUNNER_TEMP/cheesetrap-vuln-tools"
+          go install golang.org/x/vuln/cmd/govulncheck@v1.9.0
+          for arch in amd64 arm64; do
+            GOOS=linux GOARCH="$arch" "$GOBIN/govulncheck" ./...
+          done
+  automated:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      GOTOOLCHAIN: local
+      GOENV: 'off'
+      GOWORK: 'off'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+        with:
+          go-version: '1.27.3'
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22.23.1'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Check release metadata and tool versions
+        run: |
+          scripts/release-check.sh --metadata-only
+          test "$(go env GOVERSION)" = go1.27.3
+          test "$(node --version)" = v22.23.1
+          test "$(npm --version)" = 10.9.8
+      - name: Prepare locked dependencies and browser (network allowed)
+        run: |
+          go mod download
+          go mod verify
+          npm --prefix web ci --no-audit --no-fund
+          cd web
+          npx --no-install playwright install --with-deps chromium
+      - name: Verify Testcontainers loopback ports and locked Ryuk image
+        run: python3 -B scripts/test-testcontainers.py
+      - name: Offline unit, disposable DB integration and UI acceptance
+        run: scripts/test-acceptance.sh --automated-only
+      - name: Check current automated result
+        run: |
+          result=$(python3 -c 'from pathlib import Path; print(max(Path(".local/acceptance").glob("*/results.json")))')
+          scripts/release-check.sh --acceptance-results "$result"
+      - name: Build pinned images
+        run: |
+          docker build -f deploy/Dockerfile -t cheesetrap:ci .
+          docker build --target patched -t cheesetrap-web:ci sensors/web
+      - name: Test pinned engine Python boundaries and real reactor
+        timeout-minutes: 5
+        run: python3 -B scripts/test-python.py image --image cheesetrap-web:ci
+      - name: Explain external gates
+        if: always()
+        run: echo 'PASS_AUTOMATED covers general Python regressions, offline fixtures, disposable DB and UI. Engine Python boundaries and reactor are a separate required step after image build. Actual Linux network and load verification is a separately scoped release step; CI does not run or replace it. Private logs are never uploaded.' >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,3 @@
+# Public decoy credentials only. Never use these for management or real accounts.
+root:x:synthetic-shell-password
+*:x:!*

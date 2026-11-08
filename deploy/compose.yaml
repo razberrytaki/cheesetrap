@@ -1,0 +1,201 @@
+# IPv4 Linux deployment. Apply scripts/install-firewall.py before starting sensors.
+# Separate Compose networks alone do not implement the sensor boundary.
+# Go soft memory budget within the unchanged 256 MiB container limit.
+x-app-env: &app-env
+  GOMEMLIMIT: 192MiB
+
+x-app: &app
+  image: ${COMPOSE_PROJECT_NAME:-cheesetrap}:local
+  build:
+    context: ..
+    dockerfile: deploy/Dockerfile
+  user: "10001:10001"
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  tmpfs: ["/tmp:rw,noexec,nosuid,size=16m,uid=10001,gid=10001"]
+  cpus: 1.0
+  mem_limit: 256m
+  pids_limit: 128
+  networks: [management]
+  logging: &logging
+    driver: json-file
+    options: {max-size: "5m", max-file: "2"}
+
+services:
+  postgres:
+    image: postgres:17.11-bookworm@sha256:3645570cccdfa447589da9f57dd740faa29b30938e861289a5574b6ca6b03826
+    environment:
+      POSTGRES_DB: cheesetrap
+      POSTGRES_PASSWORD_FILE: /run/secrets/bootstrap-password
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ${INSTALL_ROOT:-../.local/install}/secrets/bootstrap-password:/run/secrets/bootstrap-password:ro
+      - ${INSTALL_ROOT:-../.local/install}/bootstrap/10-roles.sql:/docker-entrypoint-initdb.d/10-roles.sql:ro
+    networks: [management]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U postgres -d cheesetrap"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    cpus: 1.0
+    mem_limit: 1g
+    pids_limit: 128
+    shm_size: 64mb
+    restart: unless-stopped
+    logging: *logging
+
+  migrate:
+    <<: *app
+    command: [migrate]
+    environment:
+      <<: *app-env
+      CHEESETRAP_DATABASE_URL_FILE: /run/secrets/database-url
+    volumes:
+      - ${INSTALL_ROOT:-../.local/install}/secrets/migration-url:/run/secrets/database-url:ro
+    depends_on: {postgres: {condition: service_healthy}}
+    restart: "no"
+
+  api:
+    <<: *app
+    command: [api]
+    # Docker does not publish ports on an internal-only network. This bridge
+    # belongs only to the API; DB and collector stay on management.
+    networks: [management, api_host]
+    environment:
+      <<: *app-env
+      CHEESETRAP_DATABASE_URL_FILE: /run/secrets/database-url
+      CHEESETRAP_API_LISTEN: 0.0.0.0:8080
+      CHEESETRAP_API_CONTAINER_LISTENER: "true"
+      CHEESETRAP_API_ORIGIN: ${CHEESETRAP_API_ORIGIN:-http://127.0.0.1:8080}
+    volumes:
+      - ${INSTALL_ROOT:-../.local/install}/secrets/api-url:/run/secrets/database-url:ro
+    ports: ["127.0.0.1:8080:8080/tcp"]
+    depends_on: {migrate: {condition: service_completed_successfully}}
+    restart: "no"
+
+  collector:
+    <<: *app
+    command: [collector]
+    environment:
+      <<: *app-env
+      CHEESETRAP_DATABASE_URL_FILE: /run/secrets/database-url
+      CHEESETRAP_STORAGE_PATHS: /logs:/storage/postgres
+      CHEESETRAP_COLLECTOR_LOG_DIR: /logs
+      CHEESETRAP_COLLECTOR_SOURCES_FILE: /config/sources.json
+    volumes:
+      - postgres-data:/storage/postgres:ro
+      - ${INSTALL_ROOT:-../.local/install}/secrets/collector-url:/run/secrets/database-url:ro
+      - ${INSTALL_ROOT:-../.local/install}/config/collector:/config:ro
+      - ${INSTALL_ROOT:-../.local/install}/logs:/logs:ro
+    depends_on: {migrate: {condition: service_completed_successfully}}
+    # Restart only after refreshing the operator-owned archive manifest.
+    restart: "no"
+
+  admin:
+    <<: *app
+    profiles: [tools]
+    command: [admin, create]
+    environment:
+      <<: *app-env
+      CHEESETRAP_DATABASE_URL_FILE: /run/secrets/database-url
+    volumes:
+      - ${INSTALL_ROOT:-../.local/install}/secrets/api-url:/run/secrets/database-url:ro
+    depends_on: {migrate: {condition: service_completed_successfully}}
+    stdin_open: true
+    tty: true
+    restart: "no"
+
+  # Durable detection, draft and contact enrichment worker.
+  worker:
+    <<: *app
+    profiles: [worker]
+    command: [worker]
+    # Only the worker receives outbound routing for registry lookup.
+    networks: [management, worker_egress]
+    environment:
+      <<: *app-env
+      CHEESETRAP_DATABASE_URL_FILE: /run/secrets/database-url
+      CHEESETRAP_STORAGE_PATHS: /logs:/storage/postgres
+    volumes:
+      - postgres-data:/storage/postgres:ro
+      - ${INSTALL_ROOT:-../.local/install}/logs:/logs:ro
+      - ${INSTALL_ROOT:-../.local/install}/secrets/worker-url:/run/secrets/database-url:ro
+    depends_on: {migrate: {condition: service_completed_successfully}}
+    restart: "no"
+
+  cowrie:
+    image: cowrie/cowrie@sha256:019726c8deef20729162cda492d9385917b579c9ace6368e47e7566cd2491ba1
+    user: "999:999"
+    # Do not auto-start after host reboot without the host guard.
+    restart: "no"
+    read_only: true
+    cpus: 0.50
+    mem_limit: 256m
+    pids_limit: 128
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    dns: [127.0.0.1]
+    sysctls: {net.ipv6.conf.all.disable_ipv6: "1", net.ipv6.conf.default.disable_ipv6: "1"}
+    ports: ["${SENSOR_BIND_IP:-0.0.0.0}:${SENSOR_SSH_PORT:-2222}:2222/tcp"]
+    volumes:
+      - ${INSTALL_ROOT:-../.local/install}/config/cowrie.cfg:/cowrie/cowrie-git/etc/cowrie.cfg:ro
+      - ${INSTALL_ROOT:-../.local/install}/config/userdb.txt:/cowrie/cowrie-git/etc/userdb.txt:ro
+      - ../sensors/cowrie/commands.py:/cowrie/cowrie-git/src/cowrie/commands/__init__.py:ro
+      - ${INSTALL_ROOT:-../.local/install}/state/cowrie:/cowrie/cowrie-git/var:rw
+      - ${INSTALL_ROOT:-../.local/install}/logs/cowrie:/cowrie/cowrie-git/var/log/cowrie:rw
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=16m,uid=999,gid=999
+      - /cowrie/cowrie-git/etc:rw,noexec,nosuid,size=4m,uid=999,gid=999
+    networks: {sensor: {ipv4_address: "${COWRIE_IP:-172.30.91.10}"}}
+    logging: *logging
+
+  web:
+    image: ${COMPOSE_PROJECT_NAME:-cheesetrap}-web:local
+    build:
+      context: ../sensors/web
+      target: patched
+    user: "65534:65534"
+    restart: "no"
+    read_only: true
+    cpus: 0.50
+    mem_limit: 256m
+    pids_limit: 128
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    dns: [127.0.0.1]
+    sysctls: {net.ipv6.conf.all.disable_ipv6: "1", net.ipv6.conf.default.disable_ipv6: "1"}
+    entrypoint: [/opencanary/.venv/bin/twistd]
+    command: [-noy, /opencanary/.venv/bin/opencanary.tac, --pidfile, /tmp/opencanary.pid, --logfile, "-"]
+    ports:
+      - "${SENSOR_BIND_IP:-0.0.0.0}:${SENSOR_HTTP_PORT:-18080}:8080/tcp"
+      - "${SENSOR_BIND_IP:-0.0.0.0}:${SENSOR_HTTPS_PORT:-18443}:8443/tcp"
+    volumes:
+      - ${INSTALL_ROOT:-../.local/install}/config/web/opencanary.conf:/etc/opencanaryd/opencanary.conf:ro
+      - ${INSTALL_ROOT:-../.local/install}/config/web/cert.pem:/run/cheesetrap/cert.pem:ro
+      - ${INSTALL_ROOT:-../.local/install}/config/web/key.pem:/run/cheesetrap/key.pem:ro
+      - ${INSTALL_ROOT:-../.local/install}/logs/web:/var/tmp:rw
+    tmpfs: ["/tmp:rw,noexec,nosuid,size=16m,uid=65534,gid=65534"]
+    networks: {sensor: {ipv4_address: "${WEB_IP:-172.30.91.11}"}}
+    logging: *logging
+
+networks:
+  worker_egress:
+    driver: bridge
+    enable_ipv6: false
+  api_host:
+    name: ${COMPOSE_PROJECT_NAME:-cheesetrap}-api
+    enable_ipv6: false
+    driver_opts:
+      com.docker.network.bridge.name: ${API_BRIDGE:-ctma-sensor}
+    labels:
+      com.cheesetrap.install: ${COMPOSE_PROJECT_NAME:-cheesetrap}
+  management:
+    internal: true
+    enable_ipv6: false
+  sensor:
+    external: true
+    name: ${SENSOR_NETWORK:-cheesetrap-sensor}
+volumes:
+  postgres-data:

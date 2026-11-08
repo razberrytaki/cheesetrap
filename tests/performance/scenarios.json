@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "notes": [
+    "Rates below are INPUT rates, never measured normalized event rates. Single invalid SSH authentication uses the M0 fixture credentials; HTTP(S) GET paths use no credentials and follow the explicit web_workload.",
+    "sustained and burst are provisional input mixes. First run calibration on isolated real engines; measure supported normalized rows per SSH attempt and one row per completed HTTP(S) request, then copy this document and adjust input rates to hit 20 or 200 actual normalized events/second. Preserve the exact adjusted scenario and its report hash.",
+    "Measure normalized throughput from the isolated database over wall time independently. Never certify throughput from this document or generator output alone. Include collector drain after each run and reconcile engine records, rejected records, and normalized rows.",
+    "Nominal reference host: Ubuntu 24.04 native ARM64; this is not a minimum specification or an amd64 equivalence. No capacity measurement is asserted by these scenarios.",
+    "Require disabled SMTP and external enrichment plus all collector sources is_test=true. Execute on the isolated target using explicit loopback endpoints and verified SSH/TLS keys. Resource and API measurements belong to the external benchmark harness.",
+    "web_workload detection-mix-v1 cycles GET /synthetic plus the five detection.SuspiciousPaths per protocol in scheduled ordinal order: /.env, /.git/config, /wp-login.php, /wp-admin, /phpmyadmin. It exercises WEB-REPEAT candidate/evidence storage; no exploit payload is sent. Overload drops preserve the scheduled path order rather than catch up. Report records the cycle; actual transmitted mix may differ when inputs drop. Single-source loopback traffic exercises repeated-source thresholds, not broad source cardinality."
+  ],
+  "scenarios": [
+    {
+      "name": "calibration",
+      "duration": "10s",
+      "target_normalized_events_per_second": 0,
+      "ssh_auth_attempts_per_second": 1,
+      "http_requests_per_second": 1,
+      "https_requests_per_second": 1,
+      "web_workload": "normal"
+    },
+    {
+      "name": "sustained",
+      "duration": "30m",
+      "target_normalized_events_per_second": 20,
+      "ssh_auth_attempts_per_second": 2,
+      "http_requests_per_second": 5,
+      "https_requests_per_second": 5,
+      "web_workload": "detection-mix-v1"
+    },
+    {
+      "name": "burst",
+      "duration": "60s",
+      "target_normalized_events_per_second": 200,
+      "ssh_auth_attempts_per_second": 20,
+      "http_requests_per_second": 50,
+      "https_requests_per_second": 50,
+      "web_workload": "detection-mix-v1"
+    }
+  ]
+}

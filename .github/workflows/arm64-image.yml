@@ -1,0 +1,112 @@
+name: ARM64 image (manual)
+run-name: ARM64 image - manual - ${{ github.ref_name }}
+on:
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.run_id }}
+  cancel-in-progress: false
+permissions:
+  contents: read
+jobs:
+  arm64-image:
+    name: ARM64 image build and test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      DOCKER_HOST: unix:///var/run/docker.sock
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Require GitHub-hosted Linux x86_64 before privileged setup
+        id: runner
+        run: |
+          set -euo pipefail
+          test "$GITHUB_ACTIONS" = true
+          test "$RUNNER_ENVIRONMENT" = github-hosted
+          test "$RUNNER_OS" = Linux
+          test "$RUNNER_ARCH" = X64
+          test "$(uname -s)" = Linux
+          test "$(uname -m)" = x86_64
+          daemon=$(docker --host=unix:///var/run/docker.sock info --format '{{.OSType}}/{{.Architecture}}')
+          case "$daemon" in
+            linux/amd64|linux/x86_64) ;;
+            *) exit 1 ;;
+          esac
+      - name: Register ARM64 QEMU only on this disposable runner
+        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130
+        with:
+          image: tonistiigi/binfmt@sha256:400a4873b838d1b89194d982c45e5fb3cda4593fbfd7e08a02e76b03b21166f0
+          platforms: arm64
+          cache-image: false
+      - name: Start an owned local BuildKit with no insecure entitlements
+        id: buildkit
+        run: |
+          set -euo pipefail
+          # Like buildx's docker-container driver, BuildKit needs a privileged
+          # container for its worker. It has no host mounts or published ports.
+          docker --host=unix:///var/run/docker.sock run --detach \
+            --name cheesetrap-candidate-buildkit --privileged --network bridge \
+            --label "org.cheesetrap.ci-candidate=$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" \
+            moby/buildkit:v0.33.1@sha256:cec9f139f45e93c5c69c60f8b07cfad9f43f4ef6b6a6cd917527fea5ff2e3dea \
+            --oci-worker-net=bridge --cdi-disabled
+      - name: Connect pinned Buildx to the owned local container
+        id: builder
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
+        with:
+          version: v0.31.0
+          # This driver connects over local docker exec/stdio; no remote host.
+          # docker-container driver silently adds network.host to daemon flags.
+          driver: remote
+          endpoint: docker-container://cheesetrap-candidate-buildkit
+          cache-binary: false
+      - name: Require daemon rejection of unnecessary entitlements
+        timeout-minutes: 2
+        env:
+          BUILDER_NAME: ${{ steps.builder.outputs.name }}
+        run: |
+          set -euo pipefail
+          test "$(docker --host=unix:///var/run/docker.sock inspect cheesetrap-candidate-buildkit --format '{{json .Args}}')" = '["--oci-worker-net=bridge","--cdi-disabled"]'
+          probe=$(mktemp -d "$RUNNER_TEMP/buildkit-denial.XXXXXX")
+          printf 'FROM scratch\nCOPY payload /payload\n' > "$probe/Dockerfile"
+          printf 'synthetic, no executable or network operations\n' > "$probe/payload"
+          for entitlement in network.host security.insecure device; do
+            if docker --host=unix:///var/run/docker.sock buildx build --builder "$BUILDER_NAME" \
+                --allow "$entitlement" --output type=cacheonly "$probe" > "$probe/result" 2>&1; then
+              echo 'FAIL_BUILDKIT_ENTITLEMENTS:unexpected_permission' >&2
+              exit 1
+            fi
+            grep -Fq "granting entitlement $entitlement is not allowed by build daemon configuration" "$probe/result"
+          done
+          echo 'PASS_BUILDKIT_ENTITLEMENTS:network.host,security.insecure,device denied'
+      - name: Build and load the ARM64 runtime image
+        timeout-minutes: 20
+        env:
+          BUILDER_NAME: ${{ steps.builder.outputs.name }}
+        run: |
+          set -euo pipefail
+          docker --host=unix:///var/run/docker.sock buildx build \
+            --builder "$BUILDER_NAME" --platform linux/arm64 \
+            --provenance=false --sbom=false --file deploy/Dockerfile \
+            --iidfile "$RUNNER_TEMP/cheesetrap-image.id" --output type=docker .
+      - name: Run QEMU ARM64 CLI smoke on the built image
+        timeout-minutes: 8
+        run: |
+          set -euo pipefail
+          python3 -B scripts/test-main-image.py \
+            --image "$(cat "$RUNNER_TEMP/cheesetrap-image.id")" \
+            --architecture arm64 --execution qemu --timeout 60
+      - name: Remove the owned BuildKit container and its volume
+        if: ${{ always() && steps.runner.outcome == 'success' }}
+        run: |
+          set -euo pipefail
+          # docker run can create a container before start fails or is cancelled.
+          owned=$(docker --host=unix:///var/run/docker.sock container ls --all --quiet \
+            --filter 'name=^/cheesetrap-candidate-buildkit$' \
+            --filter "label=org.cheesetrap.ci-candidate=$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT")
+          if test -n "$owned"; then
+            docker --host=unix:///var/run/docker.sock rm --force --volumes "$owned"
+          fi

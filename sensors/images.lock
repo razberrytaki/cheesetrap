@@ -1,0 +1,21 @@
+{
+  "cowrie": {
+    "version": "3.1.2",
+    "source_commit": "56b2abb3b02fcb53980334f77daa0fe570f5e4be",
+    "image": "cowrie/cowrie@sha256:019726c8deef20729162cda492d9385917b579c9ace6368e47e7566cd2491ba1",
+    "upstream_commands_sha256": "74da6fe7d2fa304bfab8594a21056ed94905db4bade7a80602697d35df52d68e"
+  },
+  "opencanary": {
+    "version": "0.9.10",
+    "twisted_version": "26.4.0",
+    "source_commit": "fb12e4fefbdb1b9acd1e5561a2614f827ab639ff",
+    "image": "thinkst/opencanary@sha256:4e51338e3b6e349652b0604be656d9b8fc1cde2cd40409b2e956f1da3eb673a1",
+    "arm64_manifest": "sha256:6dc223106ade7b143b81c97c35626693db7a1178d9239e368f2f8168f9a3337b",
+    "upstream_http_sha256": "fb90b08e1893a4d975aada1dfe7b4fcfc02633ae90870a411285295f63be97dc",
+    "upstream_https_sha256": "83a5e42462dc264e02b572e42b3d08de510853ef5f133a0cbb1cf52ca447edd5",
+    "patched_http_sha256": "b86693cffa1f0bb0133d34dccf59cea404900fe8c5d7f0c9163d3dbc6d5f43f0",
+    "patched_https_sha256": "0e0ef380714b47cca6affa6b362e00203d4ef7365e22023549689f051bdfdb2d",
+    "patched_arm64_image_id": "sha256:71f370e058f7fdf7f9773a8b05aa76ec73c735d881a294998ffa56cc27a0b965",
+    "request_evidence_sha256": "391edc59f724236729325e242aa72ccfe4fbd78664ed015b8183be8683551c3a"
+  }
+}

@@ -1,0 +1,661 @@
+{
+  "schema_version": 1,
+  "kind": "input_case_descriptions",
+  "execution_status": "NOT_RUN",
+  "description": "M0-01 합성 입력 명세. 실행 드라이버·엔진 결과·실행된 테스트가 아니다. 모든 사례를 활성 주소 계열별로 실행하고 실제 바이트와 로그로 판정해야 한다.",
+  "design_starting_limits_bytes": {
+    "body": 16384,
+    "uri": 8192,
+    "headers_total": 16384,
+    "record": 262144
+  },
+  "rules": [
+    "소유·통제하는 설정 대상에만 입력한다.",
+    "HTTPS는 시험 인증서를 신뢰하거나 해당 연결에 한정해 예외를 적용한다. 전역 TLS 검증은 끄지 않는다.",
+    "기본 Host 헤더와 실제 공개 목적지는 실행 설정에서 결정하며 입력 해시는 최종 입력 artifact를 기준으로 한다.",
+    "크기 제한 수치는 설계 초깃값이며 이 목록은 엔진이 해당 제한을 구현했다는 증거가 아니다.",
+    "로그 출발지는 실제 peer와 비교한다. 요청 헤더는 peer 관측을 대체하지 못한다.",
+    "요청 오류에서 확보 불가능한 필드는 field_completeness에 사유와 함께 남긴다."
+  ],
+  "cases": [
+    {
+      "case_id": "ssh-connect",
+      "protocol": "ssh",
+      "input": {
+        "action": "connect_then_disconnect",
+        "description": "SSH 배너/연결 관측 후 인증 없이 종료"
+      },
+      "required_evidence": [
+        "timestamp",
+        "peer_ip",
+        "peer_port",
+        "destination",
+        "session_id",
+        "event_type"
+      ],
+      "expected": "단순 연결은 기록하되 자동 신고 근거로 판단하지 않는다."
+    },
+    {
+      "case_id": "ssh-auth-failure",
+      "protocol": "ssh",
+      "input": {
+        "action": "synthetic_failed_auth",
+        "username": "m0-invalid-user",
+        "password": "synthetic-invalid-password"
+      },
+      "required_evidence": [
+        "timestamp",
+        "peer_ip",
+        "peer_port",
+        "destination",
+        "session_id",
+        "auth_failure"
+      ],
+      "expected": "실패 인증 기록; 비밀번호 원문은 공개 fixture와 일반 결과에서 가린다."
+    },
+    {
+      "case_id": "ssh-emulated-shell",
+      "protocol": "ssh",
+      "input": {
+        "action": "emulated_shell_only",
+        "command": "echo m0-harmless",
+        "description": "엔진의 모방 셸에 고정 문자열 입력. 실제 호스트 셸 실행, proxy, 파일 다운로드, 외부 명령 실행 금지."
+      },
+      "required_evidence": [
+        "timestamp",
+        "peer_ip",
+        "peer_port",
+        "destination",
+        "session_id",
+        "command"
+      ],
+      "expected": "동일 모방 세션의 명령 문자열을 관측. 모방 셸 준비가 없으면 BLOCKED이며 실제 셸로 대체하지 않는다."
+    },
+    {
+      "case_id": "http-normal-path",
+      "protocol": "http",
+      "input": {
+        "method": "GET",
+        "target": "/",
+        "headers": {}
+      },
+      "required_evidence": [
+        "timestamp",
+        "peer_ip",
+        "peer_port",
+        "destination",
+        "method",
+        "uri",
+        "headers",
+        "body",
+        "parse_error",
+        "truncation"
+      ],
+      "expected": "정상 경로도 연결·요청 근거를 기록한다. HTTP 상태 코드만으로 합격하지 않는다."
+    },
+    {
+      "case_id": "http-missing-path",
+      "protocol": "http",
+      "input": {
+        "method": "GET",
+        "target": "/m0-path-that-does-not-exist",
+        "headers": {}
+      },
+      "required_evidence": [
+        "timestamp",
+        "peer_ip",
+        "peer_port",
+        "destination",
+        "method",
+        "uri",
+        "headers",
+        "body",
+        "parse_error",
+        "truncation"
+      ],
+      "expected": "미존재 경로의 원래 URI를 보존한다. 단일 404를 공격으로 판정하지 않는다."
+    },
+    {
+      "case_id": "http-query",
+      "protocol": "http",
+      "input": {
+        "method": "GET",
+        "target": "/search?q=m0%20probe&tag=one&tag=two",
+        "headers": {}
+      },
+      "required_evidence": [
+        "timestamp",
+        "peer_ip",
+        "peer_port",
+        "destination",
+        "method",
+        "uri",
+        "headers",
+        "body",
+        "parse_error",
+        "truncation"
+      ],
+      "expected": "쿼리·중복 키·인코딩을 포함한 URI 근거를 기록한다."
+    },
+    {
+      "case_id": "http-post",
+      "protocol": "http",
+      "input": {
+        "method": "POST",
+        "target": "/submit",
+        "headers": {
+          "Content-Type": "text/plain"
+        },
+        "body_utf8": "m0 synthetic body"
+      },
+      "required_evidence": [
+        "timestamp",
+        "peer_ip",
+        "peer_port",
+        "destination",
+        "method",
+        "uri",
+        "headers",
+        "body",
+        "parse_error",
+        "truncation"
+      ],
+      "expected": "메서드·본문·관련 헤더가 연결 관측과 연결된다."
+    },
+    {
+      "case_id": "http-malformed",
+      "protocol": "http",
+      "input": {
+        "raw_utf8": "GET / HTTP/1.1\r\nBrokenHeaderWithoutColon\r\n\r\n",
+        "description": "HTTPS는 TLS 연결 내부에서 동일한 잘못된 HTTP 바이트를 전달"
+      },
+      "required_evidence": [
+        "timestamp",
+        "peer_ip",
+        "peer_port",
+        "destination",
+        "method",
+        "uri",
+        "headers",
+        "body",
+        "parse_error",
+        "truncation"
+      ],
+      "expected": "파싱 실패와 확보 가능한 연결 근거를 기록하고, 확보 불가능한 필드는 이유를 남긴다."
+    },
+    {
+      "case_id": "http-oversize-body",
+      "protocol": "http",
+      "input": {
+        "method": "POST",
+        "target": "/submit",
+        "headers": {
+          "Content-Type": "text/plain"
+        },
+        "body_repeat": {
+          "ascii": "A",
+          "bytes": 16385
+        }
+      },
+      "required_evidence": [
+        "timestamp",
+        "peer_ip",
+        "peer_port",
+        "destination",
+        "method",
+        "uri",
+        "headers",
+        "body",
+        "parse_error",
+        "truncation"
+      ],
+      "expected": "본문 16384바이트 보존 초깃값 초과를 표시하고 유실·잘림을 숨기지 않는다."
+    },
+    {
+      "case_id": "http-oversize-uri",
+      "protocol": "http",
+      "input": {
+        "method": "GET",
+        "target_prefix": "/",
+        "target_repeat": {
+          "ascii": "u",
+          "bytes": 8192
+        },
+        "headers": {}
+      },
+      "required_evidence": [
+        "timestamp",
+        "peer_ip",
+        "peer_port",
+        "destination",
+        "method",
+        "uri",
+        "headers",
+        "body",
+        "parse_error",
+        "truncation"
+      ],
+      "expected": "총 URI 8193바이트 입력; URI 8192바이트 초깃값 초과에 대한 제한·품질 표식을 관측한다."
+    },
+    {
+      "case_id": "http-oversize-headers",
+      "protocol": "http",
+      "input": {
+        "method": "GET",
+        "target": "/",
+        "headers": {
+          "X-M0-Large": {
+            "ascii": "H",
+            "repeat_bytes": 16385
+          }
+        }
+      },
+      "required_evidence": [
+        "timestamp",
+        "peer_ip",
+        "peer_port",
+        "destination",
+        "method",
+        "uri",
+        "headers",
+        "body",
+        "parse_error",
+        "truncation"
+      ],
+      "expected": "헤더 값만 16385바이트로 보존 헤더 합계 16384바이트 초깃값을 넘긴다. 제한·잘림을 관측한다."
+    },
+    {
+      "case_id": "http-oversize-record-input",
+      "protocol": "http",
+      "input": {
+        "method": "POST",
+        "target": "/large",
+        "headers": {
+          "Content-Type": "text/plain"
+        },
+        "body_repeat": {
+          "ascii": "R",
+          "bytes": 262145
+        }
+      },
+      "required_evidence": [
+        "timestamp",
+        "peer_ip",
+        "peer_port",
+        "destination",
+        "method",
+        "uri",
+        "headers",
+        "body",
+        "parse_error",
+        "truncation"
+      ],
+      "expected": "총 입력이 256 KiB를 넘더라도 레코드는 262144바이트 상한 내 또는 명시적 거부여야 한다. 본문 제한이 먼저 적용될 수 있으므로 이것만으로 레코드 경계 검증을 완료하지 않는다."
+    },
+    {
+      "case_id": "http-forged-forwarded",
+      "protocol": "http",
+      "input": {
+        "method": "GET",
+        "target": "/",
+        "headers": {
+          "Forwarded": "for=203.0.113.99;proto=https;host=forged.example.invalid"
+        }
+      },
+      "required_evidence": [
+        "timestamp",
+        "peer_ip",
+        "peer_port",
+        "destination",
+        "method",
+        "uri",
+        "headers",
+        "body",
+        "parse_error",
+        "truncation"
+      ],
+      "expected": "가짜 Forwarded가 신뢰하는 연결 출발지 IP를 바꾸면 FAIL."
+    },
+    {
+      "case_id": "http-forged-x-forwarded-for",
+      "protocol": "http",
+      "input": {
+        "method": "GET",
+        "target": "/",
+        "headers": {
+          "X-Forwarded-For": "203.0.113.99, 203.0.113.100"
+        }
+      },
+      "required_evidence": [
+        "timestamp",
+        "peer_ip",
+        "peer_port",
+        "destination",
+        "method",
+        "uri",
+        "headers",
+        "body",
+        "parse_error",
+        "truncation"
+      ],
+      "expected": "가짜 X-Forwarded-For가 신뢰하는 연결 출발지 IP를 바꾸면 FAIL."
+    },
+    {
+      "case_id": "http-forged-x-real-ip",
+      "protocol": "http",
+      "input": {
+        "method": "GET",
+        "target": "/",
+        "headers": {
+          "X-Real-IP": "203.0.113.99"
+        }
+      },
+      "required_evidence": [
+        "timestamp",
+        "peer_ip",
+        "peer_port",
+        "destination",
+        "method",
+        "uri",
+        "headers",
+        "body",
+        "parse_error",
+        "truncation"
+      ],
+      "expected": "가짜 X-Real-IP가 신뢰하는 연결 출발지 IP를 바꾸면 FAIL."
+    },
+    {
+      "case_id": "https-normal-path",
+      "protocol": "https",
+      "input": {
+        "method": "GET",
+        "target": "/",
+        "headers": {}
+      },
+      "required_evidence": [
+        "timestamp",
+        "peer_ip",
+        "peer_port",
+        "destination",
+        "method",
+        "uri",
+        "headers",
+        "body",
+        "parse_error",
+        "truncation"
+      ],
+      "expected": "정상 경로도 연결·요청 근거를 기록한다. HTTP 상태 코드만으로 합격하지 않는다."
+    },
+    {
+      "case_id": "https-missing-path",
+      "protocol": "https",
+      "input": {
+        "method": "GET",
+        "target": "/m0-path-that-does-not-exist",
+        "headers": {}
+      },
+      "required_evidence": [
+        "timestamp",
+        "peer_ip",
+        "peer_port",
+        "destination",
+        "method",
+        "uri",
+        "headers",
+        "body",
+        "parse_error",
+        "truncation"
+      ],
+      "expected": "미존재 경로의 원래 URI를 보존한다. 단일 404를 공격으로 판정하지 않는다."
+    },
+    {
+      "case_id": "https-query",
+      "protocol": "https",
+      "input": {
+        "method": "GET",
+        "target": "/search?q=m0%20probe&tag=one&tag=two",
+        "headers": {}
+      },
+      "required_evidence": [
+        "timestamp",
+        "peer_ip",
+        "peer_port",
+        "destination",
+        "method",
+        "uri",
+        "headers",
+        "body",
+        "parse_error",
+        "truncation"
+      ],
+      "expected": "쿼리·중복 키·인코딩을 포함한 URI 근거를 기록한다."
+    },
+    {
+      "case_id": "https-post",
+      "protocol": "https",
+      "input": {
+        "method": "POST",
+        "target": "/submit",
+        "headers": {
+          "Content-Type": "text/plain"
+        },
+        "body_utf8": "m0 synthetic body"
+      },
+      "required_evidence": [
+        "timestamp",
+        "peer_ip",
+        "peer_port",
+        "destination",
+        "method",
+        "uri",
+        "headers",
+        "body",
+        "parse_error",
+        "truncation"
+      ],
+      "expected": "메서드·본문·관련 헤더가 연결 관측과 연결된다."
+    },
+    {
+      "case_id": "https-malformed",
+      "protocol": "https",
+      "input": {
+        "raw_utf8": "GET / HTTP/1.1\r\nBrokenHeaderWithoutColon\r\n\r\n",
+        "description": "HTTPS는 TLS 연결 내부에서 동일한 잘못된 HTTP 바이트를 전달"
+      },
+      "required_evidence": [
+        "timestamp",
+        "peer_ip",
+        "peer_port",
+        "destination",
+        "method",
+        "uri",
+        "headers",
+        "body",
+        "parse_error",
+        "truncation"
+      ],
+      "expected": "파싱 실패와 확보 가능한 연결 근거를 기록하고, 확보 불가능한 필드는 이유를 남긴다."
+    },
+    {
+      "case_id": "https-oversize-body",
+      "protocol": "https",
+      "input": {
+        "method": "POST",
+        "target": "/submit",
+        "headers": {
+          "Content-Type": "text/plain"
+        },
+        "body_repeat": {
+          "ascii": "A",
+          "bytes": 16385
+        }
+      },
+      "required_evidence": [
+        "timestamp",
+        "peer_ip",
+        "peer_port",
+        "destination",
+        "method",
+        "uri",
+        "headers",
+        "body",
+        "parse_error",
+        "truncation"
+      ],
+      "expected": "본문 16384바이트 보존 초깃값 초과를 표시하고 유실·잘림을 숨기지 않는다."
+    },
+    {
+      "case_id": "https-oversize-uri",
+      "protocol": "https",
+      "input": {
+        "method": "GET",
+        "target_prefix": "/",
+        "target_repeat": {
+          "ascii": "u",
+          "bytes": 8192
+        },
+        "headers": {}
+      },
+      "required_evidence": [
+        "timestamp",
+        "peer_ip",
+        "peer_port",
+        "destination",
+        "method",
+        "uri",
+        "headers",
+        "body",
+        "parse_error",
+        "truncation"
+      ],
+      "expected": "총 URI 8193바이트 입력; URI 8192바이트 초깃값 초과에 대한 제한·품질 표식을 관측한다."
+    },
+    {
+      "case_id": "https-oversize-headers",
+      "protocol": "https",
+      "input": {
+        "method": "GET",
+        "target": "/",
+        "headers": {
+          "X-M0-Large": {
+            "ascii": "H",
+            "repeat_bytes": 16385
+          }
+        }
+      },
+      "required_evidence": [
+        "timestamp",
+        "peer_ip",
+        "peer_port",
+        "destination",
+        "method",
+        "uri",
+        "headers",
+        "body",
+        "parse_error",
+        "truncation"
+      ],
+      "expected": "헤더 값만 16385바이트로 보존 헤더 합계 16384바이트 초깃값을 넘긴다. 제한·잘림을 관측한다."
+    },
+    {
+      "case_id": "https-oversize-record-input",
+      "protocol": "https",
+      "input": {
+        "method": "POST",
+        "target": "/large",
+        "headers": {
+          "Content-Type": "text/plain"
+        },
+        "body_repeat": {
+          "ascii": "R",
+          "bytes": 262145
+        }
+      },
+      "required_evidence": [
+        "timestamp",
+        "peer_ip",
+        "peer_port",
+        "destination",
+        "method",
+        "uri",
+        "headers",
+        "body",
+        "parse_error",
+        "truncation"
+      ],
+      "expected": "총 입력이 256 KiB를 넘더라도 레코드는 262144바이트 상한 내 또는 명시적 거부여야 한다. 본문 제한이 먼저 적용될 수 있으므로 이것만으로 레코드 경계 검증을 완료하지 않는다."
+    },
+    {
+      "case_id": "https-forged-forwarded",
+      "protocol": "https",
+      "input": {
+        "method": "GET",
+        "target": "/",
+        "headers": {
+          "Forwarded": "for=203.0.113.99;proto=https;host=forged.example.invalid"
+        }
+      },
+      "required_evidence": [
+        "timestamp",
+        "peer_ip",
+        "peer_port",
+        "destination",
+        "method",
+        "uri",
+        "headers",
+        "body",
+        "parse_error",
+        "truncation"
+      ],
+      "expected": "가짜 Forwarded가 신뢰하는 연결 출발지 IP를 바꾸면 FAIL."
+    },
+    {
+      "case_id": "https-forged-x-forwarded-for",
+      "protocol": "https",
+      "input": {
+        "method": "GET",
+        "target": "/",
+        "headers": {
+          "X-Forwarded-For": "203.0.113.99, 203.0.113.100"
+        }
+      },
+      "required_evidence": [
+        "timestamp",
+        "peer_ip",
+        "peer_port",
+        "destination",
+        "method",
+        "uri",
+        "headers",
+        "body",
+        "parse_error",
+        "truncation"
+      ],
+      "expected": "가짜 X-Forwarded-For가 신뢰하는 연결 출발지 IP를 바꾸면 FAIL."
+    },
+    {
+      "case_id": "https-forged-x-real-ip",
+      "protocol": "https",
+      "input": {
+        "method": "GET",
+        "target": "/",
+        "headers": {
+          "X-Real-IP": "203.0.113.99"
+        }
+      },
+      "required_evidence": [
+        "timestamp",
+        "peer_ip",
+        "peer_port",
+        "destination",
+        "method",
+        "uri",
+        "headers",
+        "body",
+        "parse_error",
+        "truncation"
+      ],
+      "expected": "가짜 X-Real-IP가 신뢰하는 연결 출발지 IP를 바꾸면 FAIL."
+    }
+  ]
+}

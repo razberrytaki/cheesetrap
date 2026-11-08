@@ -1,0 +1,25 @@
+# Isolated local integration tests only. No production credentials or volumes.
+services:
+  postgres:
+    image: postgres:17.11-bookworm@sha256:3645570cccdfa447589da9f57dd740faa29b30938e861289a5574b6ca6b03826
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: cheesetrap_test
+      POSTGRES_PASSWORD: ${CHEESETRAP_TEST_BOOTSTRAP_PASSWORD:?runner required}
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256
+    ports:
+      - "127.0.0.1::5432"
+    # Per-domain migrated databases and WAL exceed 512 MiB with restore acceptance.
+    # Keep disposable storage bounded; the container memory limit still applies.
+    tmpfs:
+      - /var/lib/postgresql/data:rw,noexec,nosuid,size=1g
+    shm_size: 64mb
+    mem_limit: 1g
+    cpus: 1.0
+    pids_limit: 128
+    restart: "no"
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
+        max-file: "1"

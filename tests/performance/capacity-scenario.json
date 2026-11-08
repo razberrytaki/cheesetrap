@@ -1,0 +1,132 @@
+{
+  "horizon_days": 180,
+  "filesystem_bytes": 50884108288,
+  "other_used_bytes": 27917287424,
+  "database_base_bytes": 10122931,
+  "wal_reserve_bytes": 2147483648,
+  "backup_reserve_bytes": 7062644043,
+  "maintenance_fraction": 0.25,
+  "warning_fraction": 0.8,
+  "raw_reserve_bytes": 2287992832,
+  "components": [
+    {
+      "name": "events",
+      "rows_per_day": 1000,
+      "bytes_per_row": 795,
+      "retention_days": 30,
+      "delete_rows_per_day": 144000
+    },
+    {
+      "name": "detection_completions",
+      "rows_per_day": 1000,
+      "bytes_per_row": 254,
+      "retention_days": 30,
+      "delete_rows_per_day": 144000
+    },
+    {
+      "name": "detection_results",
+      "rows_per_day": 981,
+      "bytes_per_row": 1387,
+      "retention_days": 30,
+      "delete_rows_per_day": 144000
+    },
+    {
+      "name": "detection_evidence",
+      "rows_per_day": 1,
+      "bytes_per_row": 24576,
+      "retention_days": 30,
+      "delete_rows_per_day": 144000
+    },
+    {
+      "name": "detection_evidence_chunks",
+      "rows_per_day": 5204,
+      "bytes_per_row": 148,
+      "retention_days": 30,
+      "delete_rows_per_day": 144000
+    },
+    {
+      "name": "evidence_chunk_members",
+      "rows_per_day": 45684,
+      "bytes_per_row": 141,
+      "retention_days": 30,
+      "delete_rows_per_day": 144000
+    },
+    {
+      "name": "evidence_chunks",
+      "rows_per_day": 981,
+      "bytes_per_row": 385,
+      "retention_days": 30,
+      "delete_rows_per_day": 144000
+    },
+    {
+      "name": "protected_report_evidence",
+      "rows_per_day": 1000,
+      "bytes_per_row": 844,
+      "retention_days": null,
+      "delete_rows_per_day": 0
+    },
+    {
+      "name": "protected_initial_report_revision",
+      "rows_per_day": 1,
+      "bytes_per_row": 344064,
+      "retention_days": null,
+      "delete_rows_per_day": 0
+    },
+    {
+      "name": "protected_additional_report_revisions",
+      "rows_per_day": 2,
+      "bytes_per_row": 274432,
+      "retention_days": null,
+      "delete_rows_per_day": 0
+    },
+    {
+      "name": "protected_reports",
+      "rows_per_day": 1,
+      "bytes_per_row": 40960,
+      "retention_days": null,
+      "delete_rows_per_day": 0
+    },
+    {
+      "name": "protected_report_candidates",
+      "rows_per_day": 1,
+      "bytes_per_row": 16384,
+      "retention_days": null,
+      "delete_rows_per_day": 0
+    },
+    {
+      "name": "no_expiry_report_windows",
+      "rows_per_day": 1,
+      "bytes_per_row": 32768,
+      "retention_days": null,
+      "delete_rows_per_day": 0
+    },
+    {
+      "name": "no_expiry_report_window_completions",
+      "rows_per_day": 1,
+      "bytes_per_row": 16384,
+      "retention_days": null,
+      "delete_rows_per_day": 0
+    },
+    {
+      "name": "no_expiry_file_generations",
+      "rows_per_day": 1,
+      "bytes_per_row": 40960,
+      "retention_days": null,
+      "delete_rows_per_day": 0
+    },
+    {
+      "name": "no_expiry_sensors",
+      "rows_per_day": 1,
+      "bytes_per_row": 24576,
+      "retention_days": null,
+      "delete_rows_per_day": 0
+    },
+    {
+      "name": "no_expiry_catalog_other_allocation_budget",
+      "rows_per_day": 1,
+      "bytes_per_row": 147456,
+      "retention_days": null,
+      "delete_rows_per_day": 0
+    }
+  ]
+}

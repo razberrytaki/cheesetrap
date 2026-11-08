@@ -1,0 +1,8 @@
+[
+ {"Name":"ipv4_more_specific_abuse","IP":"8.8.8.8","Start":"8.8.8.0","End":"8.8.8.255","Version":"v4","Emails":["abuse@EXAMPLE.NET"],"Roles":["abuse"],"WantEmails":["abuse@example.net"]},
+ {"Name":"ipv6","IP":"2a00:1450::1","Start":"2a00:1450::","End":"2a00:1450::ffff","Version":"v6","Emails":["abuse@example.net"],"Roles":["abuse"],"WantEmails":["abuse@example.net"]},
+ {"Name":"no_abuse_role","IP":"8.8.8.8","Start":"8.8.8.0","End":"8.8.8.255","Version":"v4","Emails":["admin@example.net"],"Roles":["administrative"],"WantHeld":"contact_missing"},
+ {"Name":"no_contact","IP":"8.8.8.8","Start":"8.8.8.0","End":"8.8.8.255","Version":"v4","WantHeld":"contact_missing"},
+ {"Name":"multiple_contacts","IP":"8.8.8.8","Start":"8.8.8.0","End":"8.8.8.255","Version":"v4","Emails":["b@example.net","a@example.net","a@EXAMPLE.NET"],"Roles":["abuse"],"WantHeld":"contact_ambiguous","WantEmails":["a@example.net","b@example.net"]},
+ {"Name":"invalid_mailboxes","IP":"8.8.8.8","Start":"8.8.8.0","End":"8.8.8.255","Version":"v4","Emails":["Name <abuse@example.net>","abuse@example.net\r\nBcc: victim@example.net","abuse@[8.8.8.8]","abuse@localhost","é@example.net"],"Roles":["abuse"],"WantHeld":"contact_invalid"}
+]

@@ -1,0 +1,5 @@
+# Reviewed false positives only: path:rule:line, or commit:path:rule:line for a finding that exists only in history.
+# OpenAPI content digest, not an API credential.
+315197d45bebe1245a3ea699ee3c1f778f5522a3:docs/validation/m1-auth-api.md:generic-api-key:177
+# Synthetic curl argument concatenation in the credential-redaction regression.
+internal/ingestion/adapter_test.go:curl-auth-user:546

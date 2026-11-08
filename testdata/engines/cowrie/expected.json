@@ -1,0 +1,354 @@
+{
+  "schema_version": 1,
+  "provenance": {
+    "kind": "sanitized-real-engine-run",
+    "cowrie_version": "3.1.2",
+    "cowrie_source_commit": "56b2abb3b02fcb53980334f77daa0fe570f5e4be",
+    "private_raw_sha256": "3bdb41e9729ab67ffcf2bc1533f100351aa0a7504afa231f8402fd7872f81b07",
+    "private_run_sha256": "6b96660b8dec385308cb2c9357ff98a9fe1c2ed930dc1a0d7f2475c95ce193bb",
+    "original_run_id": "ctm0-b3689264",
+    "line_count": 18,
+    "notes": "Derived only after VerifyDirectory PASS. Private original evidence is under .local/m0/runs/\u003coriginal_run_id\u003e/. Row order and timestamps preserved. Input hashes refer to original private application-input JSON, not randomized encrypted SSH bytes. Client local ports and observed peer ports are distinct facts; NAT can translate source ports. This run does not establish compatibility on other architectures or full M0 network isolation."
+  },
+  "fixture_sha256": "0cda5f2fa324b874607734c1a48b4a23cab200a7c9c438a4d2bae3e26558e83a",
+  "redactions": [
+    "src_ip: expected public client IP -\u003e 198.51.100.20; dst_ip: inspected private container IP -\u003e 172.30.0.2; manifest public destination -\u003e 192.0.2.10",
+    "session: stable first-occurrence mapping to session-NNN; all cross-event links and raw line numbers retained",
+    "password: nonempty values replaced by [REDACTED]; only known synthetic usernames and fixed harmless commands retained",
+    "all free-form message strings, sensor IDs, fingerprints, and fields outside Event's structural allowlist omitted; this removes embedded IPs and passwords",
+    "timestamps, observed peer ports, container ports and configured host/public ports retained; input artifacts remain private, only SHA-256 hashes retained"
+  ],
+  "run": {
+    "run_id": "ctm0-b3689264",
+    "image_digest": "cowrie/cowrie@sha256:019726c8deef20729162cda492d9385917b579c9ace6368e47e7566cd2491ba1",
+    "expected_ip": "198.51.100.20",
+    "address_family": "ipv4",
+    "destination_mapping": {
+      "public_ip": "192.0.2.10",
+      "public_port": 2222,
+      "host_port": 2222,
+      "container_ip": "172.30.0.2",
+      "container_port": 2222,
+      "published_host_ip": "0.0.0.0"
+    },
+    "attempts": [
+      {
+        "case_id": "ssh-connect",
+        "executed_at": "2026-10-17T14:34:24.080446Z",
+        "ended_at": "2026-10-17T14:34:24.155895Z",
+        "input_file": "inputs/ssh-connect.json",
+        "input_sha256": "0a6d5cda2ee75584d83c388b6c305c3438cb6b7193eb8c47f5f40b58e1f04224",
+        "local_port": 51462,
+        "status": "PASS"
+      },
+      {
+        "case_id": "ssh-auth-failure",
+        "executed_at": "2026-10-17T14:34:24.156421Z",
+        "ended_at": "2026-10-17T14:34:25.478674Z",
+        "input_file": "inputs/ssh-auth-failure.json",
+        "input_sha256": "f1381dc9fa1ac5d5f7933f5fdbef044c1f014987ce72c6606c83b8e02607b33e",
+        "local_port": 51464,
+        "status": "PASS"
+      },
+      {
+        "case_id": "ssh-emulated-shell",
+        "executed_at": "2026-10-17T14:34:25.479232Z",
+        "ended_at": "2026-10-17T14:34:26.05737Z",
+        "input_file": "inputs/ssh-emulated-shell.json",
+        "input_sha256": "637ace683122ca0028cdaa291810afccc4064bb2062ecb3630a43809322cc47f",
+        "local_port": 51466,
+        "status": "PASS"
+      }
+    ]
+  },
+  "expected_results": [
+    {
+      "run_id": "ctm0-b3689264",
+      "executed_at": "2026-10-17T14:34:24.080446Z",
+      "image_digest": "cowrie/cowrie@sha256:019726c8deef20729162cda492d9385917b579c9ace6368e47e7566cd2491ba1",
+      "input_file": "inputs/ssh-connect.json",
+      "input_sha256": "0a6d5cda2ee75584d83c388b6c305c3438cb6b7193eb8c47f5f40b58e1f04224",
+      "expected_ip": "198.51.100.20",
+      "destination_mapping": {
+        "public_ip": "192.0.2.10",
+        "public_port": 2222,
+        "host_port": 2222,
+        "container_ip": "172.30.0.2",
+        "container_port": 2222,
+        "published_host_ip": "0.0.0.0"
+      },
+      "field_completeness": {
+        "destination": {
+          "status": "present",
+          "source": "dst_ip/dst_port joined to raw/inspect.json HostConfig.PortBindings and NetworkSettings.Networks; public destination declared in run.json",
+          "reference": {
+            "file": "raw/cowrie.json",
+            "line": 1,
+            "event_type": "cowrie.session.connect"
+          }
+        },
+        "event_type": {
+          "status": "present",
+          "source": "eventid",
+          "reference": {
+            "file": "raw/cowrie.json",
+            "line": 1,
+            "event_type": "cowrie.session.connect"
+          }
+        },
+        "peer_ip": {
+          "status": "present",
+          "source": "src_ip",
+          "reference": {
+            "file": "raw/cowrie.json",
+            "line": 1,
+            "event_type": "cowrie.session.connect"
+          }
+        },
+        "peer_port": {
+          "status": "present",
+          "source": "src_port",
+          "reference": {
+            "file": "raw/cowrie.json",
+            "line": 1,
+            "event_type": "cowrie.session.connect"
+          }
+        },
+        "session_id": {
+          "status": "present",
+          "source": "session",
+          "reference": {
+            "file": "raw/cowrie.json",
+            "line": 1,
+            "event_type": "cowrie.session.connect"
+          }
+        },
+        "timestamp": {
+          "status": "present",
+          "source": "timestamp",
+          "reference": {
+            "file": "raw/cowrie.json",
+            "line": 1,
+            "event_type": "cowrie.session.connect"
+          }
+        }
+      },
+      "truncation": null,
+      "case_id": "ssh-connect",
+      "session_id": "session-001",
+      "observed_ip": "198.51.100.20",
+      "observed_port": 20885,
+      "status": "PASS",
+      "evidence_refs": [
+        {
+          "file": "raw/cowrie.json",
+          "line": 1,
+          "event_type": "cowrie.session.connect"
+        }
+      ]
+    },
+    {
+      "run_id": "ctm0-b3689264",
+      "executed_at": "2026-10-17T14:34:24.156421Z",
+      "image_digest": "cowrie/cowrie@sha256:019726c8deef20729162cda492d9385917b579c9ace6368e47e7566cd2491ba1",
+      "input_file": "inputs/ssh-auth-failure.json",
+      "input_sha256": "f1381dc9fa1ac5d5f7933f5fdbef044c1f014987ce72c6606c83b8e02607b33e",
+      "expected_ip": "198.51.100.20",
+      "destination_mapping": {
+        "public_ip": "192.0.2.10",
+        "public_port": 2222,
+        "host_port": 2222,
+        "container_ip": "172.30.0.2",
+        "container_port": 2222,
+        "published_host_ip": "0.0.0.0"
+      },
+      "field_completeness": {
+        "case_event": {
+          "status": "present",
+          "source": "eventid/session plus synthetic username or input",
+          "reference": {
+            "file": "raw/cowrie.json",
+            "line": 6,
+            "event_type": "cowrie.login.failed"
+          }
+        },
+        "destination": {
+          "status": "present",
+          "source": "dst_ip/dst_port joined to raw/inspect.json HostConfig.PortBindings and NetworkSettings.Networks; public destination declared in run.json",
+          "reference": {
+            "file": "raw/cowrie.json",
+            "line": 3,
+            "event_type": "cowrie.session.connect"
+          }
+        },
+        "event_type": {
+          "status": "present",
+          "source": "eventid",
+          "reference": {
+            "file": "raw/cowrie.json",
+            "line": 3,
+            "event_type": "cowrie.session.connect"
+          }
+        },
+        "peer_ip": {
+          "status": "present",
+          "source": "src_ip",
+          "reference": {
+            "file": "raw/cowrie.json",
+            "line": 3,
+            "event_type": "cowrie.session.connect"
+          }
+        },
+        "peer_port": {
+          "status": "present",
+          "source": "src_port",
+          "reference": {
+            "file": "raw/cowrie.json",
+            "line": 3,
+            "event_type": "cowrie.session.connect"
+          }
+        },
+        "session_id": {
+          "status": "present",
+          "source": "session",
+          "reference": {
+            "file": "raw/cowrie.json",
+            "line": 3,
+            "event_type": "cowrie.session.connect"
+          }
+        },
+        "timestamp": {
+          "status": "present",
+          "source": "timestamp",
+          "reference": {
+            "file": "raw/cowrie.json",
+            "line": 3,
+            "event_type": "cowrie.session.connect"
+          }
+        }
+      },
+      "truncation": null,
+      "case_id": "ssh-auth-failure",
+      "session_id": "session-002",
+      "observed_ip": "198.51.100.20",
+      "observed_port": 32094,
+      "status": "PASS",
+      "evidence_refs": [
+        {
+          "file": "raw/cowrie.json",
+          "line": 3,
+          "event_type": "cowrie.session.connect"
+        },
+        {
+          "file": "raw/cowrie.json",
+          "line": 6,
+          "event_type": "cowrie.login.failed"
+        }
+      ]
+    },
+    {
+      "run_id": "ctm0-b3689264",
+      "executed_at": "2026-10-17T14:34:25.479232Z",
+      "image_digest": "cowrie/cowrie@sha256:019726c8deef20729162cda492d9385917b579c9ace6368e47e7566cd2491ba1",
+      "input_file": "inputs/ssh-emulated-shell.json",
+      "input_sha256": "637ace683122ca0028cdaa291810afccc4064bb2062ecb3630a43809322cc47f",
+      "expected_ip": "198.51.100.20",
+      "destination_mapping": {
+        "public_ip": "192.0.2.10",
+        "public_port": 2222,
+        "host_port": 2222,
+        "container_ip": "172.30.0.2",
+        "container_port": 2222,
+        "published_host_ip": "0.0.0.0"
+      },
+      "field_completeness": {
+        "case_event": {
+          "status": "present",
+          "source": "eventid/session plus synthetic username or input",
+          "reference": {
+            "file": "raw/cowrie.json",
+            "line": 13,
+            "event_type": "cowrie.command.input"
+          }
+        },
+        "destination": {
+          "status": "present",
+          "source": "dst_ip/dst_port joined to raw/inspect.json HostConfig.PortBindings and NetworkSettings.Networks; public destination declared in run.json",
+          "reference": {
+            "file": "raw/cowrie.json",
+            "line": 8,
+            "event_type": "cowrie.session.connect"
+          }
+        },
+        "event_type": {
+          "status": "present",
+          "source": "eventid",
+          "reference": {
+            "file": "raw/cowrie.json",
+            "line": 8,
+            "event_type": "cowrie.session.connect"
+          }
+        },
+        "peer_ip": {
+          "status": "present",
+          "source": "src_ip",
+          "reference": {
+            "file": "raw/cowrie.json",
+            "line": 8,
+            "event_type": "cowrie.session.connect"
+          }
+        },
+        "peer_port": {
+          "status": "present",
+          "source": "src_port",
+          "reference": {
+            "file": "raw/cowrie.json",
+            "line": 8,
+            "event_type": "cowrie.session.connect"
+          }
+        },
+        "session_id": {
+          "status": "present",
+          "source": "session",
+          "reference": {
+            "file": "raw/cowrie.json",
+            "line": 8,
+            "event_type": "cowrie.session.connect"
+          }
+        },
+        "timestamp": {
+          "status": "present",
+          "source": "timestamp",
+          "reference": {
+            "file": "raw/cowrie.json",
+            "line": 8,
+            "event_type": "cowrie.session.connect"
+          }
+        }
+      },
+      "truncation": null,
+      "case_id": "ssh-emulated-shell",
+      "session_id": "session-003",
+      "observed_ip": "198.51.100.20",
+      "observed_port": 36550,
+      "status": "PASS",
+      "evidence_refs": [
+        {
+          "file": "raw/cowrie.json",
+          "line": 8,
+          "event_type": "cowrie.session.connect"
+        },
+        {
+          "file": "raw/cowrie.json",
+          "line": 11,
+          "event_type": "cowrie.login.success"
+        },
+        {
+          "file": "raw/cowrie.json",
+          "line": 13,
+          "event_type": "cowrie.command.input"
+        }
+      ]
+    }
+  ]
+}

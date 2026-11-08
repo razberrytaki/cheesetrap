@@ -1,0 +1,27 @@
+Dear Abuse Team,
+
+We observed the following activity from source IP {{.SourceIP}} against endpoints we operate:
+{{.Activities}}
+
+Please investigate this activity and take appropriate action.
+
+Observation period (UTC):
+{{.Start}} to {{.End}}
+{{if .Delayed}}
+Some records were collected after the activity occurred. The times above are observation times.
+{{end}}
+Destination endpoints:
+{{.Endpoints}}
+{{if .SummaryTruncated}}Some destination endpoints were omitted to keep this message within its size limit.
+{{end}}
+Evidence records: {{.Total}}
+Log excerpts included: {{.Retained}} of {{.Total}}
+{{if .Truncated}}Excerpt shortened for length; only a subset of the evidence is shown and the last record may be incomplete.
+{{end}}Selected event records (UTC):
+{{.Excerpts}}
+End excerpts.
+
+Report reference: {{.ReportID}}
+Contact: {{.ReplyTo}}
+
+Thank you for investigating this report.
