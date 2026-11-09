@@ -26,12 +26,16 @@ const restoreEvidenceSnapshot = `SELECT jsonb_build_object(
  'revisions',(SELECT jsonb_agg(to_jsonb(r) ORDER BY revision_id) FROM cheesetrap.report_revisions r),
  'copies',(SELECT jsonb_agg(to_jsonb(e) ORDER BY event_id) FROM cheesetrap.report_evidence e),
  'events',(SELECT jsonb_agg(to_jsonb(e) ORDER BY ingestion_seq) FROM cheesetrap.events e),
+ 'gap_incidents',(SELECT jsonb_agg(to_jsonb(g) ORDER BY incident_id) FROM cheesetrap.collection_gap_incidents g),
+ 'gap_counts',(SELECT jsonb_agg(to_jsonb(g) ORDER BY sensor_id) FROM cheesetrap.ingestion_gaps g),
  'cursor',(SELECT to_jsonb(c) FROM cheesetrap.processing_cursors c WHERE singleton)
 )::text`
 
 func seedRestoreEvidence(t *testing.T, ctx context.Context, owner, worker *pgxpool.Pool, reportID string) string {
 	t.Helper()
 	_, err := owner.Exec(ctx, `INSERT INTO cheesetrap.sensors(sensor_id,name,engine) VALUES('10000000-0000-0000-0000-000000000017','restore-chunks','cowrie');
+ INSERT INTO cheesetrap.ingestion_gaps(sensor_id,started_at,observed_through,gap_count) VALUES('10000000-0000-0000-0000-000000000017','2000-01-01','2000-01-02',3);
+ INSERT INTO cheesetrap.collection_gap_incidents(sensor_id,started_at,observed_through,causes,gap_count) VALUES('10000000-0000-0000-0000-000000000017','2000-01-01','2000-01-02',ARRAY['legacy'],2),('10000000-0000-0000-0000-000000000017','2001-01-01','2001-01-02',ARRAY['retention_cleanup','source_change'],1);
  INSERT INTO cheesetrap.file_generations(file_generation_id,sensor_id,path,device,inode) VALUES('20000000-0000-0000-0000-000000000017','10000000-0000-0000-0000-000000000017','/restore-chunks',17,17);
  INSERT INTO cheesetrap.events(event_id,sensor_id,file_generation_id,byte_offset,ingestion_seq,schema_version,engine,source_ip,destination_ip,destination_port,service,event_type,attributes,raw_hash)
  SELECT ('00000000-0000-0000-0000-'||lpad(n::text,12,'0'))::uuid,'10000000-0000-0000-0000-000000000017','20000000-0000-0000-0000-000000000017',n,n,1,'cowrie','1.1.1.1','8.8.8.8',22,'ssh','login.failed','{}',repeat('a',64) FROM generate_series(1,130)n;

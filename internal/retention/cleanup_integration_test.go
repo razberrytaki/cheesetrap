@@ -33,6 +33,7 @@ func TestRetentionDatabase(t *testing.T) {
 	now := time.Now().UTC()
 	old := now.Add(-31 * 24 * time.Hour)
 	exec(`INSERT INTO cheesetrap.sensors(sensor_id,name,engine) VALUES('10000000-0000-4000-8000-000000000701','retention','cowrie')`)
+	exec(`INSERT INTO cheesetrap.collection_gap_incidents(sensor_id,started_at,observed_through,causes,gap_count) VALUES('10000000-0000-4000-8000-000000000701','2000-01-01','2000-01-02',ARRAY['legacy'],7)`)
 	exec(`INSERT INTO cheesetrap.file_generations(file_generation_id,sensor_id,path,device,inode) VALUES('20000000-0000-4000-8000-000000000701','10000000-0000-4000-8000-000000000701','/fixture',1,1)`)
 	exec(`INSERT INTO cheesetrap.events(sensor_id,file_generation_id,byte_offset,ingestion_seq,schema_version,engine,ingested_at,service,event_type,raw_hash) SELECT '10000000-0000-4000-8000-000000000701','20000000-0000-4000-8000-000000000701',n,n,1,'cowrie',$1,'ssh','test',repeat('a',64) FROM generate_series(1,5)n`, old)
 	exec(`UPDATE cheesetrap.processing_cursors SET ingested_seq=5,detected_seq=3,sealed_before=$1`, now)
@@ -164,4 +165,9 @@ func TestRetentionDatabase(t *testing.T) {
 	if _, e = Cleanup(ctx, worker, now, 1001); e == nil {
 		t.Fatal("unbounded cleanup")
 	}
+	var history bool
+	if err := owner.QueryRow(ctx, `SELECT count(*)=1 AND bool_and(gap_count=7 AND started_at='2000-01-01'::timestamptz AND observed_through='2000-01-02'::timestamptz AND causes=ARRAY['legacy']) FROM cheesetrap.collection_gap_incidents WHERE sensor_id='10000000-0000-4000-8000-000000000701'`).Scan(&history); err != nil || !history {
+		t.Fatal("retention erased dated gap history", err)
+	}
+
 }

@@ -136,7 +136,7 @@ Compose collector remains the ownership reference. Do not delete it or change it
 
 Before each deletion, the script atomically increments each sensor's monotonic
 counter in `logs/.retention-loss.json`. The collector reads the receipt and
-persists collection gaps for unseen counts. The host cannot prove which bytes
+persists dated collection-gap incidents with the retention-cleanup cause for unseen counts. The host cannot prove which bytes
 were unread, so every archive deletion is conservatively a possible gap.
 A crash before actual deletion can record a gap without loss. Never delete the
 receipt or reset counters. An invalid receipt prevents collector startup or continued collection.
@@ -250,8 +250,17 @@ poll or retry after recovery. Unmeasurable configured paths also pause work.
 UI observations older than two minutes show `stale`. Missing observations show
 `unavailable`. Each task measures again immediately before work.
 
-The guard records a persistent sensor gap. Recovery or restart never resets gap
-counts or rewrites past quality. Last engine-log time is the server time when the
+The guard records a dated collection-gap incident with the storage-restricted
+cause. Incidents and cumulative gap counts remain permanently. Notes within ten
+minutes of the latest incident extend its range and combine causes; later notes
+start a new incident. Recovery or restart never resets counts or rewrites past
+quality. Sensor state describes current health. A commit without a pending gap
+returns the sensor to active. A draft includes an evidence sensor's incidents only
+when they overlap its report window, including an incident ending at the window
+start but excluding one starting at the window end. An overlapping incident holds
+the draft for `collection_gap`; old incidents alone do not hold later drafts.
+Every raw archive deletion remains a possible gap even if unread loss is unconfirmed.
+Pre-upgrade gap summaries become dated incidents with the legacy cause. Last engine-log time is the server time when the
 last record was read and committed, not the attacker-controlled event timestamp.
 Collector observation time and sensor state appear separately.
 `collection_lag_seconds` is time since the oldest collector observation among active

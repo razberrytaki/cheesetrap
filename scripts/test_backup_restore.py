@@ -45,7 +45,7 @@ class BackupRestoreTests(unittest.TestCase):
         self.assertFalse(any('create' in c for c in self.commands), self.commands)
 
     def test_supported_schema_restore_preserves_exact_review_version(self):
-        for version in (14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30):
+        for version in (14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31):
             with self.subTest(version=version):
                 self.manifest['app_schema'] = version
                 self.save_manifest()
@@ -94,7 +94,7 @@ class BackupRestoreTests(unittest.TestCase):
                 self.assertFalse((Path(self.args.output) / 'review.json').exists())
 
     def test_unsupported_schema_rejected_before_create(self):
-        for version in (13, 31, 999, '17', None):
+        for version in (13, 32, 999, '17', None):
             with self.subTest(version=version):
                 self.manifest['app_schema'] = version
                 self.save_manifest()
