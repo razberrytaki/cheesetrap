@@ -15,8 +15,11 @@ import (
 
 	"cheesetrap/internal/store"
 	"cheesetrap/internal/store/db"
+	"cheesetrap/migrations"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/stdlib"
+	"github.com/pressly/goose/v3"
 )
 
 // This integration-only test is automatically discovered by the isolated runner.
@@ -64,6 +67,23 @@ func TestMigrationsAndRoles(t *testing.T) {
 			}
 		}
 	}
+	sqlDB := stdlib.OpenDB(*migration.Config())
+	defer sqlDB.Close()
+	provider, err := goose.NewProvider(goose.DialectPostgres, sqlDB, migrations.Files, goose.WithTableName("cheesetrap.goose_db_version"), goose.WithDisableGlobalRegistry(true))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := provider.UpTo(ctx, 30); err != nil {
+		t.Fatal(err)
+	}
+	const legacySensor = "10000000-0000-4000-8000-000000000031"
+	if _, err := migration.Exec(ctx, `INSERT INTO cheesetrap.sensors(sensor_id,name,engine,public_ip,public_port) VALUES($1,'legacy-gap','cowrie','192.0.2.1',22);
+ `, legacySensor); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := migration.Exec(ctx, `INSERT INTO cheesetrap.ingestion_gaps(sensor_id,started_at,observed_through,gap_count) VALUES($1,'2000-01-01','2000-01-02',7)`, legacySensor); err != nil {
+		t.Fatal(err)
+	}
 	t.Run("empty_database_concurrent_migrations", migrateConcurrently)
 	// The first RED must reach a real PostgreSQL server and fail on absent schema.
 	if err := migration.QueryRow(ctx, "SELECT count(*) FROM cheesetrap.events").Scan(&count); err != nil {
@@ -76,9 +96,22 @@ func TestMigrationsAndRoles(t *testing.T) {
 	if err := migration.QueryRow(ctx, "SELECT ingested_seq,detected_seq FROM cheesetrap.processing_cursors WHERE singleton").Scan(&ingested, &detected); err != nil || ingested != 0 || detected != 0 {
 		t.Fatal("fresh migration-test database cursors must start at zero")
 	}
+	t.Run("legacy_gap_backfill", func(t *testing.T) {
+		var exists bool
+		if err := migration.QueryRow(ctx, `SELECT to_regclass('cheesetrap.collection_gap_incidents') IS NOT NULL`).Scan(&exists); err != nil {
+			t.Fatal(err)
+		}
+		if !exists {
+			t.Fatal("dated collection-gap history is missing")
+		}
+		var valid bool
+		if err := migration.QueryRow(ctx, `SELECT count(*)=1 AND bool_and(started_at='2000-01-01'::timestamptz AND observed_through='2000-01-02'::timestamptz AND gap_count=7 AND causes=ARRAY['legacy']) FROM cheesetrap.collection_gap_incidents WHERE sensor_id=$1`, legacySensor).Scan(&valid); err != nil || !valid {
+			t.Fatal("legacy incident range, count, or cause lost", err)
+		}
+	})
 	t.Run("idempotent_concurrent_migrations", func(t *testing.T) {
 		migrateConcurrently(t)
-		if err := migration.QueryRow(ctx, "SELECT count(*) FROM cheesetrap.goose_db_version WHERE is_applied AND version_id > 0").Scan(&count); err != nil || count != 30 {
+		if err := migration.QueryRow(ctx, "SELECT count(*) FROM cheesetrap.goose_db_version WHERE is_applied AND version_id > 0").Scan(&count); err != nil || count != 31 {
 			t.Fatal("migration history is not idempotent")
 		}
 	})
@@ -177,6 +210,31 @@ func TestMigrationsAndRoles(t *testing.T) {
 		reject(t, "collector", "23514", "UPDATE cheesetrap.file_generations SET observed_size=-1")
 	})
 
+	t.Run("incident_writer_and_permissions", func(t *testing.T) {
+		note := "SELECT cheesetrap.note_collection_gap($1,clock_timestamp(),$2,$3)"
+		run(t, "collector", note, sensor, "source_change", int64(2))
+		run(t, "collector", note, sensor, "retention_cleanup", int64(3))
+		var valid bool
+		if err := migration.QueryRow(ctx, `SELECT count(*)=1 AND bool_and(gap_count=5 AND causes=ARRAY['retention_cleanup','source_change']) FROM cheesetrap.collection_gap_incidents WHERE sensor_id=$1`, sensor).Scan(&valid); err != nil || !valid {
+			t.Fatal("nearby causes did not merge", err)
+		}
+		run(t, "migration", `UPDATE cheesetrap.collection_gap_incidents SET started_at=clock_timestamp()-interval '12 minutes',observed_through=clock_timestamp()-interval '11 minutes' WHERE sensor_id=$1`, sensor)
+		run(t, "collector", note, sensor, "storage_restricted", int64(1))
+		if err := migration.QueryRow(ctx, `SELECT count(*)=2 FROM cheesetrap.collection_gap_incidents WHERE sensor_id=$1`, sensor).Scan(&valid); err != nil || !valid {
+			t.Fatal("separate incident was lost", err)
+		}
+		for _, role := range []string{"api", "collector", "worker"} {
+			run(t, role, "SELECT * FROM cheesetrap.collection_gap_incidents")
+			reject(t, role, "42501", "DELETE FROM cheesetrap.collection_gap_incidents")
+			reject(t, role, "42501", "TRUNCATE cheesetrap.collection_gap_incidents")
+		}
+		for _, role := range []string{"api", "worker"} {
+			reject(t, role, "42501", note, sensor, "source_change", int64(1))
+			reject(t, role, "42501", "UPDATE cheesetrap.collection_gap_incidents SET gap_count=0")
+			reject(t, role, "42501", `INSERT INTO cheesetrap.collection_gap_incidents(sensor_id,started_at,observed_through,causes) VALUES($1,now(),now(),ARRAY['legacy'])`, sensor)
+		}
+		reject(t, "collector", "23514", `INSERT INTO cheesetrap.collection_gap_incidents(sensor_id,started_at,observed_through,causes) VALUES($1,now(),now(),ARRAY['unknown'])`, sensor)
+	})
 	t.Run("schema_invariants", func(t *testing.T) {
 		reject(t, "collector", "23514", "UPDATE cheesetrap.sensors SET config_version=0")
 		reject(t, "collector", "23514", "UPDATE cheesetrap.sensors SET public_port=65536")

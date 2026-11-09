@@ -163,8 +163,12 @@ func TestEvidenceChunkStorage(t *testing.T) {
 				} else if err := store.Migrate(ctx, os.Getenv("CHEESETRAP_TEST_CHUNKS_MIGRATION_URL")); err != nil {
 					t.Fatal(err)
 				}
-				if err := owner.QueryRow(ctx, `SELECT max(version_id) FROM cheesetrap.goose_db_version WHERE is_applied`).Scan(&version); err != nil || version != target {
-					t.Fatalf("upgrade must finish at%d: %d %v", target, version, err)
+				expectedVersion := target
+				if target == 30 {
+					expectedVersion = 31
+				}
+				if err := owner.QueryRow(ctx, `SELECT max(version_id) FROM cheesetrap.goose_db_version WHERE is_applied`).Scan(&version); err != nil || version != expectedVersion {
+					t.Fatalf("upgrade must finish at%d: %d %v", expectedVersion, version, err)
 				}
 				if target == 27 {
 					var queryAfter string
