@@ -10,9 +10,12 @@ import (
 	"testing"
 	"time"
 
+	"cheesetrap/internal/domain"
 	"cheesetrap/internal/store"
 	"cheesetrap/internal/store/db"
 	"github.com/jackc/pgx/v5"
+	"slices"
+	"strings"
 )
 
 // Capture the generated query actually executed, so EXPLAIN cannot accidentally
@@ -26,6 +29,18 @@ type sharedReadQueryCapture struct {
 func (c *sharedReadQueryCapture) Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error) {
 	c.sql, c.args = sql, args
 	return c.Tx.Query(ctx, sql, args...)
+}
+
+type gapQueryCounter struct {
+	pgx.Tx
+	calls int
+}
+
+func (c *gapQueryCounter) QueryRow(ctx context.Context, sql string, args ...any) pgx.Row {
+	if strings.Contains(sql, "-- name: ReportEvidenceGap :one") {
+		c.calls++
+	}
+	return c.Tx.QueryRow(ctx, sql, args...)
 }
 
 func TestSharedReportReadsVisitPhysicalMembersOnce(t *testing.T) {
@@ -239,6 +254,87 @@ func TestSharedReportReadsTriggerBoundaries(t *testing.T) {
 			t.Fatal("trigger boundary membership/order/count changed")
 		}
 	}
+	t.Run("draft_gap_window_overlap", func(t *testing.T) {
+		exec(`INSERT INTO cheesetrap.ingestion_gaps(sensor_id,started_at,observed_through) VALUES('10000000-0000-4000-8000-000000000406','1999-01-01','1999-01-02')`)
+		for _, tc := range []struct {
+			name, start, end string
+			held             bool
+		}{
+			{"old", "1999-01-01", "1999-01-02", false},
+			{"touches_start", "2001-01-01", "2001-01-02", true},
+			{"starts_at_exclusive_end", "2001-01-03", "2001-01-04", false},
+			{"inside", "2001-01-02 12:00+00", "2001-01-02 13:00+00", true},
+		} {
+			t.Run(tc.name, func(t *testing.T) {
+				exec("SAVEPOINT gap_case")
+				defer exec("ROLLBACK TO SAVEPOINT gap_case")
+				exec(`INSERT INTO cheesetrap.collection_gap_incidents(sensor_id,started_at,observed_through,causes) VALUES('10000000-0000-4000-8000-000000000406',$1,$2,$3)`, tc.start, tc.end, []string{string(domain.GapRetentionCleanup)})
+				if tc.name == "inside" {
+					exec(`INSERT INTO cheesetrap.collection_gap_incidents(sensor_id,started_at,observed_through,causes) VALUES('10000000-0000-4000-8000-000000000406','2001-01-02 10:00+00','2001-01-02 11:00+00',$1)`, []string{string(domain.GapSourceChange)})
+				}
+				for _, streamed := range []bool{false, true} {
+					counter := &gapQueryCounter{Tx: tx}
+					reader := db.New(counter)
+					exec("SAVEPOINT reader_case")
+					var snapshot domain.ReportSnapshot
+					var err error
+					if streamed {
+						var report string
+						if err = tx.QueryRow(ctx, `INSERT INTO cheesetrap.reports(window_id,source_ip) VALUES($1,'1.1.1.1') RETURNING report_id`, w.WindowID).Scan(&report); err != nil {
+							t.Fatal(err)
+						}
+						snapshot, err = collectProof(ctx, reader, w, "1.1.1.1", report)
+					} else {
+						snapshot, err = collectEvidence(ctx, reader, w, "1.1.1.1")
+					}
+					if err != nil {
+						t.Fatal(err)
+					}
+					if counter.calls != 1 {
+						t.Fatalf("gap lookups=%d for one sensor", counter.calls)
+					}
+					n := 0
+					if err = snapshot.EachEvidence(func(e domain.ReportEvidence) error {
+						n++
+						if (len(e.CollectionGap) > 0) != tc.held {
+							t.Fatalf("streamed=%t unexpected gap %s", streamed, e.CollectionGap)
+						}
+						if tc.held && (!strings.Contains(string(e.CollectionGap), `"incidents"`) || !strings.Contains(string(e.CollectionGap), string(domain.GapRetentionCleanup))) {
+							t.Fatalf("missing dated causes: %s", e.CollectionGap)
+						}
+						if tc.name == "inside" {
+							var gap struct {
+								StartedAt       time.Time                      `json:"started_at"`
+								ObservedThrough time.Time                      `json:"observed_through"`
+								Incidents       []domain.CollectionGapIncident `json:"incidents"`
+							}
+							if err := json.Unmarshal(e.CollectionGap, &gap); err != nil {
+								t.Fatal(err)
+							}
+							if len(gap.Incidents) != 2 || !gap.Incidents[0].StartedAt.Before(gap.Incidents[1].StartedAt) || !gap.StartedAt.Equal(gap.Incidents[0].StartedAt) || !gap.ObservedThrough.Equal(gap.Incidents[1].ObservedThrough) {
+								t.Fatalf("incident aggregation lost range or order: %+v", gap)
+							}
+						}
+						return nil
+					}); err != nil {
+						t.Fatal(err)
+					}
+					if n != 3 {
+						t.Fatalf("evidence count %d", n)
+					}
+					snapshot.Registry = []byte(`{}`)
+					r := domain.ReportRevision{Snapshot: snapshot}
+					if err = prepareRevision(ctx, q, &r, nil); err != nil {
+						t.Fatal(err)
+					}
+					if slices.Contains(r.HoldReasons, "collection_gap") != tc.held {
+						t.Fatalf("unexpected draft hold %v", r.HoldReasons)
+					}
+					exec("ROLLBACK TO SAVEPOINT reader_case")
+				}
+			})
+		}
+	})
 	// An entirely owned legacy/chunk mixture still returns its roots with zero
 	// attached members, and no evidence from excluded or retiring singleton roots.
 	exec(`WITH r AS (INSERT INTO cheesetrap.reports(window_id,source_ip) VALUES($1,'8.8.8.8') RETURNING report_id)

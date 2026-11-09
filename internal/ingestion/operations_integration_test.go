@@ -34,6 +34,20 @@ func TestRetentionCapacityRecovery(t *testing.T) {
 	manifest := filepath.Join(t.TempDir(), "sources.json")
 	os.WriteFile(manifest, raw, 0600)
 	os.WriteFile(filepath.Join(root, ".retention-loss.json"), []byte(`{"version":1,"sensors":{"10000000-0000-4000-8000-000000000711":3}}`), 0600)
+	appendSourceRecord := func() {
+		t.Helper()
+		f, err := os.OpenFile(filepath.Join(root, "cowrie.json"), os.O_APPEND|os.O_WRONLY, 0600)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if _, err = f.Write(append(b.Records[0].Bytes(), '\n')); err != nil {
+			f.Close()
+			t.Fatal(err)
+		}
+		if err = f.Close(); err != nil {
+			t.Fatal(err)
+		}
+	}
 	var recovered atomic.Bool
 	probe := func(string) (uint64, uint64, error) {
 		if recovered.Load() {
@@ -74,6 +88,9 @@ func TestRetentionCapacityRecovery(t *testing.T) {
 	if err := pool.QueryRow(ctx, `SELECT causes FROM cheesetrap.collection_gap_incidents WHERE sensor_id=$1`, source.SensorID).Scan(&causes); err != nil || len(causes) != 2 {
 		t.Fatal("retention and storage causes missing", causes, err)
 	}
+	appendSourceRecord()
+	wait(`SELECT count(*) FROM cheesetrap.events WHERE sensor_id=$1`, 2)
+	wait(`SELECT count(*) FROM cheesetrap.events WHERE sensor_id=$1 AND NOT ('collection_gap'=ANY(quality_flags))`, 1)
 	stop()
 	if err := <-done; err != nil && err != context.Canceled {
 		t.Fatal(err)
@@ -83,22 +100,11 @@ func TestRetentionCapacityRecovery(t *testing.T) {
 	if gaps != 4 {
 		t.Fatal("gap reset or receipt duplicate", gaps)
 	}
-	line, err := os.ReadFile(filepath.Join(root, "cowrie.json"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	f, err := os.OpenFile(filepath.Join(root, "cowrie.json"), os.O_APPEND|os.O_WRONLY, 0600)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if _, err = f.Write(line); err != nil {
-		t.Fatal(err)
-	}
-	f.Close()
+	appendSourceRecord()
 	runctx, stop = context.WithCancel(ctx)
 	go func() { done <- runCollector(runctx, url, root, manifest, probe) }()
-	wait(`SELECT count(*) FROM cheesetrap.events WHERE sensor_id=$1`, 2)
-	wait(`SELECT count(*) FROM cheesetrap.events WHERE sensor_id=$1 AND NOT ('collection_gap'=ANY(quality_flags))`, 1)
+	wait(`SELECT count(*) FROM cheesetrap.events WHERE sensor_id=$1`, 3)
+	wait(`SELECT count(*) FROM cheesetrap.events WHERE sensor_id=$1 AND NOT ('collection_gap'=ANY(quality_flags))`, 2)
 	time.Sleep(300 * time.Millisecond)
 	stop()
 	if err := <-done; err != nil && err != context.Canceled {

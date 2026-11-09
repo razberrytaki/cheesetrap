@@ -90,21 +90,23 @@ func processBatchWithContextLimits(ctx context.Context, pool *pgxpool.Pool, limi
 	if int64(len(rows)) != expected {
 		return Progress{}, ErrProcessing
 	}
-	gaps := map[pgtype.UUID]bool{}
+	gaps := map[pgtype.UUID][]db.DetectionSensorGapIncidentsRow{}
 	convert := func(row db.CheesetrapEvent) (domain.Event, error) {
 		e, err := domainEvent(row)
 		if err != nil {
 			return e, err
 		}
-		gap, known := gaps[row.SensorID]
+		incidents, known := gaps[row.SensorID]
 		if !known {
-			gap, err = q.DetectionSensorHasGap(ctx, row.SensorID)
+			incidents, err = q.DetectionSensorGapIncidents(ctx, row.SensorID)
 			if err != nil {
 				return e, err
 			}
-			gaps[row.SensorID] = gap
+			gaps[row.SensorID] = incidents
 		}
-		if gap && !slices.Contains(e.QualityFlags, "collection_gap") {
+		if slices.ContainsFunc(incidents, func(g db.DetectionSensorGapIncidentsRow) bool {
+			return !row.IngestedAt.Time.Before(g.StartedAt.Time) && !row.IngestedAt.Time.After(g.ObservedThrough.Time)
+		}) && !slices.Contains(e.QualityFlags, "collection_gap") {
 			e.QualityFlags = append(e.QualityFlags, "collection_gap")
 		}
 		return e, nil
