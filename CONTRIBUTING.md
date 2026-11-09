@@ -72,11 +72,10 @@ loopback API. It requires Docker, Compose, Python 3, Go, and Node/npm. It reject
 external DB and browser-target settings and cleans up only its own test stack.
 It does not connect to an existing deployment.
 
-For UI journeys, follow the [verification procedure](.agents/skills/verify-cheesetrap/SKILL.md)
-and [feature map](.agents/skills/verify-cheesetrap/features/README.md). The owned
-runner creates its DB and loopback API and cleans up only its resources. Do not
-supply production DB, SMTP, credentials, or public sensor addresses. Chromium,
-images, and dependencies can require network access on first use.
+For UI journeys, add assertions to the specs in `web/e2e/` or `web/e2e-https/` and
+run the same command. Do not supply production DB, SMTP, credentials, or public
+sensor addresses. Chromium, images, and dependencies can require network access
+on first use.
 
 Put integration-test `TMPDIR` on a filesystem below 90% usage with at least 10 GiB
 free. A different directory on the same filesystem does not fix low capacity.
