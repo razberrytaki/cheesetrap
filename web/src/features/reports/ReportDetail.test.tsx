@@ -305,10 +305,24 @@ it("labels collection-gap holds and displays incident ranges and causes", async 
  return json({...report,revision:{...revision,hold_reasons:['collection_gap','future_reason']}});
  });
  render(<ReportDetail client={new ApiClient(net)} id={reportID} />);
- expect(await screen.findByText('신고 기간 중 수집 공백 기록')).toBeVisible();
+ expect(await screen.findByText('수집 공백 기록')).toBeVisible();
  expect(screen.getByText('future_reason')).toBeVisible();
  fireEvent.click(screen.getByText(/증거 ·/));
  expect(await screen.findByText('보관 정리로 원본 삭제(미확인 손실 가능)')).toBeVisible();
+ expect(screen.getByText(/신고 기간과 겹치는 수집 공백/)).toBeVisible();
  expect(screen.getByText(/2026-10-17 01:00:00/)).toBeVisible();
  expect(screen.getByText(/2026-10-17 02:00:00/)).toBeVisible();
+});
+
+it("does not claim a report-window overlap for gaps copied by earlier versions", async () => {
+ const net = fetcher(url => {
+ if(url.pathname.endsWith('/evidence')) return json({items:[{event_id:'old-gap-event',ingestion_seq:'1',service:'ssh',event_type:'login',quality_flags:['collection_gap'],collection_gap:{started_at:'2026-01-02T01:00:00Z',observed_through:'2026-01-02T02:00:00Z'}}],total:'1',next_cursor:''});
+ if(url.pathname.endsWith('/rules')) return json({items:[],total:'0',next_cursor:''});
+ return json({...report,revision:{...revision,hold_reasons:['collection_gap']}});
+ });
+ render(<ReportDetail client={new ApiClient(net)} id={reportID} />);
+ expect(await screen.findByText('수집 공백 기록')).toBeVisible();
+ fireEvent.click(screen.getByText(/증거 ·/));
+ expect(await screen.findByText(/이전 방식으로 복사된 센서 수집 공백/)).toBeVisible();
+ expect(screen.queryByText(/신고 기간과 겹치는/)).toBeNull();
 });

@@ -6,7 +6,7 @@ export const gapCauseLabels: Record<string, string> = {
 };
 
 export const holdReasonLabels: Record<string, string> = {
-  collection_gap: '신고 기간 중 수집 공백 기록',
+  collection_gap: '수집 공백 기록',
   contact_ambiguous: '연락처 후보가 여러 개임',
   contact_missing: '신고 연락처 없음',
   contact_expired: '신고 연락처 조회 만료',
