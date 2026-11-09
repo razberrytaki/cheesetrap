@@ -16,6 +16,7 @@ import {
   overview,
   sampleEvent,
 } from "./test/fixtures";
+import { CollectionStatus } from "./features/status/CollectionStatus";
 import { report, refresh } from "./features/reports/fixtures";
 afterEach(() => window.history.replaceState({}, "", "/"));
 const net = () =>
@@ -299,4 +300,12 @@ it("does not invent healthy capacity or zero lag before observations", async () 
  expect(await screen.findByText("용량 확인 불가", {exact: true, selector: "span"})).toBeVisible();
  expect(screen.getAllByText("관측 없음").length).toBeGreaterThan(0);
  expect(screen.queryByText(/0\.0%/)).not.toBeInTheDocument();
+});
+
+it('uses recent gaps for the dashboard summary and alert', async () => {
+ const client=new ApiClient(fetcher(()=>json({...overview,sensors_with_gaps:'99',sensors_recent_gaps:'2'})));
+ render(<CollectionStatus client={client} dashboard />);
+ expect(await screen.findByText('최근 24시간 수집 공백 2')).toBeVisible();
+ expect(screen.queryByText('99')).not.toBeInTheDocument();
+ expect(screen.getAllByText('최근 24시간 수집 공백').length).toBeGreaterThan(0);
 });

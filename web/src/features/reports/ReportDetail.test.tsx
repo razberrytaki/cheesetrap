@@ -115,7 +115,7 @@ describe("report review", () => {
     expect(
       await screen.findByText("<script>attack()</script>"),
     ).toBeInTheDocument();
-    expect(screen.getAllByText("contact_ambiguous").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("연락처 후보가 여러 개임").length).toBeGreaterThan(0);
     expect(
       screen.getByRole("option", { name: "abuse@example.net" }),
     ).toBeInTheDocument();
@@ -296,4 +296,19 @@ it("keeps archived legacy drafts read only without sending actions", async () =>
  expect(screen.getByRole("button", {name:"초안 제외"})).toBeDisabled();
  expect(screen.getByRole("combobox", {name:"연락처 후보"})).toBeDisabled();
  expect(screen.queryByRole("button", {name:/승인|발송|재전송/})).toBeNull();
+});
+
+it("labels collection-gap holds and displays incident ranges and causes", async () => {
+ const net = fetcher(url => {
+ if(url.pathname.endsWith('/evidence')) return json({items:[{event_id:'gap-event',ingestion_seq:'1',service:'ssh',event_type:'login',quality_flags:[],collection_gap:{started_at:'2026-10-17T01:00:00Z',observed_through:'2026-10-17T02:00:00Z',incidents:[{started_at:'2026-10-17T01:00:00Z',observed_through:'2026-10-17T02:00:00Z',causes:['retention_cleanup']}]}}],total:'1',next_cursor:''});
+ if(url.pathname.endsWith('/rules')) return json({items:[],total:'0',next_cursor:''});
+ return json({...report,revision:{...revision,hold_reasons:['collection_gap','future_reason']}});
+ });
+ render(<ReportDetail client={new ApiClient(net)} id={reportID} />);
+ expect(await screen.findByText('신고 기간 중 수집 공백 기록')).toBeVisible();
+ expect(screen.getByText('future_reason')).toBeVisible();
+ fireEvent.click(screen.getByText(/증거 ·/));
+ expect(await screen.findByText('보관 정리로 원본 삭제(미확인 손실 가능)')).toBeVisible();
+ expect(screen.getByText(/2026-10-17 01:00:00/)).toBeVisible();
+ expect(screen.getByText(/2026-10-17 02:00:00/)).toBeVisible();
 });

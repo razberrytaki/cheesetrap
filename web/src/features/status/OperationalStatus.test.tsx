@@ -33,3 +33,11 @@ describe('storage explanation', () => {
   expect(screen.getByText('현재 사용 가능한 공간을 확인할 수 없습니다.')).toBeVisible();
  });
 });
+
+it('shows the last dated gap while preserving cumulative counts', () => {
+ render(<OperationalStatus value={{...sample,sensors:[{name:'gap-sensor',collector_state:'active',last_engine_log_at:null,last_observation_at:null,gap_count:'12',last_gap:{started_at:'2026-10-17T01:00:00Z',observed_through:'2026-10-17T02:00:00Z',causes:['source_change']}},{name:'clean-sensor',collector_state:'active',last_engine_log_at:null,last_observation_at:null,gap_count:'0',last_gap:null}]}} />);
+ expect(screen.getByRole('columnheader',{name:'마지막 수집 공백'})).toBeVisible();
+ expect(screen.getByText('로그 파일 변경 또는 읽기 오류')).toBeVisible();
+ expect(screen.getByText('12')).toBeVisible();
+ expect(screen.getByText('없음')).toBeVisible();
+});

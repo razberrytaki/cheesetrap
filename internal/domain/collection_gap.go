@@ -14,5 +14,5 @@ const (
 type CollectionGapIncident struct {
 	StartedAt       time.Time  `json:"started_at"`
 	ObservedThrough time.Time  `json:"observed_through"`
-	Causes          []GapCause `json:"causes"`
+	Causes          []GapCause `json:"causes" nullable:"false" minItems:"1"`
 }

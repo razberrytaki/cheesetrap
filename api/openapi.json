@@ -1,6 +1,32 @@
 {
   "components": {
     "schemas": {
+      "CollectionGapIncident": {
+        "additionalProperties": false,
+        "properties": {
+          "causes": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "observed_through": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "started_at": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "started_at",
+          "observed_through",
+          "causes"
+        ],
+        "type": "object"
+      },
       "Config": {
         "additionalProperties": false,
         "properties": {
@@ -557,6 +583,9 @@
           "sensors_disabled": {
             "type": "string"
           },
+          "sensors_recent_gaps": {
+            "type": "string"
+          },
           "sensors_unknown": {
             "type": "string"
           },
@@ -571,6 +600,7 @@
           "sensors_degraded",
           "sensors_unknown",
           "sensors_disabled",
+          "sensors_recent_gaps",
           "sensors_with_gaps",
           "detected_seq"
         ],
@@ -1164,6 +1194,16 @@
               "null"
             ]
           },
+          "last_gap": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CollectionGapIncident"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "last_observation_at": {
             "format": "date-time",
             "type": [
@@ -1176,6 +1216,7 @@
           }
         },
         "required": [
+          "last_gap",
           "name",
           "collector_state",
           "last_engine_log_at",

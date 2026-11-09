@@ -3,7 +3,7 @@ import { OperationalStatus, statusTimestamp, statusTimeZone } from './Operationa
 import { ApiClient, errorMessage, isCancelled, type Overview } from '../../api/client';
 
 type State = { kind: 'loading' } | { kind: 'error'; message: string } | { kind: 'ready'; data: Overview; at: string };
-const labels: [Exclude<keyof Overview, "operations">, string][] = [['sensors_active', '활성'], ['sensors_degraded', '저하'], ['sensors_unknown', '확인 불가'], ['sensors_disabled', '비활성'], ['sensors_with_gaps', '수집 공백']];
+const labels: [Exclude<keyof Overview, "operations">, string][] = [['sensors_active', '활성'], ['sensors_degraded', '저하'], ['sensors_unknown', '확인 불가'], ['sensors_disabled', '비활성'], ['sensors_recent_gaps', '최근 24시간 수집 공백']];
 export function CollectionStatus({ client, dashboard = false, refreshRevision, onLoadingChange }: {
   client: ApiClient; dashboard?: boolean; refreshRevision?: number; onLoadingChange?: (loading: boolean) => void;
 }) {
@@ -36,7 +36,7 @@ export function CollectionStatus({ client, dashboard = false, refreshRevision, o
       <div className="collection-summary">
         <dl className={dashboard ? "dashboard-readings" : "sensor-counts"}>
           <div><dt>활성 센서</dt><dd>{state.data.sensors_active}</dd></div>
-          <div><dt>수집 공백</dt><dd>{state.data.sensors_with_gaps}</dd></div>
+          <div><dt>최근 24시간 수집 공백</dt><dd>{state.data.sensors_recent_gaps}</dd></div>
 
         </dl>
         <span className="status-caption">확인 {statusTimestamp(state.at)} ({statusTimeZone})</span>

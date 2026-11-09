@@ -1,3 +1,4 @@
+import { gapCauseLabel } from '../shared/gapLabels';
 import type { Overview } from '../../api/client';
 import { Field } from '../shared/ui';
 
@@ -51,11 +52,12 @@ export function OperationalStatus({ value, ingestedSeq, detectedSeq }: { value: 
    <p className="status-caption">수집기의 최근 관측과 엔진 로그 확인 시각을 함께 비교합니다. 기기 현지 시각 ({statusTimeZone}) 기준입니다.</p>
    {!value ? <p className="muted">운영 상태를 확인할 수 없습니다.</p> : (value.sensors ?? []).length === 0 ? <p className="muted">등록된 센서가 없습니다.</p> : <div className="sensor-comparison-scroll" role="region" aria-label="센서 비교표 가로 스크롤" tabIndex={0}>
     <table className="sensor-comparison"><caption className="sr-only">센서별 수집 상태 비교</caption>
-     <thead><tr><th scope="col">센서</th><th scope="col">수집기 상태</th><th scope="col">수집기 관측</th><th scope="col">엔진 로그 확인</th><th scope="col">누적 공백</th></tr></thead>
+     <thead><tr><th scope="col">센서</th><th scope="col">수집기 상태</th><th scope="col">수집기 관측</th><th scope="col">엔진 로그 확인</th><th scope="col">누적 공백</th><th scope="col">마지막 수집 공백</th></tr></thead>
      <tbody>{(value.sensors ?? []).map(sensor => <tr key={sensor.name}>
       <th scope="row">{sensor.name}</th>
       <td><span className={sensor.collector_state === 'active' ? 'status-healthy' : ''}>{stateLabels[sensor.collector_state] ?? sensor.collector_state}</span></td>
       <td><SensorTime value={sensor.last_observation_at} /></td><td><SensorTime value={sensor.last_engine_log_at} /></td><td>{sensor.gap_count}</td>
+      <td>{sensor.last_gap ? <><SensorTime value={sensor.last_gap.started_at} /> ~ <SensorTime value={sensor.last_gap.observed_through} />{sensor.last_gap.causes.map(cause => <div key={cause}>{gapCauseLabel(cause)}</div>)}</> : '없음'}</td>
      </tr>)}</tbody>
     </table>
    </div>}

@@ -60,14 +60,15 @@ type eventInput struct {
 type eventOutput struct{ Body Event }
 type overviewOutput struct {
 	Body struct {
-		Operations       observability.Status `json:"operations"`
-		IngestedSequence string               `json:"ingested_seq"`
-		SensorsActive    string               `json:"sensors_active"`
-		SensorsDegraded  string               `json:"sensors_degraded"`
-		SensorsUnknown   string               `json:"sensors_unknown"`
-		SensorsDisabled  string               `json:"sensors_disabled"`
-		SensorsWithGaps  string               `json:"sensors_with_gaps"`
-		DetectedSequence string               `json:"detected_seq"`
+		Operations        observability.Status `json:"operations"`
+		IngestedSequence  string               `json:"ingested_seq"`
+		SensorsActive     string               `json:"sensors_active"`
+		SensorsDegraded   string               `json:"sensors_degraded"`
+		SensorsUnknown    string               `json:"sensors_unknown"`
+		SensorsDisabled   string               `json:"sensors_disabled"`
+		SensorsRecentGaps string               `json:"sensors_recent_gaps"`
+		SensorsWithGaps   string               `json:"sensors_with_gaps"`
+		DetectedSequence  string               `json:"detected_seq"`
 	}
 }
 type cursor struct {
@@ -114,6 +115,7 @@ func (s *server) registerEvents(a huma.API) {
 		out.Body.SensorsDegraded = strconv.FormatInt(row.SensorsDegraded, 10)
 		out.Body.SensorsUnknown = strconv.FormatInt(row.SensorsUnknown, 10)
 		out.Body.SensorsDisabled = strconv.FormatInt(row.SensorsDisabled, 10)
+		out.Body.SensorsRecentGaps = strconv.FormatInt(row.SensorsRecentGaps, 10)
 		out.Body.SensorsWithGaps = strconv.FormatInt(row.SensorsWithGaps, 10)
 		out.Body.DetectedSequence = strconv.FormatInt(row.DetectedSeq, 10)
 		return out, nil

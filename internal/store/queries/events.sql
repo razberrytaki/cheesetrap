@@ -151,7 +151,8 @@ SELECT ingested_seq,detected_seq,
  (SELECT count(*) FROM cheesetrap.sensors WHERE state='degraded') AS sensors_degraded,
  (SELECT count(*) FROM cheesetrap.sensors WHERE state='unknown') AS sensors_unknown,
  (SELECT count(*) FROM cheesetrap.sensors WHERE state='disabled') AS sensors_disabled,
- (SELECT count(*) FROM cheesetrap.ingestion_gaps) AS sensors_with_gaps
+ (SELECT count(*) FROM cheesetrap.ingestion_gaps) AS sensors_with_gaps,
+ (SELECT count(DISTINCT sensor_id) FROM cheesetrap.collection_gap_incidents WHERE observed_through>=clock_timestamp()-interval '24 hours') AS sensors_recent_gaps
 FROM cheesetrap.processing_cursors WHERE singleton;
 
 -- name: CheckAPIReady :one

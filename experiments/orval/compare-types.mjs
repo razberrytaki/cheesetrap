@@ -23,10 +23,14 @@ const statements = [
 statements.push(
   "type Draft = Omit<Old['schemas']['ReportSummary'], 'delivery_uncertain' | 'has_delivery_attempts'>;",
   "type Revision = Omit<Old['schemas']['RevisionView'], 'auto_approval_allowed'>;",
-  "type Status = Omit<Old['schemas']['Status'], 'smtp_results'>;",
+  "type GapIncident = {started_at: string; observed_through: string; causes: string[]};",
+  "type Sensor = Old['schemas']['SensorStatus'] & {last_gap: GapIncident | null};",
+  "type Status = Omit<Old['schemas']['Status'], 'smtp_results' | 'sensors'> & {sensors: Sensor[] | null};",
   "type Settings = Omit<Old['schemas']['Settings'], 'automatic_mode' | 'delivery_limits'>;",
 );
 const reviewed = {
+  CollectionGapIncident: "GapIncident",
+  SensorStatus: "Sensor",
   ReportDraft: "Draft",
   DetectionView: "Omit<Old['schemas']['DetectionView'], 'auto_approval_allowed'>",
   RulePageOutputBody: "Omit<Old['schemas']['RulePageOutputBody'], 'items'> & {items: Omit<Old['schemas']['RuleView'], 'auto_approval_allowed'>[] | null}",
@@ -39,7 +43,7 @@ const reviewed = {
   ReportDetailOutputBody: "Omit<Old['schemas']['ReportDetailOutputBody'], 'delivery_uncertain' | 'has_delivery_attempts' | 'revision'> & {revision: Revision}",
   ReportListOutputBody: "Omit<Old['schemas']['ReportListOutputBody'], 'items'> & {items: Draft[] | null}",
   IpOutputBody: "Omit<Old['schemas']['IpOutputBody'], 'reports' | 'detections'> & {reports: Draft[] | null, detections: Omit<Old['schemas']['DetectionView'], 'auto_approval_allowed'>[] | null}",
-  OverviewOutputBody: "Omit<Old['schemas']['OverviewOutputBody'], 'operations' | 'reports_queued' | 'reports_sending' | 'reports_retry_wait' | 'reports_unknown' | 'reports_sent' | 'reports_failed' | 'reports_closed_unconfirmed'> & {operations: Status}",
+  OverviewOutputBody: "Omit<Old['schemas']['OverviewOutputBody'], 'operations' | 'reports_queued' | 'reports_sending' | 'reports_retry_wait' | 'reports_unknown' | 'reports_sent' | 'reports_failed' | 'reports_closed_unconfirmed'> & {operations: Status; sensors_recent_gaps: string}",
 };
 let index = 0;
 for (const name of Object.keys(spec.components.schemas)) {
