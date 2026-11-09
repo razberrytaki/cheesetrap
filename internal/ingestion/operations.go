@@ -1,14 +1,16 @@
 package ingestion
 
 import (
-	"cheesetrap/internal/domain"
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/jackc/pgx/v5"
 	"io"
 	"os"
 	"path/filepath"
+
+	"github.com/jackc/pgx/v5"
+
+	"cheesetrap/internal/domain"
 )
 
 func readRetentionReceipt(root string) (map[string]int64, error) {

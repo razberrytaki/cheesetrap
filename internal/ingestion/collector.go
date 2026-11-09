@@ -1,7 +1,6 @@
 package ingestion
 
 import (
-	"cheesetrap/internal/domain"
 	"context"
 	"errors"
 	"fmt"
@@ -11,11 +10,14 @@ import (
 	"slices"
 	"time"
 
+	"cheesetrap/internal/domain"
+
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
+
 	"cheesetrap/internal/observability"
 	"cheesetrap/internal/store"
 	"cheesetrap/internal/store/db"
-	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 var ErrCollectorOwned = errors.New("collector_already_running")

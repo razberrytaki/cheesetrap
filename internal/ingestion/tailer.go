@@ -2,7 +2,6 @@ package ingestion
 
 import (
 	"bytes"
-	"cheesetrap/internal/domain"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
@@ -17,6 +16,8 @@ import (
 	"syscall"
 	"time"
 	"unicode/utf8"
+
+	"cheesetrap/internal/domain"
 )
 
 var (

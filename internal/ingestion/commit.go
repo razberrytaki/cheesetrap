@@ -13,10 +13,11 @@ import (
 	"strings"
 	"time"
 
-	"cheesetrap/internal/domain"
-	"cheesetrap/internal/store/db"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
+
+	"cheesetrap/internal/domain"
+	"cheesetrap/internal/store/db"
 )
 
 var (
