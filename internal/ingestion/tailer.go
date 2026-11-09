@@ -2,6 +2,7 @@ package ingestion
 
 import (
 	"bytes"
+	"cheesetrap/internal/domain"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
@@ -96,7 +97,8 @@ type TailerStatus struct {
 type TailerBatch struct {
 	// GapCountFloor is supplied by the leased collector, not the tailer. A
 	// monotonic floor makes replay of a committed batch idempotent.
-	GapCountFloor int64 `json:"-"`
+	GapCountFloor int64             `json:"-"`
+	GapCauses     []domain.GapCause `json:"-"`
 	// ObservationStartedAt is supplied by the collector from the database clock
 	// immediately BEFORE Poll. Tailer itself leaves it zero. It is a conservative
 	// lower bound for loss discovered on the next poll, persisted with this batch.

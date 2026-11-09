@@ -982,15 +982,16 @@ func (q *Queries) SetCheckpoint(ctx context.Context, arg SetCheckpointParams) er
 }
 
 const updateCollectorState = `-- name: UpdateCollectorState :exec
-UPDATE cheesetrap.sensors SET last_observation_at=greatest(last_observation_at,$2::timestamptz), state=CASE WHEN EXISTS(SELECT 1 FROM cheesetrap.ingestion_gaps g WHERE g.sensor_id=$1) THEN 'degraded' ELSE 'active' END WHERE sensors.sensor_id=$1
+UPDATE cheesetrap.sensors SET last_observation_at=greatest(last_observation_at,$2::timestamptz), state=CASE WHEN $3::boolean THEN 'degraded' ELSE 'active' END WHERE sensors.sensor_id=$1
 `
 
 type UpdateCollectorStateParams struct {
-	SensorID pgtype.UUID
-	Column2  pgtype.Timestamptz
+	SensorID      pgtype.UUID
+	Column2       pgtype.Timestamptz
+	CollectionGap bool
 }
 
 func (q *Queries) UpdateCollectorState(ctx context.Context, arg UpdateCollectorStateParams) error {
-	_, err := q.db.Exec(ctx, updateCollectorState, arg.SensorID, arg.Column2)
+	_, err := q.db.Exec(ctx, updateCollectorState, arg.SensorID, arg.Column2, arg.CollectionGap)
 	return err
 }

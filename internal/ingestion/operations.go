@@ -1,6 +1,7 @@
 package ingestion
 
 import (
+	"cheesetrap/internal/domain"
 	"context"
 	"encoding/json"
 	"errors"
@@ -44,13 +45,22 @@ func readRetentionReceipt(root string) (map[string]int64, error) {
 	}
 	return v.Sensors, nil
 }
-func notePersistentGap(ctx context.Context, conn *pgx.Conn, sensor string, amount int64) error {
-	_, err := conn.Exec(ctx, `INSERT INTO cheesetrap.ingestion_gaps(sensor_id,started_at,observed_through,gap_count) SELECT sensor_id,least(last_observation_at,clock_timestamp()),clock_timestamp(),$2 FROM cheesetrap.sensors WHERE sensor_id=$1 ON CONFLICT(sensor_id) DO UPDATE SET gap_count=ingestion_gaps.gap_count+EXCLUDED.gap_count,observed_through=EXCLUDED.observed_through`, sensor, amount)
+func notePersistentGap(ctx context.Context, conn *pgx.Conn, sensor string, cause domain.GapCause, amount int64) error {
+	tx, err := conn.Begin(ctx)
 	if err != nil {
 		return commitError(ctx)
 	}
-	_, err = conn.Exec(ctx, `UPDATE cheesetrap.sensors SET state='degraded' WHERE sensor_id=$1`, sensor)
-	if err != nil {
+	defer tx.Rollback(context.Background())
+	if _, err = tx.Exec(ctx, `SELECT cheesetrap.note_collection_gap(sensor_id,last_observation_at,$2,$3) FROM cheesetrap.sensors WHERE sensor_id=$1`, sensor, cause, amount); err != nil {
+		return commitError(ctx)
+	}
+	if _, err = tx.Exec(ctx, `INSERT INTO cheesetrap.ingestion_gaps(sensor_id,started_at,observed_through,gap_count) SELECT sensor_id,least(last_observation_at,clock_timestamp()),clock_timestamp(),$2 FROM cheesetrap.sensors WHERE sensor_id=$1 ON CONFLICT(sensor_id) DO UPDATE SET gap_count=ingestion_gaps.gap_count+EXCLUDED.gap_count,observed_through=EXCLUDED.observed_through`, sensor, amount); err != nil {
+		return commitError(ctx)
+	}
+	if _, err = tx.Exec(ctx, `UPDATE cheesetrap.sensors SET state='degraded' WHERE sensor_id=$1`, sensor); err != nil {
+		return commitError(ctx)
+	}
+	if tx.Commit(ctx) != nil {
 		return commitError(ctx)
 	}
 	return nil
@@ -67,6 +77,9 @@ func applyRetentionReceipt(ctx context.Context, conn *pgx.Conn, sensor string, c
 	}
 	if count <= previous {
 		return false, nil
+	}
+	if _, err = tx.Exec(ctx, `SELECT cheesetrap.note_collection_gap(sensor_id,last_observation_at,$2,$3) FROM cheesetrap.sensors WHERE sensor_id=$1`, sensor, domain.GapRetentionCleanup, count-previous); err != nil {
+		return false, commitError(ctx)
 	}
 	_, err = tx.Exec(ctx, `INSERT INTO cheesetrap.ingestion_gaps(sensor_id,started_at,observed_through,gap_count) SELECT sensor_id,least(last_observation_at,clock_timestamp()),clock_timestamp(),$2 FROM cheesetrap.sensors WHERE sensor_id=$1 ON CONFLICT(sensor_id) DO UPDATE SET gap_count=ingestion_gaps.gap_count+EXCLUDED.gap_count,observed_through=EXCLUDED.observed_through`, sensor, count-previous)
 	if err != nil {

@@ -91,7 +91,7 @@ INSERT INTO cheesetrap.ingestion_gaps(sensor_id,started_at,observed_through) VAL
 ON CONFLICT(sensor_id) DO UPDATE SET started_at=least(ingestion_gaps.started_at,EXCLUDED.started_at),observed_through=greatest(ingestion_gaps.observed_through,EXCLUDED.observed_through);
 
 -- name: UpdateCollectorState :exec
-UPDATE cheesetrap.sensors SET last_observation_at=greatest(last_observation_at,$2::timestamptz), state=CASE WHEN EXISTS(SELECT 1 FROM cheesetrap.ingestion_gaps g WHERE g.sensor_id=$1) THEN 'degraded' ELSE 'active' END WHERE sensors.sensor_id=$1;
+UPDATE cheesetrap.sensors SET last_observation_at=greatest(last_observation_at,$2::timestamptz), state=CASE WHEN sqlc.arg(collection_gap)::boolean THEN 'degraded' ELSE 'active' END WHERE sensors.sensor_id=$1;
 
 -- name: CloseSensorGeneration :exec
 UPDATE cheesetrap.file_generations SET closed_at=greatest(clock_timestamp(),created_at) WHERE sensor_id=$1 AND file_generation_id=$2 AND closed_at IS NULL;

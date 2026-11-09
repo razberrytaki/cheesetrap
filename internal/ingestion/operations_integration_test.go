@@ -69,6 +69,11 @@ func TestRetentionCapacityRecovery(t *testing.T) {
 	}
 	recovered.Store(true)
 	wait(`SELECT count(*) FROM cheesetrap.events WHERE sensor_id=$1`, 1)
+	wait(`SELECT count(*) FROM cheesetrap.sensors WHERE sensor_id=$1 AND state='active'`, 1)
+	var causes []string
+	if err := pool.QueryRow(ctx, `SELECT causes FROM cheesetrap.collection_gap_incidents WHERE sensor_id=$1`, source.SensorID).Scan(&causes); err != nil || len(causes) != 2 {
+		t.Fatal("retention and storage causes missing", causes, err)
+	}
 	stop()
 	if err := <-done; err != nil && err != context.Canceled {
 		t.Fatal(err)
@@ -78,9 +83,22 @@ func TestRetentionCapacityRecovery(t *testing.T) {
 	if gaps != 4 {
 		t.Fatal("gap reset or receipt duplicate", gaps)
 	}
+	line, err := os.ReadFile(filepath.Join(root, "cowrie.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	f, err := os.OpenFile(filepath.Join(root, "cowrie.json"), os.O_APPEND|os.O_WRONLY, 0600)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err = f.Write(line); err != nil {
+		t.Fatal(err)
+	}
+	f.Close()
 	runctx, stop = context.WithCancel(ctx)
 	go func() { done <- runCollector(runctx, url, root, manifest, probe) }()
-	wait(`SELECT count(*) FROM cheesetrap.checkpoints WHERE sensor_id=$1`, 1)
+	wait(`SELECT count(*) FROM cheesetrap.events WHERE sensor_id=$1`, 2)
+	wait(`SELECT count(*) FROM cheesetrap.events WHERE sensor_id=$1 AND NOT ('collection_gap'=ANY(quality_flags))`, 1)
 	time.Sleep(300 * time.Millisecond)
 	stop()
 	if err := <-done; err != nil && err != context.Canceled {
