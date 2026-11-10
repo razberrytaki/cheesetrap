@@ -250,7 +250,7 @@ function Review({ client, id }: { client: ApiClient; id: string }) {
               <section className="review-section review-controls" aria-label="현재 개정 작업">
                 <h2>수신자와 신고 처리</h2>
                 {result}
-                <p className="muted" id="contact-save-help">후보를 수신자로 저장하면 새 개정이 만들어집니다. 초안을 검토한 후 외부 도구에서 직접 사용하세요. Cheesetrap은 메일을 발송하지 않습니다.</p>
+                <p className="muted" id="contact-save-help">후보를 수신자로 저장하면 새 개정이 만들어집니다. 초안을 검토한 후 외부 도구에서 직접 사용하세요. cheesetrap은 메일을 발송하지 않습니다.</p>
                 <div className="inline-actions">
                   <label>
                     연락처 후보

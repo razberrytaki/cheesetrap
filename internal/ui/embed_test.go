@@ -24,7 +24,7 @@ func TestEmbeddedPageAndHead(t *testing.T) {
 				if w.Code != 200 || !strings.Contains(w.Header().Get("Content-Type"), "text/html") {
 					t.Fatalf("status=%d content-type=%s", w.Code, w.Header().Get("Content-Type"))
 				}
-				if method == "GET" && !strings.Contains(w.Body.String(), "Cheesetrap") {
+				if method == "GET" && !strings.Contains(w.Body.String(), "<title>cheesetrap") {
 					t.Fatal("embedded page missing")
 				}
 				if method == "HEAD" && w.Body.Len() != 0 {
