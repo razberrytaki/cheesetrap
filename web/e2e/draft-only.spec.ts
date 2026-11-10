@@ -4,6 +4,12 @@ test('draft-only navigation and settings expose no sending actions', async ({ pa
   const failures: string[] = [];
   page.on('pageerror', error => failures.push(error.message));
   const origin = process.env.CHEESETRAP_E2E_URL!;
+  const mismatched = origin.replace('127.0.0.1', 'localhost');
+  const rejected = await page.goto(`${mismatched}/reports`);
+  expect(rejected!.status()).toBe(403);
+  await expect(page.getByRole('heading', { name: '관리 화면 주소를 확인하세요', exact: true })).toBeVisible();
+  await expect(page.getByText('http://127.0.0.1:8080', { exact: true })).toBeVisible();
+  expect((await page.request.get(`${mismatched}/api/v1/auth/me`)).headers()['content-type']).toContain('application/json');
   await page.route('**/*', route => {
     if (new URL(route.request().url()).origin !== origin) {
       failures.push('unexpected external request');

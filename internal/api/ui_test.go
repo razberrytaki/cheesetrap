@@ -37,3 +37,40 @@ func TestRuntimeRouterServesUIWithSameHostAndOriginBoundary(t *testing.T) {
 		assertError(t, w, "")
 	}
 }
+
+func TestRejectedPageNavigationExplainsAddressWithoutRevealingOrigin(t *testing.T) {
+	const configured = "https://dashboard.example.test"
+	h := NewHandler(nil, configured)
+	navigate := func(host string, headers map[string]string) *httptest.ResponseRecorder {
+		r := httptest.NewRequest("GET", configured+"/reports", nil)
+		r.Host = host
+		for k, v := range headers {
+			r.Header.Set(k, v)
+		}
+		w := httptest.NewRecorder()
+		h.ServeHTTP(w, r)
+		return w
+	}
+	document := map[string]string{"Sec-Fetch-Dest": "document", "Sec-Fetch-Mode": "navigate"}
+	for _, w := range []*httptest.ResponseRecorder{
+		navigate("localhost:8080", document),
+		navigate("dashboard.example.test", map[string]string{"Sec-Fetch-Dest": "document", "Sec-Fetch-Mode": "navigate", "Sec-Fetch-Site": "cross-site"}),
+	} {
+		if w.Code != 403 || !strings.HasPrefix(w.Header().Get("Content-Type"), "text/html") || !strings.Contains(w.Body.String(), "관리 화면 주소를 확인하세요") {
+			t.Fatalf("rejected navigation gave no guidance: status=%d type=%q", w.Code, w.Header().Get("Content-Type"))
+		}
+		if strings.Contains(w.Body.String(), "dashboard.example.test") {
+			t.Fatal("guidance revealed the configured origin")
+		}
+		if !strings.Contains(w.Header().Get("Content-Security-Policy"), "default-src 'none'") || w.Header().Get("X-Frame-Options") != "DENY" {
+			t.Fatal("guidance page lost UI security headers")
+		}
+	}
+	for _, headers := range []map[string]string{nil, {"Sec-Fetch-Dest": "empty", "Sec-Fetch-Mode": "cors"}} {
+		w := navigate("localhost:8080", headers)
+		if w.Code != 403 {
+			t.Fatalf("host mismatch status=%d", w.Code)
+		}
+		assertError(t, w, "dashboard.example.test")
+	}
+}

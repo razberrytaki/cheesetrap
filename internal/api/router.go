@@ -149,6 +149,10 @@ func (s *server) protect(next http.Handler) http.Handler {
 		w.Header().Set("Cache-Control", "no-store")
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		if r.Host != s.host || r.Header.Get("Sec-Fetch-Site") == "cross-site" {
+			if r.Method == http.MethodGet && r.Header.Get("Sec-Fetch-Dest") == "document" {
+				ui.WriteAddressGuidance(w)
+				return
+			}
 			writeError(w, r, 403)
 			return
 		}
