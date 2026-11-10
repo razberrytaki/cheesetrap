@@ -57,7 +57,7 @@ export function App({ client }: { client: ApiClient }) {
               : "이벤트 탐색";
   const [session, setSession] = useState<Session>({ kind: "checking" });
   useEffect(() => {
-    document.title = `Cheesetrap · ${session.kind === "authenticated" ? title : "관리자 접속"}`;
+    document.title = `cheesetrap · ${session.kind === "authenticated" ? title : "관리자 접속"}`;
     if (session.kind === "authenticated") document.getElementById("workspace")?.focus();
   }, [path, title, session.kind]);
   const [attempt, setAttempt] = useState(0);
@@ -135,7 +135,7 @@ export function App({ client }: { client: ApiClient }) {
   if (session.kind === "error")
     return (
       <main className="session-page">
-        <h1>Cheesetrap</h1>
+        <h1>cheesetrap</h1>
         <p className="error" role="alert">
           {session.message}
         </p>
@@ -245,7 +245,7 @@ export function App({ client }: { client: ApiClient }) {
           )}
         </main>
         <footer className="app-footer">
-          <span>Cheesetrap</span>
+          <span>cheesetrap</span>
           <span>조회 시점의 데이터 · 수동 새로고침</span>
         </footer>
       </div>

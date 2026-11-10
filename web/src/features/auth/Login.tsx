@@ -55,6 +55,6 @@ export function Login({ client, onLogin, expired = false }: { client: ApiClient;
     <p className="login-help">비공개 관리 화면입니다.<br />서버에서 생성한 계정을 사용하세요.</p>
     </section>
     </div>
-    <footer className="login-footer"><span>Cheesetrap · 개인 운영자를 위한 허니팟 관리</span><span>관측 · 검토 · 신고</span></footer>
+    <footer className="login-footer"><span>cheesetrap · 개인 운영자를 위한 허니팟 관리</span><span>관측 · 검토 · 신고</span></footer>
   </main>;
 }
