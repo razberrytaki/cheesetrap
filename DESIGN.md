@@ -1,13 +1,13 @@
-# Cheesetrap administration UI for report review
+# cheesetrap administration UI for report review
 
 On 2026-10-28, the user chose the report-review layout from option D and the graphite and gold colors from option A.
 The UI copy remains Korean. The quoted labels below retain their exact text and include English explanations.
 
 ## Purpose and behavior contract
 
-Operators continue reviewing pending reports and quickly identify collection and delivery exceptions.
-The first screen shows the review count, collection gaps, and unknown outcomes. Preserve existing URLs,
-status details, refresh behavior, authentication, and report approval flows.
+Operators continue reviewing pending report drafts and quickly identify collection exceptions.
+The first screen shows the review count and collection gaps. Preserve existing URLs,
+status details, refresh behavior, authentication, and draft review flows. cheesetrap sends no email.
 Distinguish 0, unavailable data, and query failures. Display large numbers as strings.
 
 ## Appearance and tokens
@@ -20,9 +20,9 @@ Use a fluid 48–80px font size for the review count, 30px main headings, 16px b
 ## Layout and components
 
 Place the overview below the top brand and navigation. Put review actions in a wide left panel
-and collection and delivery status in a list on the right. Use a single column below 60rem.
+and collection status in a list on the right. Use a single column below 60rem.
 Use a gold fill only for the review link. Use text and thin borders for other navigation.
-Show event browsing, held reports, and delivery history as a continuous list of lower-page actions.
+Show event browsing and held reports as a continuous list of lower-page actions.
 Use dark surfaces and 1px borders for depth. Do not use decorative shadows or lighting effects.
 
 ## Resend design reference
@@ -34,7 +34,6 @@ Use the Resend reference's 8px spacing unit, 16px panel corner radius,
 
 Display a missing review count as **"확인 불가"**, meaning "Unavailable".
 Display 0 as **"검토 대기 없음"**, meaning "No pending reviews".
-Do not treat an unknown outcome as success.
 Show errors with a refresh action that allows a retry. Keep status text visible during initial loading.
 Preserve `focus-visible`, 44px touch targets, keyboard navigation, and native `details`.
 Wrap long text. Stack actions and status vertically on narrow screens.
@@ -42,7 +41,7 @@ Wrap long text. Stack actions and status vertically on narrow screens.
 ## Motion and prohibited changes
 
 Use only brief color and border feedback, and respect `reduced-motion`.
-Do not add charts, fake trends, automatic refresh, automatic redelivery, or new APIs.
+Do not add charts, fake trends, automatic refresh, or new APIs.
 
 ## Verification criteria
 
@@ -68,20 +67,19 @@ Make the refresh scope and account access clear without new images, fonts, or de
 
 Use a dedicated 2-column field grid for settings, with 1 column on narrow screens.
 Keep apply, delete, and protection guidance near the relevant input group. Place current and scheduled schedule details beside the schedule inputs.
-Place the SMTP test area after a single settings save action.
-Preserve the existing locks that prevent settings saves during a test and SMTP tests while settings change.
+Use a single settings save action.
 
-Put one overview refresh action beside the main heading. On delivery details, use one button beside the main heading
-to query both report status and delivery history. Lock refresh while an approval request is in progress or its outcome is unknown.
+Put one overview refresh action beside the main heading. On report details, use one button beside the main heading
+to read the stored report status. Lock refresh while a change request is in progress.
 Do not reuse earlier confirmation checks after refresh. Remove links from a detail screen to itself.
 
 Keep the time, type, collection sequence number, quality, and truncation warnings in the report evidence summary.
 Expand details for only the selected item. Clear the selection on page changes.
-Preserve raw-data masking, revision pinning, hold reasons, approval confirmation, and protection against redelivery after an unknown outcome.
+Preserve raw-data masking, revision pinning, and hold reasons.
 
 ## Report review actions and feedback, 2026-10-30
 
-Place the report body beside recipient and approval actions on wide screens.
+Place the report body beside recipient and rejection actions on wide screens.
 On narrow screens, put the action area after the body. Place evidence, rules, raw registry data, and revision history below, expandable as needed.
 Keep the body, recipients, and hold reasons visible in the default view.
 
@@ -91,5 +89,4 @@ Show the result in the action area with the selected address and the next review
 **"신고 상태 새로고침"**, meaning "Refresh report status", reads stored results. Distinguish request acceptance from completion.
 
 Keep the existing screen and expanded sections during saves and refreshes.
-Lock changes and approvals while reading the latest status and after a query failure. Mark information as stale after a failure.
-After refresh, require approval confirmation checks again, even when the same revision returns.
+Lock changes and rejection while reading the latest status and after a query failure. Mark information as stale after a failure.
