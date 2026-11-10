@@ -13,7 +13,7 @@ settings or stop existing services to install cheesetrap.
 For an existing deployment, follow the [upgrade guide](upgrade.md).
 Check the [resource limits and capacity](#resource-limits-and-capacity) before installation.
 
-The API publishes only on `127.0.0.1:8080`. The DB has no published port.
+The API publishes only on `127.0.0.1:8080`. The bundled DB has no published port.
 Host nftables `inet` and `bridge` filters block new sensor connections.
 Compose networks alone cannot block DB, management SSH, metadata, or callbacks.
 The optional worker runs detection, seals and repairs aggregation windows,
@@ -129,6 +129,92 @@ sudo -n chmod 644 "$INSTALL_ROOT/config/web/cert.pem"
 
 For IP or DNS verification, include the actual target in the certificate SAN or
 provide a trusted verification certificate. Do not disable certificate checks globally.
+
+## Use external PostgreSQL
+
+Omit `database` to keep the bundled PostgreSQL container. For an external database,
+start with [the external example](../../deploy/config.external-db.example.yaml).
+It uses placeholder values and does not identify a running service.
+
+Prepare these prerequisites before starting the app:
+
+1. Provision PostgreSQL 17 with a private IPv4 endpoint. The host must route to it.
+   Use a direct endpoint or session-mode pooling. Migration uses a session advisory
+   lock, and app pools set startup parameters. Transaction-mode pooling is unsupported.
+2. Create database `cheesetrap`. The provider administrator must own it and have
+   `CREATEROLE`. This account runs bootstrap SQL only. Runtime accounts remain restricted.
+3. Install the provider CA bundle as a regular, non-symlink file readable by app
+   UID 10001. Choose an absolute normalized path containing letters, digits,
+   underscores, periods, hyphens, and slashes. Keep the CA file through upgrades.
+4. Set `database.host`, `port`, `ca_file`, `quota_gib`, and `allowed_cidr` in the
+   installation config. The host is a lowercase DNS name or private IPv4 literal.
+   Preflight requires every resolved address to be inside `allowed_cidr`.
+   The CIDR must be within `10/8`, `172.16/12`, `192.168/16`, or `100.64/10`,
+   have prefix length at least 16, and not overlap the sensor subnet.
+   Public endpoints, localhost, and the bundled hostname `postgres` are rejected.
+5. Set a quota of 1 to 1,000,000 GiB below the provider's usable capacity.
+   This is a collection guard budget, not a provider storage limit.
+   Leave room for WAL, maintenance, backups, and other databases. See
+   [disk guards and recovery](retention.md#disk-guards-and-recovery).
+
+External mode requires Docker Compose 2.33.1 or newer for override tags and
+explicit gateway selection. Preparation writes verified-TLS role URLs and a
+mode-0600 `bootstrap/10-roles.sql`, without a bootstrap password. The SQL file
+stays owned by the preparing operator rather than PostgreSQL UID 999.
+Run it once against the empty database with `psql` as the provider administrator.
+Use a protected service file or password prompt. Never put credentials in command
+arguments or logs. With a locally configured `cheesetrap-provider-admin` service:
+
+```sh
+sudo -n psql 'service=cheesetrap-provider-admin' -X -v ON_ERROR_STOP=1 \
+  --single-transaction -f "$INSTALL_ROOT/bootstrap/10-roles.sql"
+```
+
+The SQL temporarily grants the migration role to the administrator with `SET`
+permission and no inheritance so PostgreSQL 16 and later can create schemas with
+that owner. It explicitly switches to that role to set schema privileges, then
+resets the role and revokes this membership. Do not rerun bootstrap over an
+existing installation. Review and recover a failed transaction before retrying.
+
+For every external-mode Compose command, use both files in this order. This
+includes build, start, admin, migration, upgrade, and recovery commands:
+
+```sh
+dc() {
+  sudo -n docker compose --env-file "$INSTALL_ROOT/compose.env" \
+    -f deploy/compose.yaml -f deploy/compose.external-db.yaml "$@"
+}
+dc config --quiet
+dc build api web
+```
+
+The override disables the bundled `postgres` service and removes its migration
+dependency and data mounts. It mounts the CA into each app and measures `/logs`
+alongside the database quota. Sensors stay on their sensor network.
+The installation-owned `database_egress` network uses the `ctmd-` bridge prefix.
+The host guard permits only the configured destination CIDR and TCP port on this
+bridge, plus replies, and blocks new access from it to the host. Its identity and
+attached containers receive the same checks as the API bridge.
+Apply the host guard before starting app services. Provider firewall rules must
+also allow the host's connection to the private endpoint. The installer does not
+change provider rules or host routes.
+
+API, migrate, collector, and admin use this bridge as their default gateway.
+The worker keeps its existing registry-lookup gateway on `worker_egress`, which
+also carries its database connections. Its outbound access remains broader than
+the database-only bridge rules. Only app services join `database_egress`.
+Role URLs require `sslmode=verify-full`, the mounted CA, and a five-second connect
+timeout. The DB name remains `cheesetrap`. `check` validates files, DNS addresses,
+and Compose rendering. It does not authenticate to the provider or verify routing.
+
+External mode has not been verified against a provider database. App containers
+may fail to resolve the database hostname when DNS queries leave through the
+database-only bridge. Confirm that `migrate` connects on the first deployment.
+
+For reboot and retention recovery, redefine `rdc` with the same two files before
+running the recovery blocks. Skip bundled-only commands such as `dc exec postgres`
+and PostgreSQL volume checks. Have the provider administrator perform database
+administration through its own protected connection.
 
 ## Run preflight and build
 
@@ -288,8 +374,8 @@ Drafts without a reply address keep `reply_to_missing`. Registry lookup failure,
 missing or ambiguous contacts, evidence-quality gaps, and evidence older than
 72 hours also hold drafts without discarding evidence. The worker queries registries
 through its dedicated `worker_egress` Compose network. It reaches the DB
-through the internal `management` Compose network. Do not add external
-networks to sensors, API, collector, or DB.
+through the internal `management` Compose network. Keep sensors on their sensor network. Add app database networking only through
+the [external PostgreSQL override](#use-external-postgresql).
 
 Only for an older installation that lacks the River schema, create it as follows.
 Do not run this against a DB where it already exists.

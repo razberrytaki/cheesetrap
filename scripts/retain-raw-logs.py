@@ -9,6 +9,7 @@ from pathlib import Path
 import sys
 from install_lib import ROOT, load, run
 from raw_retention import retain
+from backup_restore import external_source, external_sql
 
 OWNER = 'org.cheesetrap.cd-template'
 STATE = Path('/var/lib/cheesetrap-cd')
@@ -32,11 +33,15 @@ def maintain(root, command=run):
 
 def maintain_locked(root, command):
     root=Path(root).absolute()
-    load(root/'install.json')
+    config=load(root/'install.json')
     dc=['docker','compose','--env-file',str(root/'compose.env'),'-f',str(ROOT/'deploy/compose.yaml')]
     # Capture one DB policy before preview or stopping services. SQL validates
     # legacy defaults; read/parse failure never falls back to destructive defaults.
-    policy=json.loads(command(dc+['exec','-T','postgres','psql','-X','-v','ON_ERROR_STOP=1','-U','postgres','-d','cheesetrap','-Atc','SELECT cheesetrap.retention_policy()::text']))
+    if 'database' in config:
+        dc+=['-f',str(ROOT/'deploy/compose.external-db.yaml')]
+        policy=json.loads(external_sql(external_source(['docker'],root),'SELECT cheesetrap.retention_policy()::text;'))
+    else:
+        policy=json.loads(command(dc+['exec','-T','postgres','psql','-X','-v','ON_ERROR_STOP=1','-U','postgres','-d','cheesetrap','-Atc','SELECT cheesetrap.retention_policy()::text']))
     days=policy['raw_days']; raw=policy['raw_bytes']
     if type(days) is not int or not 1<=days<=365 or not isinstance(raw,str) or not re.fullmatch(r'[1-9][0-9]{0,12}',raw) or not 33554432<=int(raw)<=1099511627776:
         raise ValueError('invalid_raw_retention_policy')

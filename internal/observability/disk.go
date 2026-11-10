@@ -5,6 +5,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"golang.org/x/sys/unix"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -18,9 +19,6 @@ func Usage(total, available uint64) (float64, bool) {
 	return float64(total-available) / float64(total) * 100, true
 }
 
-// Sample measures configured actual storage mounts, never the container layer.
-// Standalone deployments opt in with CHEESETRAP_STORAGE_PATHS; Compose sets it.
-// Failed configured probes fail closed and are persisted as unavailable.
 type Probe func(string) (uint64, uint64, error)
 
 func filesystemProbe(path string) (uint64, uint64, error) {
@@ -28,33 +26,69 @@ func filesystemProbe(path string) (uint64, uint64, error) {
 	err := unix.Statfs(path, &st)
 	return st.Blocks, st.Bavail, err
 }
-func Sample(ctx context.Context, pool *pgxpool.Pool, component string, paths []string) (bool, error) {
-	return SampleWithProbe(ctx, pool, component, paths, nil)
+
+type Storage struct {
+	Paths                []string
+	DatabaseQuotaBytes   uint64
+	DatabaseQuotaInvalid bool
 }
-func SampleWithProbe(ctx context.Context, pool *pgxpool.Pool, component string, paths []string, probe Probe) (bool, error) {
-	if probe == nil {
-		probe = filesystemProbe
+
+func ConfiguredStorage() Storage {
+	var s Storage
+	if v := os.Getenv("CHEESETRAP_STORAGE_PATHS"); v != "" {
+		s.Paths = strings.Split(v, ":")
 	}
-	if len(paths) == 0 {
-		return false, nil
+	if v, configured := os.LookupEnv("CHEESETRAP_DATABASE_QUOTA_GIB"); configured {
+		gib, err := strconv.ParseUint(v, 10, 64)
+		s.DatabaseQuotaInvalid = err != nil || gib == 0 || gib > ^uint64(0)/(1<<30)
+		if !s.DatabaseQuotaInvalid {
+			s.DatabaseQuotaBytes = gib * (1 << 30)
+		}
+	}
+	return s
+}
+
+func (s Storage) measure(ctx context.Context, probe Probe, databaseSize func(context.Context) (int64, error)) (float64, bool) {
+	if s.DatabaseQuotaInvalid {
+		return 0, false
 	}
 	var worst float64
-	available := true
-	for _, path := range paths {
+	for _, path := range s.Paths {
 		total, free, err := probe(path)
 		if path == "" || err != nil {
-			available = false
-			break
+			return 0, false
 		}
 		p, ok := Usage(total, free)
 		if !ok {
-			available = false
-			break
+			return 0, false
 		}
-		if p > worst {
-			worst = p
-		}
+		worst = max(worst, p)
 	}
+	if s.DatabaseQuotaBytes > 0 {
+		size, err := databaseSize(ctx)
+		if err != nil || size < 0 {
+			return 0, false
+		}
+		worst = max(worst, min(100, float64(size)/float64(s.DatabaseQuotaBytes)*100))
+	}
+	return worst, true
+}
+
+func Sample(ctx context.Context, pool *pgxpool.Pool, component string, storage Storage) (bool, error) {
+	return SampleWithProbe(ctx, pool, component, storage, nil)
+}
+func SampleWithProbe(ctx context.Context, pool *pgxpool.Pool, component string, storage Storage, probe Probe) (bool, error) {
+	if probe == nil {
+		probe = filesystemProbe
+	}
+	if len(storage.Paths) == 0 && storage.DatabaseQuotaBytes == 0 && !storage.DatabaseQuotaInvalid {
+		return false, nil
+	}
+	worst, available := storage.measure(ctx, probe, func(ctx context.Context) (int64, error) {
+		var size int64
+		err := pool.QueryRow(ctx, "SELECT pg_database_size(current_database())").Scan(&size)
+		return size, err
+	})
 	var percent *float64
 	if available {
 		percent = &worst
@@ -67,11 +101,4 @@ func SampleWithProbe(ctx context.Context, pool *pgxpool.Pool, component string, 
 		return true, ErrStatus
 	}
 	return !available || worst >= 90, nil
-}
-func ConfiguredPaths() []string {
-	v := os.Getenv("CHEESETRAP_STORAGE_PATHS")
-	if v == "" {
-		return nil
-	}
-	return strings.Split(v, ":")
 }

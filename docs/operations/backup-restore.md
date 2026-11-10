@@ -70,6 +70,32 @@ BACKUP_DIR="$NEW_BACKUP_DIR"
 sudo stat "$BACKUP_DIR/manifest.json"
 ```
 
+### Back up external PostgreSQL
+
+For an installation configured with `database`, use `--external` instead of
+`--container`. Prepare the same private Docker context and restricted output
+paths above. Omit the `POSTGRES_CONTAINER` requirement and container inspection.
+The provider endpoint must be reachable from the installation's existing
+`database_egress` network. Keep the host guard applied and app migrations stopped.
+
+```bash
+sudo env -u DOCKER_HOST -u DOCKER_CONTEXT DOCKER_CONFIG="$OPS_DOCKER_CONFIG" \
+  "$REPO_ROOT/scripts/backup.sh" --external --database cheesetrap \
+  --install-root "$INSTALL_ROOT" --output "$NEW_BACKUP_DIR" \
+  --app-version "$DEPLOYED_GIT_COMMIT"
+```
+
+The tool checks the database network's ownership and uses the pinned PostgreSQL
+17.11 image in throwaway `docker run --rm` containers. It mounts the migration URL
+and provider CA read-only. The container reads the URL file internally for
+`pg_dump` and schema-version queries. Host command arguments and output contain
+no URL or password. The migration role owns both app schemas and needs no
+provider administrator credential for backup.
+The tool refuses servers with a newer major version than its pinned `pg_dump`.
+It records the same manifest fields and excludes secrets and bootstrap SQL.
+The provider CA is not archived. Preserve it separately for reconnection.
+Restore checks remain local and use fresh credentials as described below.
+
 Only a new output directory is accepted. Directories use 0700 and files use 0600.
 The full custom-format DB dump includes settings, rules, engine registrations,
 queues, approvals, dated collection-gap incidents, cumulative gap counts, and legacy delivery history. The non-secret file allowlist

@@ -180,8 +180,10 @@ rdc stop collector cowrie web
 
 2. Fix the established cause while stopped. Never force success by deleting
    archives, truncating active files, resetting receipts, or clearing gaps.
-   The DB must run so retry can read policy. After excluding another run and
-   fixing the cause, retry. Retry also refreshes the manifest. The explicit refresh
+   The DB must be reachable so retry can read policy. External installations read
+   policy with the pinned PostgreSQL client on `database_egress`, using the protected
+   migration URL and CA. They do not require a bundled `postgres` container.
+   After excluding another run and fixing the cause, retry. Retry also refreshes the manifest. The explicit refresh
    below validates paths again before resumption. Stop on any failed command.
    A successful retry does not start already stopped services. Start only recorded services.
 
@@ -237,16 +239,27 @@ and deletion. The 90% guard does not replace capacity planning.
 
 ## Disk guards and recovery
 
-Compose mounts `/logs` and PostgreSQL data at `/storage/postgres` read-only in
+Bundled Compose mounts `/logs` and PostgreSQL data at `/storage/postgres` read-only in
 collector and worker, with `CHEESETRAP_STORAGE_PATHS=/logs:/storage/postgres`.
-Measurement uses statfs capacity only and never reads DB file contents. For a
+Bundled measurement uses statfs capacity and never reads DB file contents. For a
 custom deployment, set actual raw and DB filesystem paths separated by colons.
-A standalone worker without this variable has no automatic disk guard. Set it in production.
+A standalone worker without storage paths or a database quota has no automatic
+disk guard. Configure storage measurement in production.
 
-The highest path usage controls the guard. Usage of 80% warns. At 90%, collector
-new-file reads and detection, aggregation, draft, and contact jobs pause.
+For external PostgreSQL, the override measures `/logs` with statfs and sets
+`CHEESETRAP_DATABASE_QUOTA_GIB` from the install config. The quota must be a positive
+integer GiB value. An explicitly empty quota is invalid and fails closed.
+Each sample queries `pg_database_size(current_database())` under the collector
+or worker role. Database usage is size divided by quota, clamped to
+100%. This budget does not enforce a provider allocation. `pg_database_size`
+excludes WAL and other databases. Leave headroom for WAL, temporary work,
+maintenance, backups, and provider limits. Monitor provider storage separately.
+
+The highest filesystem or database usage controls the guard. Usage of 80% warns.
+At 90%, collector new-file reads and detection, aggregation, draft, and contact jobs pause.
 Retention cleanup continues. Durable jobs remain queued and resume on the next
-poll or retry after recovery. Unmeasurable configured paths also pause work.
+poll or retry after recovery. Unmeasurable configured paths, invalid quotas, and
+failed database-size queries also pause work and persist an unavailable sample.
 UI observations older than two minutes show `stale`. Missing observations show
 `unavailable`. Each task measures again immediately before work.
 

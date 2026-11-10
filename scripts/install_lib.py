@@ -49,7 +49,7 @@ def canonical_api_origin(value):
 
 def validate(c):
     required = {'project','address_family','public_ip','allowed_client_cidr','management_ssh_port','sensor_ports','sensor_network','minimum_free_gib','is_test'}
-    if set(c) - {'ingress_policy','load_balancer','api_origin'} != required or c['address_family'] != 'ipv4' or type(c['is_test']) is not bool:
+    if set(c) - {'ingress_policy','load_balancer','api_origin','database'} != required or c['address_family'] != 'ipv4' or type(c['is_test']) is not bool:
         raise ValueError('required_settings_or_address_family_invalid')
     canonical_api_origin(c.get('api_origin','http://127.0.0.1:8080'))
     policy=c.get('ingress_policy','single_client')
@@ -77,6 +77,7 @@ def validate(c):
         raise ValueError('sensor_addresses_invalid')
     if 'load_balancer' in c:
         validate_load_balancer(c['load_balancer'],subnet)
+    if 'database' in c: validate_database(c['database'],subnet)
     return c
 
 
@@ -99,6 +100,45 @@ def validate_load_balancer(lb,sensor_subnet):
             raise ValueError()
     except (TypeError,ValueError):
         raise ValueError('load_balancer_endpoint_or_health_source_invalid') from None
+
+
+def validate_database(db,sensor_subnet):
+    try:
+        if not isinstance(db,dict) or set(db)!={'host','port','ca_file','quota_gib','allowed_cidr'}: raise ValueError()
+        host=db['host']
+        if not isinstance(host,str) or host in ('postgres','localhost') or host.endswith('.localhost'): raise ValueError()
+        private=[ipaddress.ip_network(n) for n in ('10.0.0.0/8','172.16.0.0/12','192.168.0.0/16','100.64.0.0/10')]
+        if not isinstance(db['allowed_cidr'],str): raise ValueError()
+        allowed=ipaddress.ip_network(db['allowed_cidr'])
+        if str(allowed)!=db['allowed_cidr']: raise ValueError()
+        if allowed.version!=4 or allowed.prefixlen<16 or not any(allowed.subnet_of(n) for n in private) or allowed.overlaps(sensor_subnet): raise ValueError()
+        try: address=ipaddress.ip_address(host)
+        except ValueError: address=None
+        if address is not None:
+            if address.version!=4 or address not in allowed: raise ValueError()
+        else:
+            labels=host.split('.')
+            if len(host)>253 or any(not re.fullmatch(r'[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?',label) for label in labels) or re.fullmatch(r'(?:[0-9]+|0x[0-9a-f]+)',labels[-1]): raise ValueError()
+        if type(db['port']) is not int or not 1<=db['port']<=65535 or type(db['quota_gib']) is not int or not 1<=db['quota_gib']<=1000000: raise ValueError()
+        ca=db['ca_file']
+        if not isinstance(ca,str) or not re.fullmatch(r'/[A-Za-z0-9_./-]+',ca) or os.path.normpath(ca)!=ca: raise ValueError()
+    except (ValueError,TypeError):
+        raise ValueError('database_settings_invalid') from None
+
+
+def roles_sql(passwords,external=False):
+    sql=[]
+    for role,password in passwords.items():
+        sql.append(f"CREATE ROLE cheesetrap_{role} LOGIN NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS PASSWORD '{password}';")
+    roles=', '.join('cheesetrap_'+role for role in passwords)
+    sql += ['REVOKE ALL ON DATABASE cheesetrap FROM PUBLIC;','REVOKE ALL ON SCHEMA public FROM PUBLIC;',f'GRANT CONNECT ON DATABASE cheesetrap TO {roles};']
+    if external: sql.append('GRANT cheesetrap_migration TO CURRENT_USER WITH SET TRUE, INHERIT FALSE;')
+    sql += ['CREATE SCHEMA cheesetrap AUTHORIZATION cheesetrap_migration;','CREATE SCHEMA cheesetrap_river AUTHORIZATION cheesetrap_migration;']
+    if external: sql.append('SET ROLE cheesetrap_migration;')
+    sql += ['REVOKE ALL ON SCHEMA cheesetrap_river FROM PUBLIC;','REVOKE ALL ON SCHEMA cheesetrap FROM PUBLIC;','GRANT USAGE ON SCHEMA cheesetrap TO cheesetrap_api,cheesetrap_collector,cheesetrap_worker;']
+    if external: sql += ['RESET ROLE;','REVOKE cheesetrap_migration FROM CURRENT_USER;']
+    sql += [f'ALTER ROLE cheesetrap_{role} SET search_path = pg_catalog, cheesetrap;' for role in passwords]
+    return '\n'.join(sql)+'\n'
 
 
 def load(path):
@@ -141,16 +181,13 @@ def prepare(c, out):
     write(out/'logs/cowrie/cowrie.json','',0o644,uid=999)
     write(out/'logs/web/events.jsonl','',0o644,uid=65534)
     passwords={role:secrets.token_hex(32) for role in ('migration','api','collector','worker')}
+    db=c.get('database')
+    endpoint=f"{db['host']}:{db['port']}" if db else 'postgres:5432'
+    tls='sslmode=verify-full&sslrootcert=/run/secrets/database-ca.pem' if db else 'sslmode=disable'
     for role,password in passwords.items():
-        write(out/'secrets'/f'{role}-url',f'postgresql://cheesetrap_{role}:{password}@postgres:5432/cheesetrap?sslmode=disable&connect_timeout=5\n',uid=10001)
-    write(out/'secrets/bootstrap-password',secrets.token_hex(32)+'\n',uid=999)
-    sql=[]
-    for role,password in passwords.items():
-        sql.append(f"CREATE ROLE cheesetrap_{role} LOGIN NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS PASSWORD '{password}';")
-    roles=', '.join('cheesetrap_'+role for role in passwords)
-    sql += ['REVOKE ALL ON DATABASE cheesetrap FROM PUBLIC;','REVOKE ALL ON SCHEMA public FROM PUBLIC;',f'GRANT CONNECT ON DATABASE cheesetrap TO {roles};','CREATE SCHEMA cheesetrap AUTHORIZATION cheesetrap_migration;','CREATE SCHEMA cheesetrap_river AUTHORIZATION cheesetrap_migration;','REVOKE ALL ON SCHEMA cheesetrap_river FROM PUBLIC;','REVOKE ALL ON SCHEMA cheesetrap FROM PUBLIC;','GRANT USAGE ON SCHEMA cheesetrap TO cheesetrap_api,cheesetrap_collector,cheesetrap_worker;']
-    sql += [f'ALTER ROLE cheesetrap_{role} SET search_path = pg_catalog, cheesetrap;' for role in passwords]
-    write(out/'bootstrap/10-roles.sql','\n'.join(sql)+'\n',uid=999)
+        write(out/'secrets'/f'{role}-url',f'postgresql://cheesetrap_{role}:{password}@{endpoint}/cheesetrap?{tls}&connect_timeout=5\n',uid=10001)
+    if not db: write(out/'secrets/bootstrap-password',secrets.token_hex(32)+'\n',uid=999)
+    write(out/'bootstrap/10-roles.sql',roles_sql(passwords,external=bool(db)),uid=None if db else 999)
     sources=[]
     n=c['sensor_network']
     public_ports=c.get('load_balancer',{}).get('public_ports',c['sensor_ports'])
@@ -165,6 +202,7 @@ def prepare(c, out):
     env.update({'SENSOR_'+service.upper()+'_PORT':str(port) for service,port in c['sensor_ports'].items()})
     env['CHEESETRAP_API_ORIGIN']=canonical_api_origin(c.get('api_origin','http://127.0.0.1:8080'))
     if 'load_balancer' in c: env['SENSOR_BIND_IP']=c['load_balancer']['backend_ip']
+    if db: env.update({'DATABASE_CA_FILE':db['ca_file'],'DATABASE_QUOTA_GIB':str(db['quota_gib']),'DATABASE_BRIDGE':database_bridge(c)})
     write(out/'compose.env',''.join(k+'='+v+'\n' for k,v in env.items()))
     write(out/'install.json',json.dumps(c,indent=2)+'\n')
 
@@ -223,6 +261,9 @@ def check(c,out):
     check_ssh(c,os.environ.get('SSH_CONNECTION',''))
     if load(Path(out)/'install.json')!=c: raise ValueError('prepared_configuration_mismatch')
     api_network(c)
+    if 'database' in c:
+        database_network(c)
+        check_database(c['database'])
     if shutil.disk_usage(out).free < c['minimum_free_gib']*1024**3: raise ValueError('insufficient_free_disk')
     if 'load_balancer' in c:
         check_ports([8080])
@@ -231,7 +272,9 @@ def check(c,out):
         check_ports([8080,*c['sensor_ports'].values()])
     version=run(['docker','version','--format','{{.Server.Version}}']).strip()
     if not re.match(r'^[0-9]+\.',version) or int(version.split('.')[0])<28: raise ValueError('docker_28_or_newer_required')
-    run(['docker','compose','version','--short'])
+    compose_version=run(['docker','compose','version','--short']).strip().lstrip('v')
+    if 'database' in c and (not re.fullmatch(r'[0-9]+\.[0-9]+\.[0-9]+',compose_version) or tuple(map(int,compose_version.split('.'))) < (2,33,1)):
+        raise ValueError('external_database_compose_2_33_1_required')
     info=json.loads(run(['docker','info','--format','{{json .}}']))
     if info.get('FirewallBackend',{}).get('Driver')!='iptables': raise ValueError('unsupported_actual_docker_backend')
     if shutil.disk_usage(info['DockerRootDir']).free < c['minimum_free_gib']*1024**3: raise ValueError('insufficient_docker_free_disk')
@@ -247,14 +290,31 @@ def check(c,out):
             raise ValueError('unsupported_docker_daemon_override')
     run(['iptables','-S','DOCKER-USER'])
     run(['nft','--version'])
-    for filename in ('api-url','collector-url','migration-url','worker-url','bootstrap-password'):
+    filenames=('api-url','collector-url','migration-url','worker-url')
+    if 'database' not in c: filenames+=('bootstrap-password',)
+    for filename in filenames:
         p=Path(out)/'secrets'/filename
         if p.is_symlink() or not p.is_file() or p.stat().st_mode&0o077 or p.stat().st_size>4096: raise ValueError('private_secret_file_required')
     for filename in ('cert.pem','key.pem'):
         p=Path(out)/'config/web'/filename
         if p.is_symlink() or not p.is_file(): raise ValueError('web_tls_files_required')
     # Validate the exact rendered Compose too; do not print credentials/config.
-    run(['docker','compose','--env-file',str(Path(out)/'compose.env'),'-f',str(ROOT/'deploy/compose.yaml'),'config','--quiet'])
+    command=['docker','compose','--env-file',str(Path(out)/'compose.env'),'-f',str(ROOT/'deploy/compose.yaml')]
+    if 'database' in c: command+=['-f',str(ROOT/'deploy/compose.external-db.yaml')]
+    run(command+['config','--quiet'])
+
+
+def check_database(db):
+    ca=Path(db['ca_file'])
+    if ca.is_symlink() or not ca.is_file() or any(p.is_symlink() for p in ca.parents): raise ValueError('database_ca_regular_file_required')
+    try:
+        addresses=socket.getaddrinfo(db['host'],db['port'],type=socket.SOCK_STREAM)
+        allowed=ipaddress.ip_network(db['allowed_cidr'])
+        if not addresses or any(ipaddress.ip_address(a[4][0]) not in allowed for a in addresses): raise ValueError()
+    except (OSError,ValueError): raise ValueError('database_private_endpoint_required') from None
+
+
+def database_bridge(c): return c['sensor_network']['bridge'].replace('ctm1-','ctmd-',1)
 
 
 def api_bridge(c): return c['sensor_network']['bridge'].replace('ctm1-','ctma-',1)
@@ -275,6 +335,17 @@ def firewall(c):
         if c.get('ingress_policy','single_client')=='single_client':
             allowed=', '.join(dict.fromkeys([client,*lb['health_check_cidrs']]))
             ingress4+=f'''  iifname != "{bridge}" ip daddr {backend} ip saddr != {{ {allowed} }} tcp dport {{ {ports} }} counter drop comment "cheesetrap:ingress4"\n'''
+    db_input=db_forward=''
+    if 'database' in c:
+        db=c['database']; db_bridge=database_bridge(c)
+        db_input=f'''  iifname "{db_bridge}" ct direction reply ct state {{ established, related }} counter accept
+  iifname "{db_bridge}" counter drop comment "cheesetrap:database-input"
+'''
+        db_forward=f'''  iifname "{db_bridge}" ct direction reply ct state {{ established, related }} counter accept
+  oifname "{db_bridge}" ct direction reply ct state {{ established, related }} counter accept
+  iifname "{db_bridge}" ip daddr {db['allowed_cidr']} tcp dport {db['port']} counter accept
+  iifname "{db_bridge}" counter drop comment "cheesetrap:database-forward"
+'''
     return f'''# Installation-owned rules only. Never flush the host ruleset.
 table inet {table} {{
  comment "{owner}"
@@ -288,14 +359,14 @@ table inet {table} {{
   iifname "{bridge}" counter drop comment "cheesetrap:input"
   iifname "{management}" ct direction reply ct state {{ established, related }} counter accept
   iifname "{management}" counter drop comment "cheesetrap:api-input"
- }}
+{db_input} }}
  chain forward {{
   type filter hook forward priority -10; policy accept;
   iifname "{bridge}" ct direction reply ct state {{ established, related }} counter accept
   iifname "{bridge}" counter drop comment "cheesetrap:forward"
   iifname "{management}" ct direction reply ct state {{ established, related }} counter accept
   iifname "{management}" counter drop comment "cheesetrap:api-forward"
- }}
+{db_forward} }}
 }}
 table bridge {table} {{
  comment "{owner}"
@@ -320,16 +391,22 @@ def network(c,allow_missing=False):
     return obj
 
 
-def api_network(c):
-    name=c['project']+'-api'
+def api_network(c): return routed_network(c,'api',api_bridge(c))
+
+
+def database_network(c): return routed_network(c,'database',database_bridge(c))
+
+
+def routed_network(c,kind,bridge):
+    name=c['project']+'-'+kind
     if name not in run(['docker','network','ls','--format','{{.Name}}']).splitlines():
         # A future Compose bridge must not reuse an unrelated host interface:
         # the guard matches this name before the Docker network is created.
-        if (Path('/sys/class/net')/api_bridge(c)).exists(): raise ValueError('api_bridge_name_collision')
+        if (Path('/sys/class/net')/bridge).exists(): raise ValueError(kind+'_bridge_name_collision')
         return {}
     obj=json.loads(run(['docker','network','inspect',name]))[0]
-    if obj.get('Driver')!='bridge' or obj.get('Internal') or obj.get('EnableIPv6') or obj.get('Labels',{}).get('com.cheesetrap.install')!=c['project'] or obj.get('Options',{})!={'com.docker.network.bridge.name':api_bridge(c)}:
-        raise ValueError('api_network_identity_mismatch')
+    if obj.get('Driver')!='bridge' or obj.get('Internal') or obj.get('EnableIPv6') or obj.get('Labels',{}).get('com.cheesetrap.install')!=c['project'] or obj.get('Options',{})!={'com.docker.network.bridge.name':bridge}:
+        raise ValueError(kind+'_network_identity_mismatch')
     return obj
 
 
@@ -338,10 +415,11 @@ def firewall_action(action,c,out):
     if action=='render': return policy
     net=network(c,allow_missing=action=='remove') or {}
     api_net=api_network(c)
+    db_net=database_network(c) if 'database' in c else {}
     tables=json.loads(run(['nft','-j','list','tables']))['nftables']
     present={t['table']['family'] for t in tables if 'table' in t and t['table']['name']==table and t['table']['family'] in ('inet','bridge')}
     if action=='apply':
-        if net.get('Containers') or api_net.get('Containers') or present: raise ValueError('stop_sensors_and_remove_existing_owned_guard_first')
+        if net.get('Containers') or api_net.get('Containers') or db_net.get('Containers') or present: raise ValueError('stop_sensors_and_remove_existing_owned_guard_first')
         run(['nft','-c','-f','-'],policy)
         run(['nft','-f','-'],policy)
         snapshots={family:run(['nft','-s','list','table',family,table]) for family in ('inet','bridge')}
@@ -353,7 +431,7 @@ def firewall_action(action,c,out):
         if expected['policy_sha256']!=hashlib.sha256(policy.encode()).hexdigest(): raise ValueError('guard_config_changed')
         if any(run(['nft','-s','list','table',family,table])!=expected['tables'][family] for family in ('inet','bridge')): raise ValueError('guard_rules_changed')
     elif action=='remove':
-        if net.get('Containers') or api_net.get('Containers'): raise ValueError('stop_and_remove_sensor_and_api_containers_before_guard_removal')
+        if net.get('Containers') or api_net.get('Containers') or db_net.get('Containers'): raise ValueError('stop_and_remove_sensor_and_api_containers_before_guard_removal')
         # Idempotent cleanup checks ownership even if only one table remains.
         for family in sorted(present):
             obj=json.loads(run(['nft','-j','list','table',family,table]))

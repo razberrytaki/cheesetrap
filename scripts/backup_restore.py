@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Local Docker PostgreSQL backup and isolated restore. Never print subprocess data."""
+"""PostgreSQL backup and isolated local restore. Never print subprocess data."""
 import argparse
 import hashlib
 import json
@@ -70,8 +70,30 @@ def regular(path):
         raise ValueError('symlink_refused')
 
 
+def external_source(docker,source):
+    import install_lib
+    regular(source/'install.json')
+    config=install_lib.load(source/'install.json')
+    if 'database' not in config: raise ValueError('external_database_configuration_required')
+    url=source/'secrets/migration-url'
+    ca=Path(config['database']['ca_file'])
+    regular(url); regular(ca)
+    if url.stat().st_mode&0o077 or url.stat().st_size>4096: raise ValueError('private_secret_file_required')
+    network=config['project']+'-database'
+    obj=json.loads(run(docker+['network','inspect',network]).stdout)[0]
+    if obj.get('Driver')!='bridge' or obj.get('Internal') or obj.get('EnableIPv6') or obj.get('Labels',{}).get('com.cheesetrap.install')!=config['project'] or obj.get('Options',{})!={'com.docker.network.bridge.name':install_lib.database_bridge(config)}:
+        raise ValueError('database_network_identity_mismatch')
+    return docker+['run','--rm','-i','--user','10001:10001','--network',network,'--read-only','--cap-drop=ALL','--security-opt=no-new-privileges:true',
+                   '--volume',f'{url}:/run/secrets/database-url:ro,z','--volume',f'{ca}:/run/secrets/database-ca.pem:ro,z',IMAGE]
+
+
+def external_sql(command,statement):
+    return run(command+['sh','-eu','-c','exec psql -X -qAt -v ON_ERROR_STOP=1 --dbname="$(cat /run/secrets/database-url)"'],statement.encode()).stdout.decode().strip()
+
+
 def backup(a):
-    if not re.fullmatch(r'[a-zA-Z0-9][a-zA-Z0-9_.-]*', a.container) or not re.fullmatch(r'[a-zA-Z0-9_]+', a.database):
+    external=getattr(a,'external',False)
+    if (external and (a.container is not None or a.database!='cheesetrap')) or (not external and (not a.container or not re.fullmatch(r'[a-zA-Z0-9][a-zA-Z0-9_.-]*', a.container) or not re.fullmatch(r'[a-zA-Z0-9_]+', a.database))):
         raise ValueError('invalid_source')
     if not re.fullmatch(r'[0-9a-f]{7,40}', a.app_version):
         raise ValueError('app_git_commit_required')
@@ -84,10 +106,20 @@ def backup(a):
         if path.exists() or path.is_symlink():
             regular(path)
             write(dest / 'config' / name, path.read_bytes())
+    if external:
+        command=external_source(docker,source)
+        version=external_sql(command,'SHOW server_version_num;')
+        if not version.isdigit(): raise ValueError('server_version_invalid')
+        if int(version)//10000>int(IMAGE.split(':')[1].split('.')[0]): raise ValueError('server_newer_than_pg_dump')
+        dump=command+['sh','-eu','-c','exec pg_dump --dbname="$(cat /run/secrets/database-url)" -Fc --no-owner']
+        query=lambda statement: external_sql(command,statement)
+    else:
+        dump=docker+['exec',a.container,'pg_dump','-U','postgres','-d',a.database,'-Fc','--no-owner']
+        query=lambda statement: sql(docker,a.container,a.database,statement)
     # pg_dump has a consistent DB snapshot; no roles/passwords or globals dump.
-    transfer(docker + ['exec', a.container, 'pg_dump', '-U', 'postgres', '-d', a.database, '-Fc', '--no-owner'], dest / 'database.dump', output=True)
-    app_schema = sql(docker, a.container, a.database, 'SELECT max(version_id) FROM cheesetrap.goose_db_version WHERE is_applied;')
-    river_schema = sql(docker, a.container, a.database, 'SELECT max(version) FROM cheesetrap_river.river_migration;')
+    transfer(dump, dest / 'database.dump', output=True)
+    app_schema = query('SELECT max(version_id) FROM cheesetrap.goose_db_version WHERE is_applied;')
+    river_schema = query('SELECT max(version) FROM cheesetrap_river.river_migration;')
     if not app_schema.isdigit() or not river_schema.isdigit():
         raise ValueError('schema_version_invalid')
     manifest = {'format': 1, 'app_commit': a.app_version, 'app_schema': int(app_schema),
@@ -188,7 +220,11 @@ def main():
     p = argparse.ArgumentParser()
     sub = p.add_subparsers(dest='action', required=True)
     b = sub.add_parser('backup')
-    for key in ('container','database','install-root','output','app-version'):
+    source=b.add_mutually_exclusive_group(required=True)
+    source.add_argument('--container')
+    source.add_argument('--external',action='store_true')
+    b.add_argument('--database',default='cheesetrap')
+    for key in ('install-root','output','app-version'):
         b.add_argument('--'+key, required=True)
     r = sub.add_parser('restore')
     for key in ('backup','target','output'):

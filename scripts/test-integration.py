@@ -194,6 +194,25 @@ class OwnedPostgres:
                 self.directory.cleanup()
 
 
+def verify_external_bootstrap(run,docker,container,bootstrap_env,test_env,env):
+    import install_lib
+    with tempfile.TemporaryDirectory(prefix="cheesetrap-external-bootstrap-") as directory:
+        config=install_lib.load(ROOT/"deploy/config.example.yaml")
+        config['database']={'host':'db.example.invalid','port':5432,'quota_gib':100,'allowed_cidr':'10.20.0.0/16','ca_file':'/tmp/database-ca.pem'}
+        root=Path(directory)/"install"
+        install_lib.prepare(config,root)
+        command=docker+["exec","-i","--env","PGPASSWORD",container,"psql","-X","-q","-v","ON_ERROR_STOP=1","-h","127.0.0.1","-U","postgres"]
+        run(command+["-d","cheesetrap_test"],childenv=bootstrap_env,data="CREATE ROLE external_admin NOLOGIN NOSUPERUSER NOCREATEDB CREATEROLE; CREATE DATABASE cheesetrap OWNER external_admin;")
+        run(command+["-d","cheesetrap"],childenv=bootstrap_env,data="SET SESSION AUTHORIZATION external_admin;\n"+(root/"bootstrap/10-roles.sql").read_text())
+        from urllib.parse import urlsplit
+        rendered=urlsplit((root/"secrets/migration-url").read_text().strip())
+        local=urlsplit(test_env['CHEESETRAP_TEST_MIGRATION_URL'])
+        migration_url=f"postgresql://{rendered.username}:{rendered.password}@{local.hostname}:{local.port}/cheesetrap?sslmode=disable&connect_timeout=5"
+        run(["go","run","./cmd/cheesetrap","migrate"],childenv=dict(env,CHEESETRAP_DATABASE_URL=migration_url),timeout=180)
+        run(command+["-d","cheesetrap_test"],childenv=bootstrap_env,data="DROP DATABASE cheesetrap; DROP ROLE cheesetrap_migration,cheesetrap_api,cheesetrap_collector,cheesetrap_worker,external_admin;")
+    print("PASS external bootstrap as non-superuser CREATEROLE database owner and CLI migration",flush=True)
+
+
 def main(e2e=False, selection=None):
     os.umask(0o077)
     if e2e and sys.argv[1:]:
@@ -274,6 +293,8 @@ def main(e2e=False, selection=None):
         for domain in ("PROOF", "MEMORY", "POLICY", "POLICY_API", "EVENTRESULT", "RESTORE", "CAPACITY", "RETENTION", "REPORTING", "JOBS", "REVISION", "DRAFT_RUNTIME", "REVIEW", "RULECONFIG", "REVIEW_UPGRADE", "REVIEW_FLOW", "AUTOMATIC_API", "SMTP_UPGRADE", "RETRY_UPGRADE", "APPROVAL", "DELIVERY_UPGRADE", "CHUNKS"):
             for role in ("MIGRATION", "API", "COLLECTOR", "WORKER"):
                 test_env[f"CHEESETRAP_TEST_{domain}_{role}_URL"] = test_env[f"CHEESETRAP_TEST_{role}_URL"].replace("/cheesetrap_test?", f"/cheesetrap_{domain.lower()}_test?")
+        if any(package == "cheesetrap/internal/observability" for package, _ in integrations):
+            verify_external_bootstrap(run,docker,container,bootstrap_env,test_env,env)
         run(docker + ["exec", "-i"] + options + [container, "psql", "-X", "-q", "-v", "ON_ERROR_STOP=1", "-h", "127.0.0.1", "-U", "postgres", "-d", "cheesetrap_test"],
             childenv=bootstrap_env, data=(ROOT / "deploy/test-bootstrap.sql").read_text())
         _, version = run(docker + ["exec", "--env", "PGPASSWORD", container, "psql", "-X", "-At", "-h", "127.0.0.1", "-U", "postgres", "-d", "cheesetrap_test", "-c", "SHOW server_version"], childenv=bootstrap_env)

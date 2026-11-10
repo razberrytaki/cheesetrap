@@ -13,6 +13,7 @@
       "postgres:17.11-bookworm@sha256:3645570cccdfa447589da9f57dd740faa29b30938e861289a5574b6ca6b03826",
       "cowrie/cowrie@sha256:019726c8deef20729162cda492d9385917b579c9ace6368e47e7566cd2491ba1"
     ],
+    "deploy/compose.external-db.yaml": [],
     "deploy/test.compose.yaml": [
       "postgres:17.11-bookworm@sha256:3645570cccdfa447589da9f57dd740faa29b30938e861289a5574b6ca6b03826"
     ],
