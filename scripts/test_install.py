@@ -23,6 +23,104 @@ class InstallTest(unittest.TestCase):
     def config(self):
         return json.loads((ROOT/'deploy/config.example.yaml').read_text())
 
+    def external_config(self):
+        c=self.config()
+        c['database']={'host':'db.example.invalid','port':5432,'ca_file':'/tmp/database-ca.pem','quota_gib':100,'allowed_cidr':'10.20.0.0/16'}
+        return c
+
+    def test_external_database_validation(self):
+        try: self.lib.validate(self.external_config())
+        except ValueError as error: self.fail('valid external database rejected: '+str(error))
+        for host in ('10.20.0.2','100.64.1.2'):
+            c=self.external_config();c['database']['host']=host;c['database']['allowed_cidr']='100.64.0.0/16' if host.startswith('100.') else '10.20.0.0/16'
+            self.lib.validate(c)
+        for key,value in [('host','postgres'),('host','localhost'),('host','db.localhost'),('host','127.0.0.1'),('host','8.8.8.8'),('host','::1'),('host','DB.example.invalid'),('host','bad_host'),('host','db.example.invalid/evil'),('host','169.254.169.254'),('port',0),('port',65536),('port',True),('quota_gib',0),('quota_gib',1000001),('quota_gib',True),('ca_file','relative.pem'),('ca_file','/tmp/../ca.pem'),('ca_file','/tmp/ca.pem\nBAD=1'),('allowed_cidr',169082881),('allowed_cidr','10.20.0.0/255.255.0.0'),('allowed_cidr','0.0.0.0/0'),('allowed_cidr','10.0.0.0/8'),('allowed_cidr','198.51.100.0/24'),('allowed_cidr','172.30.0.0/16'),('allowed_cidr','::/16'),('extra',1)]:
+            c=self.external_config();c['database'][key]=value
+            with self.subTest(key=key,value=value),self.assertRaisesRegex(ValueError,'database_settings_invalid'): self.lib.validate(c)
+        for value in (None,{},[],False):
+            c=self.external_config();c['database']=value
+            with self.assertRaisesRegex(ValueError,'database_settings_invalid'): self.lib.validate(c)
+
+    def test_bundled_rendering_unchanged(self):
+        import hashlib
+        import uuid
+        with tempfile.TemporaryDirectory() as tmp:
+            out=Path(tmp)/'install'
+            with patch.object(self.lib.secrets,'token_hex',return_value='a'*64),patch.object(self.lib.uuid,'uuid4',return_value=uuid.UUID(int=1)):
+                self.lib.prepare(self.config(),out)
+            digest=hashlib.sha256()
+            for path in sorted(out.rglob('*')):
+                if path.is_file(): digest.update(str(path.relative_to(out)).encode()+b'\0'+path.read_bytes().replace(str(out).encode(),b'INSTALL_ROOT')+b'\0')
+            self.assertEqual(digest.hexdigest(),'776e7ebcd29a9d7cac893bb6b1f1e9ce688f31f114afd5d342756319001cfe74')
+        self.assertEqual(hashlib.sha256(self.lib.firewall(self.config()).encode()).hexdigest(),'58f5d65cbc2da970f661c0ffec33adda9485d4c8d1a536740842a5d59a8b8cc6')
+
+    def test_external_artifacts_and_firewall(self):
+        c=self.external_config()
+        with tempfile.TemporaryDirectory() as tmp:
+            out=Path(tmp)/'install'
+            try: self.lib.prepare(c,out)
+            except ValueError as error: self.fail('external prepare rejected: '+str(error))
+            self.assertFalse((out/'secrets/bootstrap-password').exists())
+            from urllib.parse import urlsplit,parse_qs
+            for role in ('migration','api','collector','worker'):
+                url=urlsplit((out/'secrets'/f'{role}-url').read_text().strip())
+                self.assertEqual((url.hostname,url.port,url.username,url.path),('db.example.invalid',5432,'cheesetrap_'+role,'/cheesetrap'))
+                self.assertEqual(parse_qs(url.query),{'sslmode':['verify-full'],'sslrootcert':['/run/secrets/database-ca.pem'],'connect_timeout':['5']})
+            sql=(out/'bootstrap/10-roles.sql').read_text()
+            grant='GRANT cheesetrap_migration TO CURRENT_USER WITH SET TRUE, INHERIT FALSE;'
+            revoke='REVOKE cheesetrap_migration FROM CURRENT_USER;'
+            self.assertLess(sql.index(grant),sql.index('CREATE SCHEMA'))
+            self.assertLess(sql.index('SET ROLE cheesetrap_migration;'),sql.index('REVOKE ALL ON SCHEMA cheesetrap_river'))
+            self.assertGreater(sql.index('RESET ROLE;'),sql.index('GRANT USAGE ON SCHEMA cheesetrap'))
+            self.assertGreater(sql.index(revoke),sql.index('RESET ROLE;'))
+            self.assertEqual((out/'bootstrap/10-roles.sql').stat().st_mode&0o777,0o600)
+            if os.geteuid()==0: self.assertEqual((out/'bootstrap/10-roles.sql').stat().st_uid,0)
+            env=(out/'compose.env').read_text()
+            for line in ('DATABASE_CA_FILE=/tmp/database-ca.pem','DATABASE_QUOTA_GIB=100','DATABASE_BRIDGE=ctmd-sensor'): self.assertIn(line+'\n',env)
+        policy=self.lib.firewall(c)
+        self.assertIn('iifname "ctmd-sensor" ip daddr 10.20.0.0/16 tcp dport 5432 counter accept',policy)
+        self.assertIn('iifname "ctmd-sensor" counter drop comment "cheesetrap:database-forward"',policy)
+        self.assertIn('iifname "ctmd-sensor" counter drop comment "cheesetrap:database-input"',policy)
+
+    def test_external_preflight_ca_endpoint_and_compose(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out=Path(tmp)/'install';ca=Path(tmp)/'database-ca.pem';ca.write_text('CA fixture')
+            c=self.external_config();c['database']['ca_file']=str(ca);self.lib.prepare(c,out)
+            for name in ('cert.pem','key.pem'): (out/'config/web'/name).write_text('fixture')
+            def run(args,data=None):
+                if args[:2]==['docker','version']: return '29.1.3'
+                if args[:3]==['docker','compose','version']: return '2.33.1'
+                if args[:2]==['docker','info']: return json.dumps({'FirewallBackend':{'Driver':'iptables'},'DockerRootDir':str(out)})
+                return ''
+            resolved=[(socket.AF_INET,socket.SOCK_STREAM,6,'',('10.20.0.2',5432))]
+            with patch.object(self.lib,'run',side_effect=run) as commands,patch.object(self.lib,'check_ports'),patch.object(self.lib.shutil,'disk_usage',return_value=SimpleNamespace(free=20*1024**3)),patch.dict(os.environ,{'SSH_CONNECTION':'100.64.0.2 50000 100.64.0.1 22'}),patch.object(self.lib.socket,'getaddrinfo',return_value=resolved):
+                self.lib.check(c,out)
+            compose=commands.call_args_list[-1].args[0]
+            self.assertEqual(compose.count('-f'),2)
+            self.assertIn(str(ROOT/'deploy/compose.external-db.yaml'),compose)
+            ca.unlink();ca.symlink_to(out/'config/web/cert.pem')
+            with self.assertRaisesRegex(ValueError,'database_ca_regular_file_required'): self.lib.check_database(c['database'])
+            ca.unlink();ca.mkdir()
+            with self.assertRaisesRegex(ValueError,'database_ca_regular_file_required'): self.lib.check_database(c['database'])
+            ca.rmdir();ca.write_text('CA fixture')
+            for address in ('198.51.100.2','10.21.0.2','::1'):
+                with patch.object(self.lib.socket,'getaddrinfo',return_value=[(socket.AF_INET,socket.SOCK_STREAM,6,'',(address,5432))]),self.assertRaisesRegex(ValueError,'database_private_endpoint_required'):
+                    self.lib.check_database(c['database'])
+
+    def test_database_network_identity_and_active_guard(self):
+        c=self.external_config();name=c['project']+'-database'
+        obj={'Driver':'bridge','EnableIPv6':False,'Labels':{'com.cheesetrap.install':c['project']},'Options':{'com.docker.network.bridge.name':'ctmd-sensor'},'Containers':{'live':{}}}
+        def run(args,data=None):
+            if args[:3]==['docker','network','ls']: return name+'\n'
+            if args[:3]==['docker','network','inspect']: return json.dumps([obj])
+            return '{"nftables":[]}'
+        with tempfile.TemporaryDirectory() as out,patch.object(self.lib,'run',side_effect=run),patch.object(self.lib,'network',return_value={}),patch.object(self.lib,'api_network',return_value={}):
+            self.assertEqual(self.lib.database_network(c),obj)
+            for action in ('apply','remove'):
+                with self.assertRaisesRegex(ValueError,'stop_'): self.lib.firewall_action(action,c,out)
+            obj['Labels']['com.cheesetrap.install']='unrelated'
+            with self.assertRaisesRegex(ValueError,'database_network_identity_mismatch'): self.lib.database_network(c)
+
     def test_api_origin_shared_contract(self):
         for case in json.loads((ROOT/'testdata/api-origins.json').read_text()):
             c=self.config();c['api_origin']=case['input']

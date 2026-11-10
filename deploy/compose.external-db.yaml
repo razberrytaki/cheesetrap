@@ -1,0 +1,56 @@
+services:
+  postgres:
+    profiles: !override [bundled-database]
+  migrate:
+    depends_on: !reset {}
+    networks: !override
+      management: {}
+      database_egress: {gw_priority: 1}
+    volumes:
+      - ${DATABASE_CA_FILE:?external database CA required}:/run/secrets/database-ca.pem:ro,z
+  api:
+    networks: !override
+      management: {}
+      api_host: {}
+      database_egress: {gw_priority: 1}
+    volumes:
+      - ${DATABASE_CA_FILE:?external database CA required}:/run/secrets/database-ca.pem:ro,z
+  collector:
+    networks: !override
+      management: {}
+      database_egress: {gw_priority: 1}
+    environment:
+      CHEESETRAP_STORAGE_PATHS: /logs
+      CHEESETRAP_DATABASE_QUOTA_GIB: ${DATABASE_QUOTA_GIB:?external database quota required}
+    volumes: !override
+      - ${INSTALL_ROOT}/secrets/collector-url:/run/secrets/database-url:ro
+      - ${INSTALL_ROOT}/config/collector:/config:ro
+      - ${INSTALL_ROOT}/logs:/logs:ro
+      - ${DATABASE_CA_FILE}:/run/secrets/database-ca.pem:ro,z
+  worker:
+    networks: !override
+      management: {}
+      worker_egress: {gw_priority: 1}
+      database_egress: {}
+    environment:
+      CHEESETRAP_STORAGE_PATHS: /logs
+      CHEESETRAP_DATABASE_QUOTA_GIB: ${DATABASE_QUOTA_GIB}
+    volumes: !override
+      - ${INSTALL_ROOT}/logs:/logs:ro
+      - ${INSTALL_ROOT}/secrets/worker-url:/run/secrets/database-url:ro
+      - ${DATABASE_CA_FILE}:/run/secrets/database-ca.pem:ro,z
+  admin:
+    networks: !override
+      management: {}
+      database_egress: {gw_priority: 1}
+    volumes:
+      - ${DATABASE_CA_FILE}:/run/secrets/database-ca.pem:ro,z
+networks:
+  database_egress:
+    name: ${COMPOSE_PROJECT_NAME}-database
+    driver: bridge
+    enable_ipv6: false
+    driver_opts:
+      com.docker.network.bridge.name: ${DATABASE_BRIDGE}
+    labels:
+      com.cheesetrap.install: ${COMPOSE_PROJECT_NAME}
