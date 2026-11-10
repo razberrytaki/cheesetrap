@@ -44,6 +44,56 @@ class BackupRestoreTests(unittest.TestCase):
     def assert_no_create(self):
         self.assertFalse(any('create' in c for c in self.commands), self.commands)
 
+    def external_backup(self,version=b'170011\n'):
+        import install_lib
+        source=self.root/'external'
+        c=install_lib.load(Path(__file__).resolve().parents[1]/'deploy/config.example.yaml')
+        ca=self.root/'database-ca.pem';ca.write_text('public CA fixture')
+        c['database']={'host':'db.example.invalid','port':5432,'quota_gib':100,'allowed_cidr':'10.20.0.0/16','ca_file':str(ca)}
+        install_lib.prepare(c,source)
+        args=argparse.Namespace(external=True,container=None,database='cheesetrap',app_version='7649eb8',install_root=str(source),output=str(self.root/'backup'))
+        def query(command,data=None,check=True):
+            if 'network' in command and 'inspect' in command:
+                return subprocess.CompletedProcess(command,0,json.dumps([{'Driver':'bridge','Labels':{'com.cheesetrap.install':c['project']},'Options':{'com.docker.network.bridge.name':install_lib.database_bridge(c)}}]).encode(),b'')
+            self.commands.append(command)
+            if data and b'server_version_num' in data: result=version
+            elif data and b'version_id' in data: result=b'31\n'
+            else: result=b'8\n'
+            return subprocess.CompletedProcess(command,0,result,b'')
+        def dump(command,path,output=False):
+            self.commands.append(command);path.write_bytes(b'database fixture')
+        with patch.object(MOD,'run',side_effect=query),patch.object(MOD,'transfer',side_effect=dump):
+            try: MOD.backup(args)
+            except TypeError: self.fail("external backup rejected without container source")
+        return source
+
+    def test_external_backup_keeps_credentials_off_host_argv(self):
+        source=self.external_backup()
+        url=(source/'secrets/migration-url').read_text().strip()
+        for command in self.commands:
+            self.assertNotIn(url,' '.join(command))
+            self.assertNotIn(url.split(':')[2].split('@')[0],' '.join(command))
+            self.assertIn('run',command)
+            self.assertIn('--rm',command)
+            self.assertIn(MOD.IMAGE,command)
+            self.assertIn('cheesetrap-example-database',command)
+            self.assertIn(str(source/'secrets/migration-url')+':/run/secrets/database-url:ro,z',command)
+            self.assertIn(str(self.root/'database-ca.pem')+':/run/secrets/database-ca.pem:ro,z',command)
+        self.assertTrue(any('pg_dump' in ' '.join(command) for command in self.commands))
+        manifest=json.loads((self.root/'backup/manifest.json').read_text())
+        self.assertEqual((manifest['app_schema'],manifest['river_schema']),(31,8))
+        self.assertFalse(any('secrets' in name for name in manifest['files']))
+
+    def test_external_backup_reads_secret_as_its_owning_app_uid(self):
+        self.external_backup()
+        for command in self.commands:
+            self.assertEqual(command[command.index('--user')+1],'10001:10001')
+
+    def test_external_backup_rejects_newer_server_before_dump(self):
+        with self.assertRaisesRegex(ValueError,'server_newer_than_pg_dump'):
+            self.external_backup(b'180001\n')
+        self.assertFalse(any('pg_dump' in ' '.join(command) for command in self.commands))
+
     def test_supported_schema_restore_preserves_exact_review_version(self):
         for version in (14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31):
             with self.subTest(version=version):

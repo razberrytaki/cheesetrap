@@ -138,7 +138,7 @@ class CommandCoordinationTest(unittest.TestCase):
         if 'ps' in args: return 'cowrie-id web-id collector-id'
         return ''
 
-    def run_maintenance(self, preview=True, failure=False):
+    def run_maintenance(self, preview=True, failure=False, config=None):
         def retain(root,**kwargs):
             self.assertEqual(kwargs.get('max_days'),2)
             self.assertEqual(kwargs.get('max_bytes'),33554432)
@@ -146,8 +146,18 @@ class CommandCoordinationTest(unittest.TestCase):
             self.calls.append(['retention'])
             if failure: raise ValueError('retention failed')
             return {'needs_work':True}
-        with patch.object(self.cli,'load'), patch.object(self.cli,'retain',side_effect=retain):
+        with patch.object(self.cli,'load',return_value=config or {}), patch.object(self.cli,'retain',side_effect=retain):
             return self.cli.maintain('/unused',command=self.command)
+
+    def test_external_policy_uses_protected_source_and_override(self):
+        with patch.object(self.cli,'external_source',create=True,return_value=['external-client']) as source,patch.object(self.cli,'external_sql',create=True,return_value=json.dumps({'raw_days':2,'raw_bytes':'33554432'})) as query:
+            self.run_maintenance(config={'database':{'host':'db.example.invalid'}})
+        source.assert_called_once_with(['docker'],Path('/unused'))
+        query.assert_called_once_with(['external-client'],'SELECT cheesetrap.retention_policy()::text;')
+        self.assertFalse(any('postgres' in args for args in self.calls))
+        compose=next(args for args in self.calls if 'compose' in args)
+        self.assertIn(str(ROOT/'deploy/compose.external-db.yaml'),compose)
+        self.assertEqual(self.calls[-1],['docker','start','cowrie-id','collector-id'])
 
     def test_compose_only_install_without_cd_state_does_not_create_it(self):
         self.state.rmdir()
