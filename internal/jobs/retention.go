@@ -25,7 +25,7 @@ type retentionWorker struct {
 func (w *retentionWorker) Work(ctx context.Context, _ *river.Job[RetentionArgs]) error {
 	return runRetentionPasses(ctx, time.Now, func(ctx context.Context) error {
 		// Cleanup must free space even when ingestion is storage-restricted.
-		_, err := observability.Sample(ctx, w.pool, "worker", observability.ConfiguredPaths())
+		_, err := observability.Sample(ctx, w.pool, "worker", observability.ConfiguredStorage())
 		return err
 	}, func(ctx context.Context) (retention.Progress, error) {
 		return retention.Cleanup(ctx, w.pool, time.Now().UTC(), 1000)
@@ -96,7 +96,7 @@ func waitRetention(ctx context.Context, delay time.Duration) error {
 }
 
 func storageGate(ctx context.Context, pool *pgxpool.Pool) error {
-	restricted, err := observability.Sample(ctx, pool, "worker", observability.ConfiguredPaths())
+	restricted, err := observability.Sample(ctx, pool, "worker", observability.ConfiguredStorage())
 	if err != nil {
 		return err
 	}

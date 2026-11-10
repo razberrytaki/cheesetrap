@@ -114,11 +114,11 @@ func runCollector(ctx context.Context, databaseURL, logRoot, sourcesFile string,
 				readers[i].noteGap(domain.GapRetentionCleanup)
 			}
 		}
-		paths := observability.ConfiguredPaths()
-		if len(paths) == 0 {
-			paths = []string{root}
+		storage := observability.ConfiguredStorage()
+		if len(storage.Paths) == 0 {
+			storage.Paths = []string{root}
 		}
-		restricted, e := observability.SampleWithProbe(ctx, pool, "collector", paths, probe)
+		restricted, e := observability.SampleWithProbe(ctx, pool, "collector", storage, probe)
 		if e != nil {
 			return e
 		}

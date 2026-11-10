@@ -123,12 +123,75 @@ func TestRetentionCapacityRecovery(t *testing.T) {
 		}
 	})
 	t.Run("storage_database_error_remains_failure", func(t *testing.T) {
-		restricted, err := observability.SampleWithProbe(ctx, pool, "invalid-component", []string{root}, func(string) (uint64, uint64, error) { return 100, 50, nil })
+		restricted, err := observability.SampleWithProbe(ctx, pool, "invalid-component", observability.Storage{Paths: []string{root}}, func(string) (uint64, uint64, error) { return 100, 50, nil })
 		if !restricted || err != observability.ErrStatus {
 			t.Fatalf("genuine storage error was lost: restricted=%v err=%v", restricted, err)
 		}
 	})
 
+}
+
+func TestCollectorInvalidDatabaseQuotaRecordsGap(t *testing.T) {
+	t.Setenv("CHEESETRAP_DATABASE_QUOTA_GIB", "invalid")
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	url := os.Getenv("CHEESETRAP_TEST_CAPACITY_COLLECTOR_URL")
+	pool, err := store.NewPool(ctx, url)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer pool.Close()
+	b := commitFixture(t, "20000000-0000-4000-8000-000000000713", 1)
+	root := filepath.Dir(b.Generations[0].Path)
+	source := testSource()
+	source.SensorID = "10000000-0000-4000-8000-000000000713"
+	source.Name = "database-quota"
+	source.Path = "cowrie.json"
+	raw, err := json.Marshal([]Source{source})
+	if err != nil {
+		t.Fatal(err)
+	}
+	manifest := filepath.Join(t.TempDir(), "sources.json")
+	if err := os.WriteFile(manifest, raw, 0600); err != nil {
+		t.Fatal(err)
+	}
+	runctx, stop := context.WithCancel(ctx)
+	done := make(chan error, 1)
+	go func() {
+		done <- runCollector(runctx, url, root, manifest, func(string) (uint64, uint64, error) { return 100, 50, nil })
+	}()
+	defer func() {
+		stop()
+		if err := <-done; err != nil && err != context.Canceled {
+			t.Error(err)
+		}
+	}()
+	for {
+		var recorded bool
+		err := pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM cheesetrap.collection_gap_incidents WHERE sensor_id=$1 AND 'storage_restricted'=ANY(causes))`, source.SensorID).Scan(&recorded)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if recorded {
+			break
+		}
+		select {
+		case err := <-done:
+			done <- err
+			t.Fatal("collector exited before gap", err)
+		case <-ctx.Done():
+			t.Fatal("quota failure did not record gap")
+		case <-time.After(20 * time.Millisecond):
+		}
+	}
+	var count int
+	if err := pool.QueryRow(ctx, `SELECT count(*) FROM cheesetrap.events WHERE sensor_id=$1`, source.SensorID).Scan(&count); err != nil || count != 0 {
+		t.Fatalf("collection did not pause: count=%d err=%v", count, err)
+	}
+	var available bool
+	if err := pool.QueryRow(ctx, `SELECT available FROM cheesetrap.storage_status WHERE component='collector'`).Scan(&available); err != nil || available {
+		t.Fatalf("quota failure not unavailable: %v", err)
+	}
 }
 
 // A canceled SQL call must finish session cleanup before a local restart.
