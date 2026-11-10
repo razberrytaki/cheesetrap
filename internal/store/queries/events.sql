@@ -91,7 +91,7 @@ INSERT INTO cheesetrap.ingestion_gaps(sensor_id,started_at,observed_through) VAL
 ON CONFLICT(sensor_id) DO UPDATE SET started_at=least(ingestion_gaps.started_at,EXCLUDED.started_at),observed_through=greatest(ingestion_gaps.observed_through,EXCLUDED.observed_through);
 
 -- name: UpdateCollectorState :exec
-UPDATE cheesetrap.sensors SET last_observation_at=greatest(last_observation_at,$2::timestamptz), state=CASE WHEN EXISTS(SELECT 1 FROM cheesetrap.ingestion_gaps g WHERE g.sensor_id=$1) THEN 'degraded' ELSE 'active' END WHERE sensors.sensor_id=$1;
+UPDATE cheesetrap.sensors SET last_observation_at=greatest(last_observation_at,$2::timestamptz), state=CASE WHEN sqlc.arg(collection_gap)::boolean THEN 'degraded' ELSE 'active' END WHERE sensors.sensor_id=$1;
 
 -- name: CloseSensorGeneration :exec
 UPDATE cheesetrap.file_generations SET closed_at=greatest(clock_timestamp(),created_at) WHERE sensor_id=$1 AND file_generation_id=$2 AND closed_at IS NULL;
@@ -151,7 +151,8 @@ SELECT ingested_seq,detected_seq,
  (SELECT count(*) FROM cheesetrap.sensors WHERE state='degraded') AS sensors_degraded,
  (SELECT count(*) FROM cheesetrap.sensors WHERE state='unknown') AS sensors_unknown,
  (SELECT count(*) FROM cheesetrap.sensors WHERE state='disabled') AS sensors_disabled,
- (SELECT count(*) FROM cheesetrap.ingestion_gaps) AS sensors_with_gaps
+ (SELECT count(*) FROM cheesetrap.ingestion_gaps) AS sensors_with_gaps,
+ (SELECT count(DISTINCT sensor_id) FROM cheesetrap.collection_gap_incidents WHERE observed_through>=clock_timestamp()-interval '24 hours') AS sensors_recent_gaps
 FROM cheesetrap.processing_cursors WHERE singleton;
 
 -- name: CheckAPIReady :one

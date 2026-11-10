@@ -236,7 +236,7 @@ test('captured engine evidence reaches authenticated review and persisted reject
   await expect(page.getByRole('region', { name: /^이벤트 #.* 증거 상세$/ })).toHaveCount(1);
   await checkDesign(page, 'report-evidence-open');
   await page.getByRole('button', { name: /^이벤트 #.* 증거 접기$/ }).click();
-  await expect(page.getByText('contact_ambiguous', { exact: true }).first()).toBeVisible();
+  await expect(page.getByText('연락처 후보가 여러 개임', { exact: true }).first()).toBeVisible();
   await expect(page.getByRole('button', { name: '승인 및 발송', exact: true })).toHaveCount(0);
   await page.setViewportSize({ width: 390, height: 900 });
   await page.getByRole('combobox', { name: /^연락처 후보/ }).selectOption('second@example.test');

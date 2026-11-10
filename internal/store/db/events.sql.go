@@ -330,18 +330,20 @@ SELECT ingested_seq,detected_seq,
  (SELECT count(*) FROM cheesetrap.sensors WHERE state='degraded') AS sensors_degraded,
  (SELECT count(*) FROM cheesetrap.sensors WHERE state='unknown') AS sensors_unknown,
  (SELECT count(*) FROM cheesetrap.sensors WHERE state='disabled') AS sensors_disabled,
- (SELECT count(*) FROM cheesetrap.ingestion_gaps) AS sensors_with_gaps
+ (SELECT count(*) FROM cheesetrap.ingestion_gaps) AS sensors_with_gaps,
+ (SELECT count(DISTINCT sensor_id) FROM cheesetrap.collection_gap_incidents WHERE observed_through>=clock_timestamp()-interval '24 hours') AS sensors_recent_gaps
 FROM cheesetrap.processing_cursors WHERE singleton
 `
 
 type GetAPIOverviewRow struct {
-	IngestedSeq     int64
-	DetectedSeq     int64
-	SensorsActive   int64
-	SensorsDegraded int64
-	SensorsUnknown  int64
-	SensorsDisabled int64
-	SensorsWithGaps int64
+	IngestedSeq       int64
+	DetectedSeq       int64
+	SensorsActive     int64
+	SensorsDegraded   int64
+	SensorsUnknown    int64
+	SensorsDisabled   int64
+	SensorsWithGaps   int64
+	SensorsRecentGaps int64
 }
 
 func (q *Queries) GetAPIOverview(ctx context.Context) (GetAPIOverviewRow, error) {
@@ -355,6 +357,7 @@ func (q *Queries) GetAPIOverview(ctx context.Context) (GetAPIOverviewRow, error)
 		&i.SensorsUnknown,
 		&i.SensorsDisabled,
 		&i.SensorsWithGaps,
+		&i.SensorsRecentGaps,
 	)
 	return i, err
 }
@@ -982,15 +985,16 @@ func (q *Queries) SetCheckpoint(ctx context.Context, arg SetCheckpointParams) er
 }
 
 const updateCollectorState = `-- name: UpdateCollectorState :exec
-UPDATE cheesetrap.sensors SET last_observation_at=greatest(last_observation_at,$2::timestamptz), state=CASE WHEN EXISTS(SELECT 1 FROM cheesetrap.ingestion_gaps g WHERE g.sensor_id=$1) THEN 'degraded' ELSE 'active' END WHERE sensors.sensor_id=$1
+UPDATE cheesetrap.sensors SET last_observation_at=greatest(last_observation_at,$2::timestamptz), state=CASE WHEN $3::boolean THEN 'degraded' ELSE 'active' END WHERE sensors.sensor_id=$1
 `
 
 type UpdateCollectorStateParams struct {
-	SensorID pgtype.UUID
-	Column2  pgtype.Timestamptz
+	SensorID      pgtype.UUID
+	Column2       pgtype.Timestamptz
+	CollectionGap bool
 }
 
 func (q *Queries) UpdateCollectorState(ctx context.Context, arg UpdateCollectorStateParams) error {
-	_, err := q.db.Exec(ctx, updateCollectorState, arg.SensorID, arg.Column2)
+	_, err := q.db.Exec(ctx, updateCollectorState, arg.SensorID, arg.Column2, arg.CollectionGap)
 	return err
 }

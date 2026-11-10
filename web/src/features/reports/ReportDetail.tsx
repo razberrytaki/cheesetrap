@@ -1,3 +1,5 @@
+import { holdReasonLabel } from '../shared/gapLabels';
+import { CollectionGapNotice } from '../shared/CollectionGapNotice';
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   ApiClient,
@@ -444,7 +446,7 @@ function RevisionContent({
         {r.hold_reasons?.length ? (
           <ul className="flag-list">
             {r.hold_reasons.map((reason, i) => (
-              <li key={i}>{reason}</li>
+              <li key={i}>{holdReasonLabel(reason)}</li>
             ))}
           </ul>
         ) : (
@@ -528,6 +530,7 @@ function Evidence({
                     <h3>{e.service} / {e.event_type}</h3>
                     <p className="muted">{utcTime(e.observed_at)} (UTC) · 이벤트 #<span className="mono">{e.ingestion_seq}</span></p>
                     <p>품질: {e.quality_flags?.join(", ") || "표시 없음"}{e.is_test ? " · 테스트" : ""}</p>
+                    <CollectionGapNotice value={e.collection_gap} />
                     {e.entry_truncated && <p className="notice">증거 항목이 잘렸습니다.</p>}
                   </div>
                   <button className="quiet" aria-expanded={selected === e.event_id} aria-controls={`evidence-${e.event_id}`} aria-label={`이벤트 #${e.ingestion_seq} 증거 ${selected === e.event_id ? "접기" : "보기"}`} onClick={() => setSelected(selected === e.event_id ? null : e.event_id)}>{selected === e.event_id ? "접기" : "증거 보기"}</button>

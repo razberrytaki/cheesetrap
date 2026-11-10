@@ -22,11 +22,17 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type contextQueryCounter struct{ calls atomic.Int64 }
+type contextQueryCounter struct {
+	calls atomic.Int64
+	gaps  atomic.Int64
+}
 
 func (c *contextQueryCounter) TraceQueryStart(ctx context.Context, _ *pgx.Conn, data pgx.TraceQueryStartData) context.Context {
 	if strings.Contains(data.SQL, "-- name: ListDetectionContext :many") {
 		c.calls.Add(1)
+	}
+	if strings.Contains(data.SQL, "-- name: DetectionSensorGapIncidents :many") {
+		c.gaps.Add(1)
 	}
 	return ctx
 }
@@ -209,8 +215,8 @@ func TestDetectionCursor(t *testing.T) {
 			t.Fatal("retry skipped nonmatching sequence")
 		}
 	})
-	t.Run("persistent_gap_holds_new_results_without_mutating_past", func(t *testing.T) {
-		exec(collector, "INSERT INTO cheesetrap.ingestion_gaps(sensor_id,started_at,observed_through) VALUES($1,clock_timestamp(),clock_timestamp())", sensor)
+	t.Run("incident_holds_covered_events_without_mutating_past", func(t *testing.T) {
+		exec(collector, `INSERT INTO cheesetrap.collection_gap_incidents(sensor_id,started_at,observed_through,causes) VALUES($1,'2026-10-19 13:00+00','2026-10-19 13:00+00',$2)`, sensor, []string{string(domain.GapSourceChange)})
 		appendEvents(fixtureEvents(ruleFixture{Groups: []fixtureGroup{{Count: 1, Start: 420}}}))
 		process(100)
 		var eligible bool
@@ -522,6 +528,29 @@ func TestDetectionCursor(t *testing.T) {
 		}
 		if snapshot() != before || queryInt("SELECT detected_seq FROM cheesetrap.processing_cursors") != cursorBefore {
 			t.Fatal("retiring chunk retry changed committed proof")
+		}
+	})
+
+	t.Run("old_incident_does_not_flag_later_events", func(t *testing.T) {
+		exec(owner, `ALTER TABLE cheesetrap.detection_results DISABLE TRIGGER guard_evidence_root; UPDATE cheesetrap.detection_results SET evidence_state='active' WHERE evidence_state='retiring'; ALTER TABLE cheesetrap.detection_results ENABLE TRIGGER guard_evidence_root`)
+		process(1000)
+		late := fixtureEvents(ruleFixture{Groups: []fixtureGroup{{Count: 12, Start: 2400, Step: 1, IP: "198.51.100.99"}}})
+		at := time.Date(2026, 10, 19, 14, 0, 0, 0, time.UTC)
+		for i := range late {
+			late[i].IngestedAt = &at
+		}
+		appendEvents(late)
+		counter.gaps.Store(0)
+		process(1000)
+		if calls := counter.gaps.Load(); calls != 1 {
+			t.Fatalf("gap lookups=%d for one sensor batch", calls)
+		}
+		var reasons bool
+		if err := owner.QueryRow(ctx, `SELECT bool_or(explanation::text LIKE '%collection_gap%') FROM cheesetrap.detection_results WHERE source_ip='198.51.100.99'`).Scan(&reasons); err != nil {
+			t.Fatal(err)
+		}
+		if reasons {
+			t.Fatal("old incident flagged later events")
 		}
 	})
 

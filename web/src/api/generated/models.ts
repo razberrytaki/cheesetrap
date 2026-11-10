@@ -4,6 +4,13 @@
  * Cheesetrap private management API
  * OpenAPI spec version: 1.0.0
  */
+export interface CollectionGapIncident {
+  /** @minItems 1 */
+  causes: string[];
+  observed_through: string;
+  started_at: string;
+}
+
 export interface Config {
   /**
      * @minimum 2
@@ -250,6 +257,7 @@ export interface SensorStatus {
   gap_count: string;
   /** @nullable */
   last_engine_log_at: string | null;
+  last_gap: CollectionGapIncident | null;
   /** @nullable */
   last_observation_at: string | null;
   name: string;
@@ -285,6 +293,7 @@ export interface OverviewOutputBody {
   sensors_active: string;
   sensors_degraded: string;
   sensors_disabled: string;
+  sensors_recent_gaps: string;
   sensors_unknown: string;
   sensors_with_gaps: string;
 }

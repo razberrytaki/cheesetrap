@@ -10,8 +10,8 @@ WHERE e.source_ip=sqlc.arg(source_ip)::inet AND e.event_type=sqlc.arg(event_type
  AND e.observed_at>=sqlc.arg(window_start)::timestamptz AND e.observed_at<=sqlc.arg(window_end)::timestamptz
 ORDER BY e.observed_at,e.ingestion_seq;
 
--- name: DetectionSensorHasGap :one
-SELECT EXISTS(SELECT 1 FROM cheesetrap.ingestion_gaps WHERE sensor_id=$1) AS has_gap;
+-- name: DetectionSensorGapIncidents :many
+SELECT started_at,observed_through FROM cheesetrap.collection_gap_incidents WHERE sensor_id=$1 ORDER BY started_at;
 
 -- name: InsertDetectionResult :one
 INSERT INTO cheesetrap.detection_results(rule_id,rule_version,signature_id,signature_version,processing_event_id,processing_ingestion_seq,source_ip,window_start,window_end,evidence_hash,evidence_count,evidence_eligible,auto_approval_allowed,explanation,settings_version)

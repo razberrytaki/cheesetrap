@@ -382,7 +382,11 @@ dc start web collector
 After resumption, send authorized input and compare event counts, checkpoints,
 and generations. Verify that the DB checkpoint reaches the final complete
 JSONL line in the renamed file, with no duplicate or missing events.
-If raw files were lost or overwritten, retain the degraded or collection-gap state. An empty UI does not prove there were no past observations.
+If raw files were lost or overwritten, preserve the dated collection-gap history.
+Sensor state describes current health and returns to active after a successful
+commit without a pending gap. Drafts are held for collection gaps when an evidence
+sensor's incident overlaps the report window. An empty UI does not prove there
+were no past observations.
 
 ### Resume after reboot
 

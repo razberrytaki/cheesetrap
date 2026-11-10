@@ -79,8 +79,11 @@ SELECT e.* FROM cheesetrap.processing_events e JOIN evidence_ids ids USING(event
 WHERE NOT EXISTS(SELECT 1 FROM cheesetrap.report_evidence re WHERE re.event_id=e.event_id)
 ORDER BY e.ingestion_seq;
 
--- name: ReportEvidenceGaps :many
-SELECT * FROM cheesetrap.ingestion_gaps WHERE sensor_id=ANY(sqlc.arg(sensor_ids)::uuid[]);
+-- name: ReportEvidenceGap :one
+SELECT jsonb_build_object('started_at',min(started_at),'observed_through',max(observed_through),
+ 'incidents',jsonb_agg(jsonb_build_object('started_at',started_at,'observed_through',observed_through,'causes',causes) ORDER BY started_at,incident_id))::jsonb AS gap
+FROM cheesetrap.collection_gap_incidents WHERE sensor_id=sqlc.arg(sensor_id)::uuid
+ AND started_at<sqlc.arg(window_end)::timestamptz AND observed_through>=sqlc.arg(window_start)::timestamptz HAVING count(*)>0;
 
 -- name: CompleteReportWindow :exec
 INSERT INTO cheesetrap.report_window_completions(window_id) VALUES($1);

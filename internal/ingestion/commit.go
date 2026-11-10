@@ -13,10 +13,11 @@ import (
 	"strings"
 	"time"
 
-	"cheesetrap/internal/domain"
-	"cheesetrap/internal/store/db"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
+
+	"cheesetrap/internal/domain"
+	"cheesetrap/internal/store/db"
 )
 
 var (
@@ -191,6 +192,23 @@ func CommitBatch(ctx context.Context, conn transactionStarter, source Source, ba
 	}
 	if batch.Status.CollectionGap {
 		since := sensor.LastObservationAt.Time
+		var previous int64
+		if err := tx.QueryRow(ctx, `SELECT COALESCE((SELECT gap_count FROM cheesetrap.ingestion_gaps WHERE sensor_id=$1),0)`, source.SensorID).Scan(&previous); err != nil {
+			return commitError(ctx)
+		}
+		causes := batch.GapCauses
+		if len(causes) == 0 {
+			causes = []domain.GapCause{domain.GapSourceChange}
+		}
+		amount := max(batch.GapCountFloor-previous, 0)
+		for i, cause := range causes {
+			if _, err := tx.Exec(ctx, `SELECT cheesetrap.note_collection_gap($1,$2,$3,$4)`, source.SensorID, since, cause, amount); err != nil {
+				return commitError(ctx)
+			}
+			if i == 0 {
+				amount = 0
+			}
+		}
 		if err := q.MarkCollectionGap(ctx, db.MarkCollectionGapParams{SensorID: uuid(source.SensorID), Column2: timestamp(since)}); err != nil {
 			return commitError(ctx)
 		}
@@ -214,7 +232,7 @@ func CommitBatch(ctx context.Context, conn transactionStarter, source Source, ba
 		}
 		observation = timestamp(batch.ObservationStartedAt)
 	}
-	if err := q.UpdateCollectorState(ctx, db.UpdateCollectorStateParams{SensorID: uuid(source.SensorID), Column2: observation}); err != nil {
+	if err := q.UpdateCollectorState(ctx, db.UpdateCollectorStateParams{SensorID: uuid(source.SensorID), Column2: observation, CollectionGap: batch.Status.CollectionGap}); err != nil {
 		return commitError(ctx)
 	}
 	if len(records) > 0 {

@@ -50,15 +50,33 @@ func (q *Queries) CompleteDetectionEvent(ctx context.Context, arg CompleteDetect
 	return err
 }
 
-const detectionSensorHasGap = `-- name: DetectionSensorHasGap :one
-SELECT EXISTS(SELECT 1 FROM cheesetrap.ingestion_gaps WHERE sensor_id=$1) AS has_gap
+const detectionSensorGapIncidents = `-- name: DetectionSensorGapIncidents :many
+SELECT started_at,observed_through FROM cheesetrap.collection_gap_incidents WHERE sensor_id=$1 ORDER BY started_at
 `
 
-func (q *Queries) DetectionSensorHasGap(ctx context.Context, sensorID pgtype.UUID) (bool, error) {
-	row := q.db.QueryRow(ctx, detectionSensorHasGap, sensorID)
-	var has_gap bool
-	err := row.Scan(&has_gap)
-	return has_gap, err
+type DetectionSensorGapIncidentsRow struct {
+	StartedAt       pgtype.Timestamptz
+	ObservedThrough pgtype.Timestamptz
+}
+
+func (q *Queries) DetectionSensorGapIncidents(ctx context.Context, sensorID pgtype.UUID) ([]DetectionSensorGapIncidentsRow, error) {
+	rows, err := q.db.Query(ctx, detectionSensorGapIncidents, sensorID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []DetectionSensorGapIncidentsRow{}
+	for rows.Next() {
+		var i DetectionSensorGapIncidentsRow
+		if err := rows.Scan(&i.StartedAt, &i.ObservedThrough); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getDetectionIdentity = `-- name: GetDetectionIdentity :one

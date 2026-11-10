@@ -108,7 +108,7 @@ def restore(a):
     source = Path(a.backup).resolve()
     regular(source / 'manifest.json')
     manifest = json.loads((source / 'manifest.json').read_text())
-    if manifest['format'] != 1 or manifest['app_schema'] not in (14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30) or manifest['river_schema'] != 8 or manifest['river_module'] != 'v0.49.0' or manifest['postgres_image'] != IMAGE:
+    if manifest['format'] != 1 or manifest['app_schema'] not in (14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31) or manifest['river_schema'] != 8 or manifest['river_module'] != 'v0.49.0' or manifest['postgres_image'] != IMAGE:
         raise ValueError('backup_version_incompatible')
     allowed = {'database.dump'} | {'config/'+p for p in CONFIG}
     if 'database.dump' not in manifest['files'] or set(manifest['files']) - allowed:

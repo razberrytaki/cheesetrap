@@ -7,13 +7,17 @@ import (
 	"math"
 	"math/big"
 	"path/filepath"
+	"slices"
 	"time"
+
+	"cheesetrap/internal/domain"
+
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 
 	"cheesetrap/internal/observability"
 	"cheesetrap/internal/store"
 	"cheesetrap/internal/store/db"
-	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 var ErrCollectorOwned = errors.New("collector_already_running")
@@ -69,13 +73,7 @@ func runCollector(ctx context.Context, databaseURL, logRoot, sourcesFile string,
 	if !owned {
 		return ErrCollectorOwned
 	}
-	type reader struct {
-		source Source
-		tail   *Tailer
-		gap    bool
-		gaps   uint64
-	}
-	readers := make([]reader, 0, len(sources))
+	readers := make([]collectorReader, 0, len(sources))
 	defer func() {
 		for _, r := range readers {
 			_ = r.tail.Close()
@@ -98,14 +96,7 @@ func runCollector(ctx context.Context, databaseURL, logRoot, sourcesFile string,
 		if err != nil {
 			return ErrBatch
 		}
-		r := reader{source: s, tail: tail}
-		_, err = q.GetCollectionGap(ctx, uuid(s.SensorID))
-		if err == nil {
-			r.gap = true
-		} else if !errors.Is(err, pgx.ErrNoRows) {
-			tail.Close()
-			return commitError(ctx)
-		}
+		r := collectorReader{source: s, tail: tail}
 		readers = append(readers, r)
 	}
 	storagePaused := false
@@ -119,7 +110,9 @@ func runCollector(ctx context.Context, databaseURL, logRoot, sourcesFile string,
 			if e != nil {
 				return e
 			}
-			readers[i].gap = readers[i].gap || changed
+			if changed {
+				readers[i].noteGap(domain.GapRetentionCleanup)
+			}
 		}
 		paths := observability.ConfiguredPaths()
 		if len(paths) == 0 {
@@ -132,10 +125,10 @@ func runCollector(ctx context.Context, databaseURL, logRoot, sourcesFile string,
 		if restricted {
 			if !storagePaused {
 				for i := range readers {
-					if e := notePersistentGap(ctx, conn, readers[i].source.SensorID, 1); e != nil {
+					if e := notePersistentGap(ctx, conn, readers[i].source.SensorID, domain.GapStorageRestricted, 1); e != nil {
 						return e
 					}
-					readers[i].gap = true
+					readers[i].noteGap(domain.GapStorageRestricted)
 				}
 			}
 			storagePaused = true
@@ -166,14 +159,17 @@ func runCollector(ctx context.Context, databaseURL, logRoot, sourcesFile string,
 					return ErrBatch
 				}
 				batch.GapCountFloor = persisted + int64(delta)
+				r.noteGap(domain.GapSourceChange)
 			}
-			r.gap = r.gap || batch.Status.CollectionGap
 			delay := 250 * time.Millisecond
 			for {
 				batch.Status.CollectionGap = r.gap
+				batch.GapCauses = r.causes
 				err := CommitBatch(ctx, conn, r.source, batch)
 				if err == nil {
 					r.gaps = batch.Status.GapCount
+					r.gap = false
+					r.causes = nil
 					break
 				}
 				if ctx.Err() != nil {
@@ -182,7 +178,7 @@ func runCollector(ctx context.Context, databaseURL, logRoot, sourcesFile string,
 				if conn.IsClosed() || !errors.Is(err, ErrCommit) {
 					return err
 				}
-				r.gap = true
+				r.noteGap(domain.GapSourceChange)
 				if err := waitCollector(ctx, delay); err != nil {
 					return err
 				}
@@ -192,6 +188,21 @@ func runCollector(ctx context.Context, databaseURL, logRoot, sourcesFile string,
 		if err := waitCollector(ctx, 250*time.Millisecond); err != nil {
 			return err
 		}
+	}
+}
+
+type collectorReader struct {
+	source Source
+	tail   *Tailer
+	gap    bool
+	gaps   uint64
+	causes []domain.GapCause
+}
+
+func (r *collectorReader) noteGap(cause domain.GapCause) {
+	r.gap = true
+	if !slices.Contains(r.causes, cause) {
+		r.causes = append(r.causes, cause)
 	}
 }
 

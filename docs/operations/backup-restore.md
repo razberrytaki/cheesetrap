@@ -12,10 +12,10 @@ SMTP or sensors to a restore test.
 
 Use Python 3, a local Unix-socket Docker context, and administrative access to the
 source PostgreSQL container. The tool uses that image's `pg_dump`. The current
-locally verified combination is PostgreSQL 17.11, app schema 30, River module
+locally verified combination is PostgreSQL 17.11, app schema 31, River module
 v0.49.0, and River schema 8. Set `--app-version` to the running image's actual Git
 commit. The checkout HEAD need not match the deployed image. Restore accepts app
-schemas 14 to 30 and requires manifest and restored DB versions to match exactly.
+schemas 14 to 31 and requires manifest and restored DB versions to match exactly.
 Restoring an older schema does not replace migration before running the current binary.
 
 ### Prepare a shared administrative Bash session
@@ -72,7 +72,7 @@ sudo stat "$BACKUP_DIR/manifest.json"
 
 Only a new output directory is accepted. Directories use 0700 and files use 0600.
 The full custom-format DB dump includes settings, rules, engine registrations,
-queues, approvals, and legacy delivery history. The non-secret file allowlist
+queues, approvals, dated collection-gap incidents, cumulative gap counts, and legacy delivery history. The non-secret file allowlist
 contains `install.json`, `compose.env`, Cowrie config and userdb, OpenCanary config,
 the public certificate, and collector sources. These configs must not contain
 credentials. Review custom settings against this contract before backup.

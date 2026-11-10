@@ -16,6 +16,8 @@ import (
 	"time"
 
 	"cheesetrap/internal/auth"
+	"cheesetrap/internal/domain"
+	"cheesetrap/internal/observability"
 	"cheesetrap/internal/store"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"golang.org/x/crypto/argon2"
@@ -223,6 +225,50 @@ func TestEventsPaginationAndFilters(t *testing.T) {
 	if overview.Code != 200 || !strings.Contains(overview.Body.String(), "sensors_unknown") {
 		t.Fatal("overview missing sensor operation state")
 	}
+	t.Run("dated_gap_overview_and_status", func(t *testing.T) {
+		check := func(want string, cause domain.GapCause) {
+			t.Helper()
+			response := request(h, "GET", "/api/v1/overview", "", nil, cookies...)
+			var body map[string]json.RawMessage
+			if err := json.Unmarshal(response.Body.Bytes(), &body); err != nil {
+				t.Fatal(err)
+			}
+			if string(body["sensors_recent_gaps"]) != `"`+want+`"` {
+				t.Fatalf("recent sensor count %s, want %s", body["sensors_recent_gaps"], want)
+			}
+			var status observability.Status
+			if err := json.Unmarshal(body["operations"], &status); err != nil {
+				t.Fatal(err)
+			}
+			found := false
+			for _, s := range status.Sensors {
+				if s.Name != "api-fixture" {
+					continue
+				}
+				found = true
+				if cause == "" {
+					if s.LastGap != nil {
+						t.Fatal("sensor without incidents has last_gap")
+					}
+				} else if s.LastGap == nil || len(s.LastGap.Causes) != 1 || s.LastGap.Causes[0] != cause || s.LastGap.ObservedThrough.Before(s.LastGap.StartedAt) {
+					t.Fatalf("latest incident lost its range or cause: %+v", s.LastGap)
+				}
+			}
+			if !found {
+				t.Fatal("fixture sensor missing from overview")
+			}
+
+		}
+		check("0", "")
+		if _, err := migration.Exec(ctx, `INSERT INTO cheesetrap.collection_gap_incidents(sensor_id,started_at,observed_through,causes) VALUES($1,clock_timestamp()-interval '3 days',clock_timestamp()-interval '2 days',ARRAY['legacy'])`, sensor); err != nil {
+			t.Fatal(err)
+		}
+		check("0", domain.GapLegacy)
+		if _, err := migration.Exec(ctx, `INSERT INTO cheesetrap.collection_gap_incidents(sensor_id,started_at,observed_through,causes) SELECT $1,clock_timestamp()-interval '1 hour',clock_timestamp(),ARRAY['source_change'] FROM generate_series(1,2)`, sensor); err != nil {
+			t.Fatal(err)
+		}
+		check("1", domain.GapSourceChange)
+	})
 	get := func(path string) *httptest.ResponseRecorder { return request(h, "GET", path, "", nil, cookies...) }
 	w := get("/api/v1/events?event_type=api-fixture.test&detection_result=pending&limit=2")
 	if w.Code != 200 || !strings.Contains(w.Body.String(), `"detection_result":"pending"`) {

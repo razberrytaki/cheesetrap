@@ -60,6 +60,15 @@ type CheesetrapCheckpoint struct {
 	UpdatedAt        pgtype.Timestamptz
 }
 
+type CheesetrapCollectionGapIncident struct {
+	IncidentID      int64
+	SensorID        pgtype.UUID
+	StartedAt       pgtype.Timestamptz
+	ObservedThrough pgtype.Timestamptz
+	Causes          []string
+	GapCount        int64
+}
+
 type CheesetrapContactRefreshRequest struct {
 	RequestID        pgtype.UUID
 	ReportID         pgtype.UUID

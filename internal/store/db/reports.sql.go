@@ -478,33 +478,24 @@ func (q *Queries) RecordReportCandidate(ctx context.Context, arg RecordReportCan
 	return err
 }
 
-const reportEvidenceGaps = `-- name: ReportEvidenceGaps :many
-SELECT sensor_id, started_at, observed_through, gap_count FROM cheesetrap.ingestion_gaps WHERE sensor_id=ANY($1::uuid[])
+const reportEvidenceGap = `-- name: ReportEvidenceGap :one
+SELECT jsonb_build_object('started_at',min(started_at),'observed_through',max(observed_through),
+ 'incidents',jsonb_agg(jsonb_build_object('started_at',started_at,'observed_through',observed_through,'causes',causes) ORDER BY started_at,incident_id))::jsonb AS gap
+FROM cheesetrap.collection_gap_incidents WHERE sensor_id=$1::uuid
+ AND started_at<$2::timestamptz AND observed_through>=$3::timestamptz HAVING count(*)>0
 `
 
-func (q *Queries) ReportEvidenceGaps(ctx context.Context, sensorIds []pgtype.UUID) ([]CheesetrapIngestionGap, error) {
-	rows, err := q.db.Query(ctx, reportEvidenceGaps, sensorIds)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []CheesetrapIngestionGap{}
-	for rows.Next() {
-		var i CheesetrapIngestionGap
-		if err := rows.Scan(
-			&i.SensorID,
-			&i.StartedAt,
-			&i.ObservedThrough,
-			&i.GapCount,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+type ReportEvidenceGapParams struct {
+	SensorID    pgtype.UUID
+	WindowEnd   pgtype.Timestamptz
+	WindowStart pgtype.Timestamptz
+}
+
+func (q *Queries) ReportEvidenceGap(ctx context.Context, arg ReportEvidenceGapParams) ([]byte, error) {
+	row := q.db.QueryRow(ctx, reportEvidenceGap, arg.SensorID, arg.WindowEnd, arg.WindowStart)
+	var gap []byte
+	err := row.Scan(&gap)
+	return gap, err
 }
 
 const reportRevisionClock = `-- name: ReportRevisionClock :one

@@ -3,14 +3,15 @@ package reporting
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/netip"
 	"sort"
 	"strconv"
-	"time"
 
 	"cheesetrap/internal/domain"
 	"cheesetrap/internal/store/db"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -30,35 +31,16 @@ func collectEvidence(ctx context.Context, q *db.Queries, w db.CheesetrapReportWi
 	if err != nil {
 		return snapshot, err
 	}
-	sensorIDs := []pgtype.UUID{}
-	seen := map[pgtype.UUID]bool{}
-	for _, row := range rows {
-		if !seen[row.SensorID] {
-			seen[row.SensorID] = true
-			sensorIDs = append(sensorIDs, row.SensorID)
-		}
-	}
-	gaps, err := q.ReportEvidenceGaps(ctx, sensorIDs)
-	if err != nil {
-		return snapshot, err
-	}
-	bySensor := map[pgtype.UUID]json.RawMessage{}
-	for _, gap := range gaps {
-		data, err := json.Marshal(struct {
-			StartedAt       time.Time `json:"started_at"`
-			ObservedThrough time.Time `json:"observed_through"`
-		}{gap.StartedAt.Time.UTC(), gap.ObservedThrough.Time.UTC()})
-		if err != nil {
-			return snapshot, err
-		}
-		bySensor[gap.SensorID] = data
-	}
+	gapForSensor := reportGapLookup(ctx, q, w)
 	for _, row := range rows {
 		e, err := copyEvidence(db.CheesetrapEvent(row))
 		if err != nil {
 			return snapshot, err
 		}
-		e.CollectionGap = bySensor[row.SensorID]
+		e.CollectionGap, err = gapForSensor(row.SensorID)
+		if err != nil {
+			return snapshot, err
+		}
 		snapshot.Evidence = append(snapshot.Evidence, e)
 	}
 	sort.Slice(snapshot.Evidence, func(i, j int) bool { return snapshot.Evidence[i].IngestionSeq < snapshot.Evidence[j].IngestionSeq })
@@ -113,4 +95,19 @@ func copyEvidence(row db.CheesetrapEvent) (domain.ReportEvidence, error) {
 	e.FieldCompleteness = attributes.FieldCompleteness
 	e.Truncation = attributes.Truncation
 	return e, nil
+}
+
+func reportGapLookup(ctx context.Context, q *db.Queries, w db.CheesetrapReportWindow) func(pgtype.UUID) (json.RawMessage, error) {
+	cache := map[pgtype.UUID]json.RawMessage{}
+	return func(sensor pgtype.UUID) (json.RawMessage, error) {
+		if gap, ok := cache[sensor]; ok {
+			return gap, nil
+		}
+		gap, err := q.ReportEvidenceGap(ctx, db.ReportEvidenceGapParams{SensorID: sensor, WindowStart: w.StartAt, WindowEnd: w.EndAt})
+		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+			return nil, err
+		}
+		cache[sensor] = gap
+		return gap, nil
+	}
 }

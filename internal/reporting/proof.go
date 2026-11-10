@@ -196,6 +196,7 @@ func collectProof(ctx context.Context, q *db.Queries, w db.CheesetrapReportWindo
 	if err != nil {
 		return snapshot, err
 	}
+	gapForSensor := reportGapLookup(ctx, q, w)
 	err = q.VisitReportCandidateEvidence(ctx, db.ListReportCandidateEvidenceParams{WindowID: w.WindowID, SourceIp: netip.MustParseAddr(source)}, func(page []db.CheesetrapEvent) error {
 		copied := make([]domain.ReportEvidence, 0, len(page))
 		for _, row := range page {
@@ -203,14 +204,10 @@ func collectProof(ctx context.Context, q *db.Queries, w db.CheesetrapReportWindo
 			if err != nil {
 				return err
 			}
-			// Sensors are configuration identities, not arbitrary input. Query
-			// the gap beside each copied row without accumulating a global map.
-			var gap []byte
-			err = q.Queryer().QueryRow(ctx, `SELECT jsonb_build_object('started_at',started_at,'observed_through',observed_through) FROM cheesetrap.ingestion_gaps WHERE sensor_id=$1`, row.SensorID).Scan(&gap)
-			if err != nil && err != pgx.ErrNoRows {
+			e.CollectionGap, err = gapForSensor(row.SensorID)
+			if err != nil {
 				return err
 			}
-			e.CollectionGap = gap
 			copied = append(copied, e)
 			if !e.ObservedAt.IsZero() {
 				if snapshot.ObservedStart.IsZero() || e.ObservedAt.Before(snapshot.ObservedStart) {

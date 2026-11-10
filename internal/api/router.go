@@ -124,6 +124,10 @@ func newAPI(pool *pgxpool.Pool, origin string) (http.Handler, huma.API) {
 	s.registerReportCommands(a)
 	s.registerSettings(a)
 	s.registerContactRefresh(a)
+	// Huma's nullable tag supports scalars only; the wire value is an object or null.
+	schemas := a.OpenAPI().Components.Schemas.Map()
+	latestGap := schemas["SensorStatus"].Properties["last_gap"]
+	schemas["SensorStatus"].Properties["last_gap"] = &huma.Schema{AnyOf: []*huma.Schema{latestGap, {Type: "null"}}}
 	return r, a
 }
 

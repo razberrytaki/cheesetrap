@@ -16,7 +16,7 @@ export const overview: Overview = {
     lookup_failures: '0', report_states: {}, sensors: [],
     retention: { raw_days: 7, raw_bytes: "1073741824", event_days: 30, history_days: 180, job_days: 7 } },
   ingested_seq: '9007199254740993', detected_seq: '9007199254740992',
-  sensors_active: '2', sensors_degraded: '1', sensors_unknown: '3', sensors_disabled: '4', sensors_with_gaps: '1',
+  sensors_active: '2', sensors_degraded: '1', sensors_unknown: '3', sensors_disabled: '4', sensors_with_gaps: '1', sensors_recent_gaps: '1',
 };
 export const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 export function deferred<T>() {

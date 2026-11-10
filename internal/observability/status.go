@@ -2,10 +2,12 @@
 package observability
 
 import (
+	"cheesetrap/internal/domain"
 	"cheesetrap/internal/policy"
 	"cheesetrap/internal/retention"
 	"cheesetrap/internal/store"
 	"context"
+	"encoding/json"
 	"errors"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"strconv"
@@ -15,11 +17,12 @@ import (
 var ErrStatus = errors.New("operations_status_failed")
 
 type SensorStatus struct {
-	Name              string     `json:"name"`
-	CollectorState    string     `json:"collector_state"`
-	LastEngineLogAt   *time.Time `json:"last_engine_log_at"`
-	LastObservationAt *time.Time `json:"last_observation_at"`
-	GapCount          string     `json:"gap_count"`
+	LastGap           *domain.CollectionGapIncident `json:"last_gap"`
+	Name              string                        `json:"name"`
+	CollectorState    string                        `json:"collector_state"`
+	LastEngineLogAt   *time.Time                    `json:"last_engine_log_at"`
+	LastObservationAt *time.Time                    `json:"last_observation_at"`
+	GapCount          string                        `json:"gap_count"`
 }
 type Status struct {
 	StorageState          string            `json:"storage_state"`
@@ -62,15 +65,24 @@ func Read(ctx context.Context, pool *pgxpool.Pool, now time.Time) (Status, error
 		return s, ErrStatus
 	}
 	s.Retention = operational.Retention
-	rows, err := pool.Query(ctx, `SELECT name,state,last_engine_log_at,last_observation_at,COALESCE(g.gap_count,0)::text FROM cheesetrap.sensors s LEFT JOIN cheesetrap.ingestion_gaps g USING(sensor_id) ORDER BY name`)
+	rows, err := pool.Query(ctx, `SELECT name,state,last_engine_log_at,last_observation_at,COALESCE(g.gap_count,0)::text,
+ (SELECT jsonb_build_object('started_at',started_at,'observed_through',observed_through,'causes',causes) FROM cheesetrap.collection_gap_incidents i WHERE i.sensor_id=s.sensor_id ORDER BY observed_through DESC,incident_id DESC LIMIT 1)
+ FROM cheesetrap.sensors s LEFT JOIN cheesetrap.ingestion_gaps g USING(sensor_id) ORDER BY name`)
 	if err != nil {
 		return s, ErrStatus
 	}
 	for rows.Next() {
 		var v SensorStatus
-		if err = rows.Scan(&v.Name, &v.CollectorState, &v.LastEngineLogAt, &v.LastObservationAt, &v.GapCount); err != nil {
+		var gap []byte
+		if err = rows.Scan(&v.Name, &v.CollectorState, &v.LastEngineLogAt, &v.LastObservationAt, &v.GapCount, &gap); err != nil {
 			rows.Close()
 			return s, ErrStatus
+		}
+		if len(gap) > 0 {
+			if err = json.Unmarshal(gap, &v.LastGap); err != nil {
+				rows.Close()
+				return s, ErrStatus
+			}
 		}
 		s.Sensors = append(s.Sensors, v)
 	}

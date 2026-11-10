@@ -1,3 +1,4 @@
+import { holdReasonLabel } from '../shared/gapLabels';
 import { useState, type FormEvent } from "react";
 import { ApiClient, type ReportQuery, type Schema } from "../../api/client";
 import { useRead } from "../shared/useRead";
@@ -36,7 +37,7 @@ export function ReportRows({ items }: { items: Schema["ReportDraft"][] }) {
                 {r.state}
                 {r.hold_reasons?.map((reason, i) => (
                   <span className="event-type" key={i}>
-                    {reason}
+                    {holdReasonLabel(reason)}
                   </span>
                 ))}
               </td>

@@ -3,11 +3,11 @@
 Use pinned source, tools, and images from the [release procedure](release.md).
 Read the project MIT license and [third-party notices](../../THIRD_PARTY_NOTICES.md).
 
-The locally verified combination is PostgreSQL 17.11, app schema 30, River module
+The locally verified combination is PostgreSQL 17.11, app schema 31, River module
 v0.49.0, and River schema 8. Record these versions and the deployed image Git commit
 and digest. Check the new release's supported combination and schema compatibility,
 then pass an isolated restore with the same combination. `restore-check.sh` accepts
-app schemas 14 to 30 and requires the manifest to match the actual DB. Restoring
+app schemas 14 to 31 and requires the manifest to match the actual DB. Restoring
 an old schema does not replace migrations before starting the latest app.
 Unsupported combinations fail without a force-version bypass.
 
@@ -205,7 +205,7 @@ that also changes product names, follow the full identity-preservation procedure
    secrets into the new worker.
 3. Replace Compose configuration. Remove `deploy/smtp.compose.yaml`, SMTP test
    addresses, and `CHEESETRAP_SMTP_SECRET_FILE`. Inspect other overrides too.
-4. Apply forward migrations with the migration role. Check app schema 30 and River 8.
+4. Apply forward migrations with the migration role. Check app schema 31 and River 8.
 5. Recreate API and worker with the new binary only. Resume only previously running
    sensor and collector services after checking the installation manifest and host guard.
 
@@ -267,7 +267,7 @@ immutable revisions, or hashes. Sources and legacy and chunked reads remain.
 
 A shorter policy can affect preexisting data. Check purpose and backups before
 reducing values. Unchanged settings retain defaults. Replayed successful PATCH
-responses provide defaults for new fields. Restore recognizes schemas 14 to 30,
+responses provide defaults for new fields. Restore recognizes schemas 14 to 31,
 but current migrations are required before app use. Automatic downgrade is unsupported.
 Check migration duration separately for a large production DB.
 
@@ -278,7 +278,7 @@ actual legacy or chunk membership first, then reads linked references and detect
 Results, evidence sets, copies, revisions, retention history, and list snapshot
 semantics remain. Migration 26 is not edited. Use the standard stop, backup,
 migrate, and restore-check procedure. Ownership, permissions, function settings,
-resource limits, and timeouts remain. Restore accepts schema 14 to 30 manifests
+resource limits, and timeouts remain. Restore accepts schema 14 to 31 manifests
 and requires current migrations before app use. Downgrade is unsupported.
 
 ## Streamed evidence and contact provenance, schemas 28 to 30
@@ -296,3 +296,14 @@ progress. Shutdown cancellation and storage guards remain. See the
 and verification scope.
 
 Legacy SMTP environment variables prevent startup with `smtp_configuration_removed`.
+
+## Dated collection gaps, schema 31
+
+Migration 31 preserves the cumulative gap summaries and backfills one dated
+incident per summary with the legacy cause. Incidents retain their time ranges
+and causes permanently. Sensor state reflects current collection health and
+returns to active after a commit without a pending gap. New draft evidence
+includes only incidents overlapping its report window. Existing revisions and
+stored event quality flags stay unchanged. Raw-retention deletions remain possible
+gaps; keep the receipt format and monotonic counters. Use the standard stopped
+backup and forward-migration procedure. Restore accepts schema-31 manifests.

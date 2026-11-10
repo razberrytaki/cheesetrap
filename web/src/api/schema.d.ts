@@ -4,6 +4,7 @@ import type * as Orval from "./generated/models";
 
 export interface components {
   schemas: {
+    "CollectionGapIncident": Orval.CollectionGapIncident;
     "Config": Orval.Config;
     "CsrfOutputBody": Orval.CsrfOutputBody;
     "DetectionView": Orval.DetectionView;
