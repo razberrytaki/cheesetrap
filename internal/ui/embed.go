@@ -55,10 +55,42 @@ func Handler(onError func(http.ResponseWriter, *http.Request, int)) http.Handler
 			return
 		}
 		w.Header().Set("Content-Type", mime.TypeByExtension(path.Ext(name)))
-		w.Header().Set("X-Content-Type-Options", "nosniff")
-		w.Header().Set("Referrer-Policy", "no-referrer")
-		w.Header().Set("X-Frame-Options", "DENY")
-		w.Header().Set("Content-Security-Policy", "default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self'; font-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'")
+		setPageHeaders(w)
 		http.ServeContent(w, r, name, time.Time{}, bytes.NewReader(data))
 	})
+}
+
+func setPageHeaders(w http.ResponseWriter) {
+	w.Header().Set("X-Content-Type-Options", "nosniff")
+	w.Header().Set("Referrer-Policy", "no-referrer")
+	w.Header().Set("X-Frame-Options", "DENY")
+	w.Header().Set("Content-Security-Policy", "default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self'; font-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'")
+}
+
+// The page is static because a DNS-rebinding page can read this response, so
+// it must not reveal the configured origin.
+const addressGuidance = `<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>관리 화면 주소를 확인하세요 · cheesetrap</title>
+<main>
+<h1>관리 화면 주소를 확인하세요</h1>
+<p>cheesetrap 관리 화면은 설치할 때 설정한 관리 주소로만 열립니다.</p>
+<ul>
+<li>SSH 터널을 쓴다면 주소창에 <code>http://127.0.0.1:8080</code>을 직접 입력하세요. <code>localhost</code>나 다른 로컬 포트로는 열리지 않습니다.</li>
+<li>HTTPS 프록시를 쓴다면 설정한 <code>api_origin</code> 주소로 여세요.</li>
+<li>다른 사이트의 링크로는 열리지 않습니다. 주소를 직접 입력하거나 북마크를 쓰세요.</li>
+</ul>
+</main>
+</html>
+`
+
+// WriteAddressGuidance answers a rejected page navigation with instructions
+// instead of the API error envelope.
+func WriteAddressGuidance(w http.ResponseWriter) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	setPageHeaders(w)
+	w.WriteHeader(http.StatusForbidden)
+	_, _ = w.Write([]byte(addressGuidance))
 }
